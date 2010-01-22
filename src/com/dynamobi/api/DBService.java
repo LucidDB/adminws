@@ -17,21 +17,24 @@ import com.dynamobi.util.AppException;
  * @since Jan-12-2010
  */
 
-public interface DBService {
+public interface DBService
+{
 
-    
     @GET
-    public List<Table> readTablesInfo() throws AppException;
-       
-	@Path("/{schema}")
-	@GET
-	public List<Table> readTablesInfo(@PathParam("schema")
-	String schemaName) throws AppException;
+    public List<Table> readTablesInfo()
+        throws AppException;
 
-	@Path("/{tableName}/{schemaName}")
-	@GET
-	public List<Column> readColumnNamesFromTable(@PathParam("tableName")
-	String tableName, @PathParam("schemaName")
-	String schemaName) throws AppException;
+    @Path("/{schema}")
+    @GET
+    public List<Table> readTablesInfoBySchema(@PathParam("schema")
+    String schemaName)
+        throws AppException;
+
+    @Path("/{tableName}/{schemaName}")
+    @GET
+    public List<Column> readColumnNamesFromTable(@PathParam("tableName")
+    String tableName, @PathParam("schemaName")
+    String schemaName)
+        throws AppException;
 
 }

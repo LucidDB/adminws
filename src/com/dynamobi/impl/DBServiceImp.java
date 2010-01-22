@@ -32,7 +32,7 @@ public class DBServiceImp
 
     }
 
-    public List<Table> readTablesInfo(String schemaName)
+    public List<Table> readTablesInfoBySchema(String schemaName)
         throws AppException
     {
 

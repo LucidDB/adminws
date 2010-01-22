@@ -5,8 +5,10 @@
 
   <!--The ${enunciate.home} property should point to the Enunciate home distribution directory. -->
   <property name="enunciate.home" value="${basedir}"/>
-
-  <target name="enunciate">
+  <target name="clean">
+  	<delete dir="${basedir}/target"></delete>
+  </target>
+  <target name="enunciate" depends="clean">
     <path id="enunciate.classpath">
       <fileset dir="${enunciate.home}/lib">
         <include name="*.jar"/>
@@ -20,10 +22,13 @@
 
     <mkdir dir="target"/>
     <enunciate dir="${basedir}/src"
-      configFile="${basedir}/src/enunciate.xml">
+      configFile="${basedir}/src/enunciate.xml" 
+    	buildDir="${basedir}/target/build"
+    	generateDir="${basedir}/target/generate"
+    	packageDir="${basedir}/target/package"
+  		compileDir="${basedir}/target/compile">
       <include name="**/*.java"/>
       <classpath refid="enunciate.classpath"/>
-
       <export artifactId="war.file" destination="target/dynamobi.war"/>
       <export artifactId="jaxws.client.library.binaries" destination="target/dynamobi-client.jar"/>
     </enunciate>

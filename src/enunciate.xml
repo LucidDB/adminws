@@ -17,4 +17,7 @@
       <download name="License" file="LICENSE.txt" description="The license file governing the use of this API."/>
     </docs>
   </modules>
+  <webapp>
+  	<resources dir="${basedir}/src" pattern="*.properties" />
+  </webapp>
 </enunciate>
