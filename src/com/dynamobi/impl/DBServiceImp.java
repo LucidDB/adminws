@@ -2,6 +2,7 @@ package com.dynamobi.impl;
 
 import java.util.List;
 
+import javax.jws.WebService;
 import javax.ws.rs.Path;
 
 import com.dynamobi.api.DBService;
@@ -18,6 +19,9 @@ import com.dynamobi.util.DBAccess;
  */
 
 @Path("/TableService")
+@WebService (
+    endpointInterface = "com.dynamobi.api.DBService"
+  )
 public class DBServiceImp
     implements DBService
 {

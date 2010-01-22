@@ -2,6 +2,7 @@ package com.dynamobi.api;
 
 import java.util.List;
 
+import javax.jws.WebService;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -16,7 +17,7 @@ import com.dynamobi.util.AppException;
  * @author Ray Zhang
  * @since Jan-12-2010
  */
-
+@WebService
 public interface DBService
 {
 
