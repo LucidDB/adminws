@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<enunciate label="dynamobi"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.17.xsd">
+  <deployment host="www.dynamobi.com" context="api"/>
+  <namespaces>
+    <namespace id="api" uri="http://api.dynamobi.com/"/>
+    <namespace id="table" uri="http://api.dynamobi.com/table"/>
+  </namespaces>
+  <modules>
+    <xfire-client>
+      <package-conversions>
+        <convert from="com.dynamobi" to="com.dynamobi.client"/>
+      </package-conversions>
+    </xfire-client>
+    <docs splashPackage="com.dynamobi.api" title="DynamoBI's API" copyright="DynamoBI Inc.">
+      <download name="License" file="LICENSE.txt" description="The license file governing the use of this API."/>
+    </docs>
+  </modules>
+</enunciate>
