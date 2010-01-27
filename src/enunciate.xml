@@ -3,10 +3,6 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.17.xsd">
   <deployment host="www.dynamobi.com" context="api"/>
-  <namespaces>
-    <namespace id="api" uri="http://api.dynamobi.com/"/>
-    <namespace id="table" uri="http://api.dynamobi.com/table"/>
-  </namespaces>
   <modules>
     <xfire-client>
       <package-conversions>

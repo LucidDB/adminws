@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Properties;
 
 import com.dynamobi.domain.Column;
+import com.dynamobi.domain.Counter;
+import com.dynamobi.domain.SystemParameter;
 import com.dynamobi.domain.Table;
 
 /**
@@ -267,6 +269,354 @@ public class DBAccess
         return retVal;
 
     }
+    
+    public static SystemParameter findSystemParameterByName(String paramName) throws AppException{
+        
+        
+        SystemParameter retVal = new SystemParameter();
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+
+            conn = getConnenction();
+
+            ps = conn.prepareStatement("select param_name, param_value from sys_root.dba_system_parameters where param_name = ?");
+            ps.setString(1, paramName);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                retVal.setParamName(rs.getString(1));
+                retVal.setParamValue(rs.getString(2));
+                break;
+
+            }
+
+        } catch (ClassNotFoundException e) {
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found JDBC driver!");
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: The connection was bad or Execute sql statment failed!");
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found jdbc.properties!");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: failed to parse jdbc.properties!");
+        } finally {
+
+            try {
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+
+            } catch (SQLException ex) {
+
+                throw new AppException("Error Info: Release db resouce failed");
+
+            }
+
+        }
+
+        return retVal;
+        
+    }
+    
+    
+    public static List<SystemParameter> getAllSystemParameters() throws AppException{
+        
+        
+        List<SystemParameter> retVal = new ArrayList<SystemParameter>();
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+
+            conn = getConnenction();
+
+            ps = conn.prepareStatement("select param_name, param_value from sys_root.dba_system_parameters");
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                
+                SystemParameter en = new SystemParameter();
+                en.setParamName(rs.getString(1));
+                en.setParamValue(rs.getString(2));
+                retVal.add(en);
+
+            }
+
+        } catch (ClassNotFoundException e) {
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found JDBC driver!");
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: The connection was bad or Execute sql statment failed!");
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found jdbc.properties!");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: failed to parse jdbc.properties!");
+        } finally {
+
+            try {
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+
+            } catch (SQLException ex) {
+
+                throw new AppException("Error Info: Release db resouce failed");
+
+            }
+
+        }
+
+        return retVal;
+        
+    }
+
+    
+    
+    public static boolean updateSystemParameter(String paramName, String paramValue) throws AppException{
+        
+        
+        boolean retVal = false;
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+
+        try {
+
+            conn = getConnenction();
+            String sql = "alter system set \""+ paramName +"\" = '"+paramValue+"'";
+            System.out.println(sql);
+            ps = conn.prepareStatement(sql);
+            ps.execute();
+            
+            retVal = true;
+
+        } catch (ClassNotFoundException e) {
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found JDBC driver!");
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: The connection was bad or Execute sql statment failed!");
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found jdbc.properties!");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: failed to parse jdbc.properties!");
+        } finally {
+
+            try {
+
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+
+            } catch (SQLException ex) {
+
+                throw new AppException("Error Info: Release db resouce failed");
+
+            }
+
+        }
+
+        return retVal;
+        
+    }
+    
+   public static List<Counter> getAllPerformanceCounters() throws AppException{
+        
+        
+        List<Counter> retVal = new ArrayList<Counter>();
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+
+            conn = getConnenction();
+
+            ps = conn.prepareStatement("select source_name, counter_name, counter_units, counter_value  from SYS_ROOT.DBA_PERFORMANCE_COUNTERS");
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                
+                Counter en = new Counter();
+                en.setSourceName(rs.getString(1));
+                en.setCounterName(rs.getString(2));
+                en.setCounterUnits(rs.getString(3));
+                en.setCounterValue(rs.getString(4));
+                retVal.add(en);
+
+            }
+
+        } catch (ClassNotFoundException e) {
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found JDBC driver!");
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: The connection was bad or Execute sql statment failed!");
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found jdbc.properties!");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: failed to parse jdbc.properties!");
+        } finally {
+
+            try {
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+
+            } catch (SQLException ex) {
+
+                throw new AppException("Error Info: Release db resouce failed");
+
+            }
+
+        }
+
+        return retVal;
+        
+    }
+   
+   public static Counter findPerformanceCounterByName(String counterName) throws AppException{
+       
+       
+       Counter retVal = new Counter();
+
+       Connection conn = null;
+       PreparedStatement ps = null;
+       ResultSet rs = null;
+
+       try {
+
+           conn = getConnenction();
+
+           ps = conn.prepareStatement("select source_name, counter_name, counter_units, counter_value  from SYS_ROOT.DBA_PERFORMANCE_COUNTERS where counter_name = ?");
+           ps.setString(1, counterName);
+           rs = ps.executeQuery();
+
+           while (rs.next()) {
+               
+               retVal.setSourceName(rs.getString(1));
+               retVal.setCounterName(rs.getString(2));
+               retVal.setCounterUnits(rs.getString(3));
+               retVal.setCounterValue(rs.getString(4));
+               break;
+           }
+
+       } catch (ClassNotFoundException e) {
+
+           e.printStackTrace();
+           throw new AppException("Error Info: Not found JDBC driver!");
+       } catch (SQLException e) {
+
+           e.printStackTrace();
+           throw new AppException(
+               "Error Info: The connection was bad or Execute sql statment failed!");
+       } catch (FileNotFoundException e) {
+           // TODO Auto-generated catch block
+
+           e.printStackTrace();
+           throw new AppException("Error Info: Not found jdbc.properties!");
+       } catch (IOException e) {
+           // TODO Auto-generated catch block
+           e.printStackTrace();
+           throw new AppException(
+               "Error Info: failed to parse jdbc.properties!");
+       } finally {
+
+           try {
+
+               if (rs != null) {
+                   rs.close();
+               }
+               if (ps != null) {
+                   ps.close();
+               }
+               if (conn != null) {
+                   conn.close();
+               }
+
+           } catch (SQLException ex) {
+
+               throw new AppException("Error Info: Release db resouce failed");
+
+           }
+
+       }
+
+       return retVal;
+       
+   }
+
+
 
     public static void main(String[] args)
     {
@@ -278,6 +628,14 @@ public class DBAccess
                 System.out.println(te.getCatalogName() + "."
                     + te.getSchemaName() + "." + te.getTableName());
             }
+            
+            SystemParameter en = DBAccess.findSystemParameterByName("javaCompilerClassName");
+            DBAccess.updateSystemParameter("fennelDisabled", "false");
+            System.out.println(en.getParamName()+":"+en.getParamValue());
+            
+            Counter co = DBAccess.findPerformanceCounterByName("JvmMemoryUnused");
+            
+            System.out.println(co.getSourceName()+":"+co.getCounterName()+":"+co.getCounterUnits()+":"+co.getCounterValue());
         } catch (AppException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
