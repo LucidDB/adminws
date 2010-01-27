@@ -3,7 +3,10 @@
  */
 package com.dynamobi.domain;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 /**
  * VO: It holds the table information.
@@ -11,15 +14,20 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Ray Zhang
  * @since Jan-11-2010
  */
+@XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement
 public class Table
 {
 
+	@XmlAttribute(name = "name")
     private String tableName;
 
+	@XmlAttribute(name = "schema")
     private String schemaName;
 
+	@XmlAttribute(name = "catalog")
     private String catalogName;
+
 
     public String getCatalogName()
     {
