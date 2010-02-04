@@ -14,49 +14,20 @@ import javax.xml.bind.annotation.XmlAccessorType;
  * @author Ray Zhang
  * @since Jan-11-2010
  */
-@XmlAccessorType(XmlAccessType.NONE)
+@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 @XmlRootElement
 public class Table
 {
+	@XmlAttribute
+	public String uuid;
+	
+	@XmlAttribute
+    public String name;
 
-	@XmlAttribute(name = "name")
-    private String tableName;
+	@XmlAttribute
+    public String schema;
 
-	@XmlAttribute(name = "schema")
-    private String schemaName;
-
-	@XmlAttribute(name = "catalog")
-    private String catalogName;
-
-
-    public String getCatalogName()
-    {
-        return catalogName;
-    }
-
-    public void setCatalogName(String catalogName)
-    {
-        this.catalogName = catalogName;
-    }
-
-    public String getSchemaName()
-    {
-        return schemaName;
-    }
-
-    public void setSchemaName(String schemaName)
-    {
-        this.schemaName = schemaName;
-    }
-
-    public String getTableName()
-    {
-        return tableName;
-    }
-
-    public void setTableName(String tableName)
-    {
-        this.tableName = tableName;
-    }
+	@XmlAttribute
+    public String catalog;
 
 }

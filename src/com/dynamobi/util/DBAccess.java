@@ -69,9 +69,9 @@ public class DBAccess
 
                 Table en = new Table();
                 int c = 1;
-                en.setTableName(rs.getString(c++));
-                en.setSchemaName(rs.getString(c++));
-                en.setCatalogName(rs.getString(c++));
+                en.name = rs.getString(c++);
+                en.schema = rs.getString(c++);
+                en.catalog = rs.getString(c++);
                 retVal.add(en);
 
             }
@@ -136,7 +136,12 @@ public class DBAccess
 
             conn = getConnenction();
 
-            ps = conn.prepareStatement("select table_name, schema_name,catalog_name from sys_root.dba_tables where schema_name=?");
+            StringBuffer sb = new StringBuffer();
+            sb.append("select table_name, schema_name,catalog_name, lineage_id from sys_root.dba_tables where ");
+            sb.append(" TABLE_TYPE = 'LOCAL TABLE'");
+            sb.append(" AND schema_name = ?");
+            
+            ps = conn.prepareStatement(sb.toString());
             ps.setString(1, schemaName);
             rs = ps.executeQuery();
 
@@ -144,9 +149,10 @@ public class DBAccess
 
                 Table en = new Table();
                 int c = 1;
-                en.setTableName(rs.getString(c++));
-                en.setSchemaName(rs.getString(c++));
-                en.setCatalogName(rs.getString(c++));
+                en.name = rs.getString(c++);
+                en.schema = rs.getString(c++);
+                en.catalog = rs.getString(c++);
+                en.uuid = rs.getString(c++);
                 retVal.add(en);
 
             }
@@ -813,8 +819,8 @@ public class DBAccess
             List<Table> list = DBAccess.getTableInfo("RAY");
             for (Table te : list) {
 
-                System.out.println(te.getCatalogName() + "."
-                    + te.getSchemaName() + "." + te.getTableName());
+                System.out.println(te.catalog + "."
+                    + te.schema + "." + te.name);
             }
             
             SystemParameter en = DBAccess.findSystemParameterByName("javaCompilerClassName");
