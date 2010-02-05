@@ -4,11 +4,14 @@
            xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.17.xsd">
   <!-- <deployment host="www.dynamobi.com" context="api"/> -->
   <modules>
-    <xfire-client>
-      <package-conversions>
-        <convert from="com.dynamobi" to="com.dynamobi.client"/>
-      </package-conversions>
-    </xfire-client>
+    <xfire-client disabled="true"/>
+    <amf disabled="true"/>
+    <c disabled="true"/>
+    <gwt disabled="true"/>
+    <jaxws-client disabled="true"/>
+    <obj-c disabled="true"/>
+<!--    <jaxws-ri disabled="true"/>-->
+    <!--  <jersey disabled="true"/>   -->
     <docs splashPackage="com.dynamobi.api" title="DynamoBI's API" copyright="DynamoBI Inc.">
       <download name="License" file="LICENSE.txt" description="The license file governing the use of this API."/>
     </docs>

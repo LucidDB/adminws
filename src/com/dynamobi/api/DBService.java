@@ -9,6 +9,7 @@ import javax.ws.rs.PathParam;
 
 import com.dynamobi.domain.Column;
 import com.dynamobi.domain.Table;
+import com.dynamobi.domain.TableDetails;
 import com.dynamobi.util.AppException;
 
 /**
@@ -31,11 +32,9 @@ public interface DBService
     String schemaName)
         throws AppException;
 
-    @Path("/{tableName}/{schemaName}")
+    @Path("/{schema}/{table}")
     @GET
-    public List<Column> readColumnNamesFromTable(@PathParam("tableName")
-    String tableName, @PathParam("schemaName")
-    String schemaName)
-        throws AppException;
+    public TableDetails getTableDetails(@PathParam("schema")String schema,
+    		@PathParam("table") String table) throws AppException;
 
 }

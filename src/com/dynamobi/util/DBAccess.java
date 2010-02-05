@@ -1,6 +1,5 @@
 package com.dynamobi.util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,6 +15,8 @@ import com.dynamobi.domain.ColumnStats;
 import com.dynamobi.domain.Counter;
 import com.dynamobi.domain.SystemParameter;
 import com.dynamobi.domain.Table;
+import com.dynamobi.domain.TableDetails;
+import java.io.FileNotFoundException;
 
 /**
  * Get Tables' info from database
@@ -809,6 +810,95 @@ public class DBAccess
        return retVal;
        
    }
+   
+   public static TableDetails getTableDetails(String schema, String table)
+   throws AppException
+{
+
+   TableDetails retVal = new TableDetails();
+
+   Connection conn = null;
+   PreparedStatement ps = null;
+   ResultSet rs = null;
+
+   try {
+
+       conn = getConnenction();
+
+       StringBuffer sb = new StringBuffer();
+       
+       sb.append("select dst.table_name,dst.schema_name,dst.catalog_name,dt.lineage_id");
+       sb.append(" ,dst.creation_timestamp,dst.last_analyze_row_count,dst.last_analyze_timestamp,dst.current_row_count,dst.deleted_row_count,dt.table_type");
+       sb.append(" from sys_boot.mgmt.dba_stored_tables_internal1 dst join sys_root.dba_tables dt on dst.\"lineageId\" = dt.lineage_id");
+       sb.append(" where dt.schema_name = ? and dt.table_name = ?");
+
+       
+       ps = conn.prepareStatement(sb.toString());
+       ps.setString(1, schema);
+       ps.setString(2, table);
+       rs = ps.executeQuery();
+
+       while (rs.next()) {
+
+           int c = 1;
+           retVal.name = rs.getString(c++);
+           retVal.schema = rs.getString(c++);
+           retVal.catalog= rs.getString(c++);
+           retVal.uuid = rs.getString(c++);
+           retVal.create_time = rs.getDate(c++);
+           retVal.last_analyze_row_count = rs.getInt(c++);
+           retVal.last_analyze_timestamp = rs.getDate(c++);
+           retVal.current_row_count = rs.getInt(c++);
+           retVal.deleted_row_count = rs.getInt(c++);
+           retVal.table_type = rs.getString(c++);           
+
+       }
+
+   } catch (ClassNotFoundException e) {
+
+       e.printStackTrace();
+       throw new AppException("Error Info: Not found JDBC Driver Class!");
+
+   } catch (SQLException e) {
+
+       e.printStackTrace();
+       throw new AppException(
+           "Error Info: The connection was bad or Execute sql statment failed!");
+   } catch (FileNotFoundException e) {
+       // TODO Auto-generated catch block
+
+       e.printStackTrace();
+       throw new AppException("Error Info: Not found jdbc.properties!");
+   } catch (IOException e) {
+       // TODO Auto-generated catch block
+       e.printStackTrace();
+       throw new AppException(
+           "Error Info: failed to parse jdbc.properties!");
+   } finally {
+
+       try {
+
+           if (rs != null) {
+               rs.close();
+           }
+           if (ps != null) {
+               ps.close();
+           }
+           if (conn != null) {
+               conn.close();
+           }
+
+       } catch (SQLException ex) {
+
+           throw new AppException("Error Info: Release db resouce failed");
+
+       }
+
+   }
+
+   return retVal;
+
+}
 
 
 

@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import com.dynamobi.api.DBService;
 import com.dynamobi.domain.Column;
 import com.dynamobi.domain.Table;
+import com.dynamobi.domain.TableDetails;
 import com.dynamobi.util.AppException;
 import com.dynamobi.util.DBAccess;
 
@@ -17,8 +18,7 @@ import com.dynamobi.util.DBAccess;
  * @author Ray Zhang
  * @since Jan-12-2010
  */
-
-@Path("/TableService")
+@Path("/tables")
 @WebService (
     endpointInterface = "com.dynamobi.api.DBService"
   )
@@ -58,6 +58,14 @@ public class DBServiceImp
 
         return ret;
 
+    }
+    
+    public TableDetails getTableDetails(String schema, String table) 
+    throws AppException
+    {
+    	TableDetails ret = DBAccess.getTableDetails(schema, table);
+    	
+    	return ret;
     }
 
 }
