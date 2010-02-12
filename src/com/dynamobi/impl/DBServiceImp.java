@@ -1,14 +1,18 @@
 package com.dynamobi.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jws.WebService;
 import javax.ws.rs.Path;
 
 import com.dynamobi.api.DBService;
+import com.dynamobi.domain.Catalog;
 import com.dynamobi.domain.Column;
+import com.dynamobi.domain.Schema;
 import com.dynamobi.domain.Table;
 import com.dynamobi.domain.TableDetails;
+import com.dynamobi.domain.TablesInfo;
 import com.dynamobi.util.AppException;
 import com.dynamobi.util.DBAccess;
 
@@ -26,13 +30,16 @@ public class DBServiceImp
     implements DBService
 {
 
-    public List<Table> readTablesInfo()
+    public TablesInfo readTablesInfo()
         throws AppException
     {
 
-        List<Table> ret = DBAccess.getTableInfo();
+    	
+    	return DBAccess.getTablesInfo();
 
-        return ret;
+        //List<Table> ret = DBAccess.getTableInfo();
+
+        //return ret;
 
     }
 

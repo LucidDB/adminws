@@ -7,9 +7,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-import com.dynamobi.domain.Column;
 import com.dynamobi.domain.Table;
 import com.dynamobi.domain.TableDetails;
+import com.dynamobi.domain.TablesInfo;
 import com.dynamobi.util.AppException;
 
 /**
@@ -23,7 +23,7 @@ public interface DBService
 {
 
     @GET
-    public List<Table> readTablesInfo()
+    public TablesInfo readTablesInfo()
         throws AppException;
 
     @Path("/{schema}")

@@ -1,26 +1,31 @@
 package com.dynamobi.domain;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Date;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /**
- * VO: It holds the column name information.
+ * VO: It holds the column information.
  * 
- * @author Ray Zhang
+ * @author rzhang, ngoodman
  * @since Jan-15-2010
  */
-@XmlRootElement
+@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 public class Column
 {
-    private String columnName;
-
-    public String getColumnName()
-    {
-        return columnName;
-    }
-
-    public void setColumnName(String columnName)
-    {
-        this.columnName = columnName;
-    }
+	@XmlAttribute public String name;
+	@XmlAttribute public String uuid;
+	@XmlAttribute public Integer ordinal_position;
+	@XmlAttribute public String datatype;
+	@XmlAttribute public Integer precision;
+	@XmlAttribute public Integer dec_digits;
+	@XmlAttribute public Boolean is_nullable;
+	@XmlAttribute public String remarks;
+	@XmlAttribute public Integer distinct_value_count;
+	@XmlAttribute public Boolean distinct_value_count_estimated;
+	@XmlAttribute public Date last_analyze_time;
+	
 
 }

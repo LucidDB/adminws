@@ -7,15 +7,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import com.dynamobi.domain.Catalog;
 import com.dynamobi.domain.Column;
 import com.dynamobi.domain.ColumnStats;
 import com.dynamobi.domain.Counter;
+import com.dynamobi.domain.Schema;
 import com.dynamobi.domain.SystemParameter;
 import com.dynamobi.domain.Table;
 import com.dynamobi.domain.TableDetails;
+import com.dynamobi.domain.TablesInfo;
+
 import java.io.FileNotFoundException;
 
 /**
@@ -49,33 +54,74 @@ public class DBAccess
 
     }
 
-    public static List<Table> getTableInfo()
+    public static TablesInfo getTablesInfo()
         throws AppException
     {
 
-        List<Table> retVal = new ArrayList<Table>();
-
-        Connection conn = null;
+    
+    	  Connection conn = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
+        ResultSet rs_cat = null;
+        ResultSet rs_table = null;
+        ResultSet rs_schema = null;
+        TablesInfo ti = new TablesInfo();
 
         try {
-
+        	
+       
             conn = getConnenction();
 
-            ps = conn.prepareStatement("select table_name, schema_name,catalog_name from sys_root.dba_tables");
-            rs = ps.executeQuery();
+            ps = conn.prepareStatement("select distinct catalog_name, catalog_name from sys_root.dba_schemas");
+            rs_cat = ps.executeQuery();
 
-            while (rs.next()) {
-
-                Table en = new Table();
-                int c = 1;
-                en.name = rs.getString(c++);
-                en.schema = rs.getString(c++);
-                en.catalog = rs.getString(c++);
-                retVal.add(en);
-
+           
+            
+            while (rs_cat.next()) {
+            	
+            	if ( ti.catalog == null ) {
+                    ti.catalog = new ArrayList<Catalog>();
+            	}
+            	
+            	Catalog c = new Catalog();
+            	c.name = rs_cat.getString(1);
+            	c.uuid = rs_cat.getString(2);
+            	ti.catalog.add(c);
+            	
+            	
+            	ps = conn.prepareStatement("select schema_name, lineage_id from sys_root.dba_schemas where catalog_name = ?");
+            	ps.setString(1, c.name);
+            	rs_schema = ps.executeQuery();
+            	while (rs_schema.next()) {
+            		
+            		if ( c.schema == null ) {
+                    	c.schema = new ArrayList<Schema>();
+            		}
+            		
+            		Schema s = new Schema();
+            		s.name = rs_schema.getString(1);
+            		s.uuid = rs_schema.getString(2);
+            		c.schema.add(s);
+            		
+            		
+                	ps = conn.prepareStatement("select table_name, lineage_id from sys_root.dba_tables where catalog_name = ? and schema_name = ? and table_type = 'LOCAL TABLE'");
+                	ps.setString(1, c.name);
+                	ps.setString(2, s.name);
+                	rs_table = ps.executeQuery();
+                	while (rs_table.next()) {
+            		
+                		if ( s.tables == null ) {
+                			s.tables = new ArrayList<Table> ();
+                		}
+                		Table t = new Table();
+                		t.name = rs_table.getString(1);
+                		t.uuid = rs_table.getString(2);
+                		s.tables.add(t);
+                	}
+            		
+            	}
             }
+            
+
 
         } catch (ClassNotFoundException e) {
 
@@ -101,11 +147,14 @@ public class DBAccess
 
             try {
 
-                if (rs != null) {
-                    rs.close();
+                if (rs_table != null) {
+                    rs_table.close();
                 }
-                if (ps != null) {
-                    ps.close();
+                if (rs_schema != null) {
+                    rs_schema.close();
+                }
+                if (rs_cat != null) {
+                    rs_cat.close();
                 }
                 if (conn != null) {
                     conn.close();
@@ -119,7 +168,7 @@ public class DBAccess
 
         }
 
-        return retVal;
+        return ti;
 
     }
 
@@ -228,7 +277,7 @@ public class DBAccess
             while (rs.next()) {
 
                 Column en = new Column();
-                en.setColumnName(rs.getString(1));
+                en.name = rs.getString(1);
                 retVal.add(en);
 
             }
@@ -853,6 +902,45 @@ public class DBAccess
            retVal.table_type = rs.getString(c++);           
 
        }
+       
+       // TODO: check for null retVal
+       List<Column> columns = new ArrayList<Column>();
+       
+       ps = conn.prepareStatement("select dc.lineage_id, dc.column_name, dc.ordinal_position, dc.datatype,"
+							+ "dc.\"PRECISION\", dc.dec_digits, dc.is_nullable, dc.remarks, dcs.distinct_value_count, dcs.is_distinct_value_count_estimated, "
+							+ "dcs.last_analyze_time "
+							+ "from sys_root.dba_columns dc left join sys_root.dba_column_stats dcs on dc.table_name "
+							+ " = dcs.table_name and dc.schema_name = dcs.schema_name and dc.catalog_name = dcs.catalog_name "
+							+ "and dc.column_name = dcs.column_name " 
+							+ "where dc.catalog_name = ? and dc.schema_name = ? "
+							+ " and dc.table_name = ?");
+       ps.setString(1, "LOCALDB");
+       ps.setString(2, schema);
+       ps.setString(3, table);
+       
+       rs = ps.executeQuery();
+       
+       while (rs.next() ) {
+    	   Column c = new Column();
+    	   c.uuid = rs.getString(1);
+    	   c.name = rs.getString(2);
+    	   c.ordinal_position = rs.getInt(3);
+    	   c.datatype = rs.getString(4);
+    	   c.precision = rs.getInt(5);
+    	   c.dec_digits = rs.getInt(6);
+    	   c.is_nullable = rs.getBoolean(7);
+    	   c.remarks = rs.getString(8);
+    	   c.distinct_value_count = rs.getInt(9);
+    	   c.distinct_value_count_estimated = rs.getBoolean(10);
+    	   c.last_analyze_time = rs.getDate(11);
+    	   
+    	   columns.add(c);
+    	   
+       }
+       
+       retVal.column = columns;
+       
+       
 
    } catch (ClassNotFoundException e) {
 
@@ -895,8 +983,9 @@ public class DBAccess
        }
 
    }
-
+   
    return retVal;
+	   
 
 }
 
