@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.dynamobi.domain;
 
 import java.util.List;
@@ -9,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * VO: It holds the schema information.
@@ -17,6 +15,7 @@ import javax.xml.bind.annotation.XmlElement;
  * @since Jan-11-2010
  */
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlRootElement
 public class Schema
 {
 	@XmlAttribute public String uuid;

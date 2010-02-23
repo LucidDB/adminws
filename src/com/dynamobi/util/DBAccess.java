@@ -71,7 +71,7 @@ public class DBAccess
        
             conn = getConnenction();
 
-            ps = conn.prepareStatement("select distinct catalog_name, catalog_name from sys_root.dba_schemas");
+            ps = conn.prepareStatement("select distinct catalog_name, catalog_name from sys_root.dba_schemas order by 1");
             rs_cat = ps.executeQuery();
 
            
@@ -88,7 +88,7 @@ public class DBAccess
             	ti.catalog.add(c);
             	
             	
-            	ps = conn.prepareStatement("select schema_name, lineage_id from sys_root.dba_schemas where catalog_name = ?");
+            	ps = conn.prepareStatement("select schema_name, lineage_id from sys_root.dba_schemas where catalog_name = ? order by 1");
             	ps.setString(1, c.name);
             	rs_schema = ps.executeQuery();
             	while (rs_schema.next()) {
@@ -860,7 +860,7 @@ public class DBAccess
        
    }
    
-   public static TableDetails getTableDetails(String schema, String table)
+   public static TableDetails getTableDetails(String catalog, String schema, String table)
    throws AppException
 {
 
@@ -879,12 +879,13 @@ public class DBAccess
        sb.append("select dst.table_name,dst.schema_name,dst.catalog_name,dt.lineage_id");
        sb.append(" ,dst.creation_timestamp,dst.last_analyze_row_count,dst.last_analyze_timestamp,dst.current_row_count,dst.deleted_row_count,dt.table_type");
        sb.append(" from sys_boot.mgmt.dba_stored_tables_internal1 dst join sys_root.dba_tables dt on dst.\"lineageId\" = dt.lineage_id");
-       sb.append(" where dt.schema_name = ? and dt.table_name = ?");
+       sb.append(" where dt.catalog_name = ? and dt.schema_name = ? and dt.table_name = ?");
 
        
        ps = conn.prepareStatement(sb.toString());
-       ps.setString(1, schema);
-       ps.setString(2, table);
+       ps.setString(1, catalog);
+       ps.setString(2, schema);
+       ps.setString(3, table);
        rs = ps.executeQuery();
 
        while (rs.next()) {
@@ -914,7 +915,7 @@ public class DBAccess
 							+ "and dc.column_name = dcs.column_name " 
 							+ "where dc.catalog_name = ? and dc.schema_name = ? "
 							+ " and dc.table_name = ?");
-       ps.setString(1, "LOCALDB");
+       ps.setString(1, catalog);
        ps.setString(2, schema);
        ps.setString(3, table);
        
@@ -989,6 +990,19 @@ public class DBAccess
 
 }
 
+   
+   public static Schema getSchemaByName(String catalog, String schema)
+   throws AppException
+{
+	// TODO Auto-generated method stub
+		Schema s = new Schema();
+		s.name = "BLAH";
+		s.uuid = "BLAHUUID";
+		s.tables = null;
+		return s;
+	   
+
+}
 
 
     public static void main(String[] args)

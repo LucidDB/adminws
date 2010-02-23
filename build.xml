@@ -2,6 +2,8 @@
 
 <!--Ant build file for building the sample API.-->
 <project default="enunciate">
+	
+	<property name="webapp.dir" value="/Users/ngoodman/dev/eigenbase_workspace/dynamodb-services/bundle"/>
 
   <!--The ${enunciate.home} property should point to the Enunciate home distribution directory. -->
   <property name="enunciate.home" value="${basedir}"/>
@@ -33,6 +35,9 @@
       <export artifactId="jaxws.client.library.binaries" destination="target/dynamobi-client.jar"/>
     </enunciate>
   </target>
-
+	
+ <target name="deploy" depends="enunciate">
+	<copy file="target/dynamobi.war" tofile="${webapp.dir}/adminws.war"/>
+</target>
 </project>
 
