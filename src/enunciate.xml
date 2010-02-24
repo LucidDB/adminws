@@ -13,7 +13,7 @@
     <obj-c disabled="true"/>
 <!--    <jaxws-ri disabled="true"/>-->
     <!--  <jersey disabled="true"/>   -->
-    <docs splashPackage="com.dynamobi.api" title="DynamoBI's API" copyright="DynamoBI Inc.">
+    <docs splashPackage="com.dynamobi.ws.api" title="DynamoBI's API" copyright="DynamoBI Inc.">
       <download name="License" file="LICENSE.txt" description="The license file governing the use of this API."/>
     </docs>
   </modules>
