@@ -996,12 +996,167 @@ public class DBAccess
     public static Schema getSchemaByName(String catalog, String schema)
         throws AppException
     {
-        // TODO Auto-generated method stub
+
         Schema s = new Schema();
-        s.name = "BLAH";
-        s.uuid = "BLAHUUID";
-        s.tables = null;
+        s.name = schema;
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+
+            conn = getConnenction();
+
+            StringBuffer sb = new StringBuffer();
+
+            sb.append("select lineage_id from sys_root.dba_schemas ");
+            sb.append("where catalog_name = ? and schema_name = ?");
+
+            ps = conn.prepareStatement(sb.toString());
+            ps.setString(1, catalog);
+            ps.setString(2, schema);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                int c = 1;
+                s.uuid = rs.getString(c++);
+
+            }
+
+            List<Table> tables = new ArrayList<Table>();
+
+            sb = new StringBuffer();
+            sb.append("select lineage_id, table_name,schema_name,catalog_name from sys_root.dba_tables ");
+            sb.append("where catalog_name = ? and schema_name = ?");
+            ps = conn.prepareStatement(sb.toString());
+            ps.setString(1, catalog);
+            ps.setString(2, schema);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Table table = new Table();
+                int c = 1;
+                table.uuid = rs.getString(c++);
+                ;
+                table.name = rs.getString(c++);
+                ;
+                table.schema = rs.getString(c++);
+                table.catalog = rs.getString(c++);
+                tables.add(table);
+
+            }
+
+            s.tables = tables;
+
+        } catch (ClassNotFoundException e) {
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found JDBC Driver Class!");
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: The connection was bad or Execute sql statment failed!");
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found jdbc.properties!");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: failed to parse jdbc.properties!");
+        } finally {
+
+            try {
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+
+            } catch (SQLException ex) {
+
+                throw new AppException("Error Info: Release db resouce failed");
+
+            }
+
+        }
+
         return s;
+
+    }
+
+    public static Schema putSchema(String catalogName, Schema schema)
+        throws AppException
+    {
+        Schema ret = schema;
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+
+            conn = getConnenction();
+
+            ps = conn.prepareStatement("create or replace schema "
+                + catalogName.trim() + "." + ret.name.trim());
+            ps.execute();
+
+        } catch (ClassNotFoundException e) {
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found JDBC Driver Class!");
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: The connection was bad or Execute sql statment failed!");
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found jdbc.properties!");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: failed to parse jdbc.properties!");
+        } finally {
+
+            try {
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+
+            } catch (SQLException ex) {
+
+                throw new AppException("Error Info: Release db resouce failed");
+
+            }
+
+        }
+
+        return ret;
 
     }
 
@@ -1392,20 +1547,22 @@ public class DBAccess
     {
 
         try {
-            List<Table> list = DBAccess.getTableInfo("RAY");
-            for (Table te : list) {
-
-                System.out.println(te.catalog + "." + te.schema + "." + te.name);
-            }
-
-            SystemParameter en = DBAccess.findSystemParameterByName("javaCompilerClassName");
-            DBAccess.updateSystemParameter("fennelDisabled", "false");
-            System.out.println(en.getParamName() + ":" + en.getParamValue());
-
-            Counter co = DBAccess.findPerformanceCounterByName("JvmMemoryUnused");
-
-            System.out.println(co.getSourceName() + ":" + co.getCounterName()
-                + ":" + co.getCounterUnits() + ":" + co.getCounterValue());
+            // List<Table> list = DBAccess.getTableInfo("RAY");
+            // for (Table te : list) {
+            //
+            // System.out.println(te.catalog + "." + te.schema + "." + te.name);
+            // }
+            //
+            // SystemParameter en =
+            // DBAccess.findSystemParameterByName("javaCompilerClassName");
+            // DBAccess.updateSystemParameter("fennelDisabled", "false");
+            // System.out.println(en.getParamName() + ":" + en.getParamValue());
+            //
+            // Counter co =
+            // DBAccess.findPerformanceCounterByName("JvmMemoryUnused");
+            //
+            // System.out.println(co.getSourceName() + ":" + co.getCounterName()
+            // + ":" + co.getCounterUnits() + ":" + co.getCounterValue());
 
             // List<ColumnStats> cols = DBAccess.getAllColumnStats();
             //            
@@ -1422,20 +1579,37 @@ public class DBAccess
             // );
             // }
             //            
-            List<ColumnStats> cols = DBAccess.findColumnStats(
-                "LOCALDB",
-                "RAY",
-                "",
-                "NAME");
+            // List<ColumnStats> cols = DBAccess.findColumnStats(
+            // "LOCALDB",
+            // "RAY",
+            // "",
+            // "NAME");
+            //
+            // for (ColumnStats te : cols) {
+            //
+            // System.out.println(te.getCatalogName() + "."
+            // + te.getSchemaName() + "." + te.getTableName() + "."
+            // + te.getColumnName() + "." + te.getDistinctValueCount()
+            // + "." + te.isDistinctValueCountEstimated() + "."
+            // + te.getPercentSampled() + "." + te.getSampleSize() + ".");
+            // }
 
-            for (ColumnStats te : cols) {
+            // test getSchemaByName
+            String catalog = "LOCALDB";
+            String schema = "RAY";
+            Schema obj = DBAccess.getSchemaByName(catalog, schema);
 
-                System.out.println(te.getCatalogName() + "."
-                    + te.getSchemaName() + "." + te.getTableName() + "."
-                    + te.getColumnName() + "." + te.getDistinctValueCount()
-                    + "." + te.isDistinctValueCountEstimated() + "."
-                    + te.getPercentSampled() + "." + te.getSampleSize() + ".");
+            System.out.println(obj.uuid + ":" + obj.name);
+            for (Table te : obj.tables) {
+
+                System.out.println(te.uuid + "." + te.name + "." + te.schema
+                    + "." + te.catalog);
             }
+            System.out.println();
+
+            // test putSchema
+            obj.name = "RayTest";
+            DBAccess.putSchema(catalog, obj);
 
         } catch (AppException e) {
 

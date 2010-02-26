@@ -1,14 +1,11 @@
 package com.dynamobi.ws.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.jws.WebService;
 import javax.ws.rs.Path;
-import javax.xml.bind.JAXBElement;
 
 import com.dynamobi.ws.api.DBService;
-import com.dynamobi.ws.domain.Catalog;
 import com.dynamobi.ws.domain.Column;
 import com.dynamobi.ws.domain.Schema;
 import com.dynamobi.ws.domain.Table;
@@ -24,9 +21,7 @@ import com.dynamobi.ws.util.DBAccess;
  * @since Jan-12-2010
  */
 @Path("/metadata")
-@WebService (
-    endpointInterface = "com.dynamobi.ws.api.DBService"
-  )
+@WebService(endpointInterface = "com.dynamobi.ws.api.DBService")
 public class DBServiceImp
     implements DBService
 {
@@ -35,12 +30,11 @@ public class DBServiceImp
         throws AppException
     {
 
-    	
-    	return DBAccess.getTablesInfo();
+        return DBAccess.getTablesInfo();
 
-        //List<Table> ret = DBAccess.getTableInfo();
+        // List<Table> ret = DBAccess.getTableInfo();
 
-        //return ret;
+        // return ret;
 
     }
 
@@ -67,34 +61,28 @@ public class DBServiceImp
         return ret;
 
     }
-    
-    public TableDetails getTableDetails(String catalog, String schema, String table) 
-    throws AppException
+
+    public TableDetails getTableDetails(
+        String catalog,
+        String schema,
+        String table)
+        throws AppException
     {
-    	TableDetails ret = DBAccess.getTableDetails(catalog, schema, table);
-    	
-    	return ret;
+        TableDetails ret = DBAccess.getTableDetails(catalog, schema, table);
+
+        return ret;
     }
 
-	public Schema getSchema(String catalogName, String schemaName) throws AppException {
-		return DBAccess.getSchemaByName(catalogName, schemaName);
-	}
+    public Schema getSchema(String catalogName, String schemaName)
+        throws AppException
+    {
+        return DBAccess.getSchemaByName(catalogName, schemaName);
+    }
 
-	public Schema putSchema(String catalogName, 
-			Schema schema) throws AppException {
-		// TODO Auto-generated method stub
-		Schema s = new Schema();
-		s.name = schema.name;
-		s.uuid = s.uuid;
-		if ( s.name == "NEWTABLE" ) {
-			throw new AppException("blah");
-			
-		}
-		return s;
-	}
-
-
-	
-	
+    public Schema putSchema(String catalogName, Schema schema)
+        throws AppException
+    {
+        return DBAccess.putSchema(catalogName, schema);
+    }
 
 }
