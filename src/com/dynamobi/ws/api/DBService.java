@@ -52,5 +52,11 @@ public interface DBService
     @GET
     public TableDetails getTableDetails(@PathParam("catalog") String catalogName, @PathParam("schema")String schema,
     		@PathParam("table") String table) throws AppException;
+    
+    @Path("/{catalog}/{schema}/{table}")
+    @POST
+    @Consumes ("application/xml")
+    public TableDetails postTableDetails(@PathParam("catalog") String catalogName, @PathParam("schema")String schema,
+    @PathParam("table") String table, TableDetails td) throws AppException;
 
 }

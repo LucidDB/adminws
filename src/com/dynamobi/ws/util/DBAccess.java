@@ -1543,6 +1543,236 @@ public class DBAccess
             + datatables + "</sqlquery>";
     }
 
+    public static TableDetails postTableDetails(
+        String catalogName,
+        String schema,
+        String table,
+        TableDetails td)
+        throws AppException
+    {
+        TableDetails retVal = td;
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+
+            conn = getConnenction();
+
+            StringBuffer sb = new StringBuffer();
+            sb.append("select count(1) from sys_root.dba_tables where ");
+            sb.append(" TABLE_TYPE = 'LOCAL TABLE'");
+            sb.append(" AND catalog_name = ? ");
+            sb.append(" AND schema_name = ? ");
+            sb.append(" AND table_name = ?");
+            ps = conn.prepareStatement(sb.toString());
+            ps.setString(1, catalogName);
+            ps.setString(2, schema);
+            ps.setString(3, table);
+            rs = ps.executeQuery();
+
+            long isExisting = 0;
+            while (rs.next()) {
+                isExisting = rs.getLong(1);
+            }
+            ;
+
+            if (isExisting == 0) {
+
+                sb = new StringBuffer();
+                sb.append("create table " + catalogName + "." + schema + "."
+                    + table + " ( ");
+                sb.append(createTableSQL(retVal.column));
+                sb.append(" )");
+                ps = conn.prepareStatement(sb.toString());
+                ps.execute();
+
+            } else {
+
+                ps = conn.prepareStatement("select dc.lineage_id, dc.column_name, dc.ordinal_position, dc.datatype,"
+                    + "dc.\"PRECISION\", dc.dec_digits, dc.is_nullable, dc.remarks, dcs.distinct_value_count, dcs.is_distinct_value_count_estimated, "
+                    + "dcs.last_analyze_time "
+                    + "from sys_root.dba_columns dc left join sys_root.dba_column_stats dcs on dc.table_name "
+                    + " = dcs.table_name and dc.schema_name = dcs.schema_name and dc.catalog_name = dcs.catalog_name "
+                    + "and dc.column_name = dcs.column_name "
+                    + "where dc.catalog_name = ? and dc.schema_name = ? "
+                    + " and dc.table_name = ? order by  dc.ordinal_position");
+                ps.setString(1, catalogName);
+                ps.setString(2, schema);
+                ps.setString(3, table);
+
+                rs = ps.executeQuery();
+
+                List<Integer> index = new ArrayList<Integer>();
+
+                List<String> colNameFromDb = new ArrayList<String>();
+
+                while (rs.next()) {
+
+                    String colName = rs.getString(2);
+
+                    int matchCode = -1;
+                    for (int i = 0; i < retVal.column.size(); i++) {
+
+                        if (index.size() > 0) {
+                            for (int j = 0; j < index.size(); j++) {
+
+                                if (index.indexOf(j) == i) {
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (retVal.column.get(i).name.equals(colName)) {
+
+                            matchCode = i;
+                            break;
+                        }
+                    }
+
+                    if (matchCode == -1) {
+
+                        colNameFromDb.add(colName);
+                    } else {
+
+                        index.add(matchCode);
+                    }
+
+                }
+
+                if (colNameFromDb.size() != 0) {
+
+                    throw new AppException("Cannot remove columns");
+                }
+
+                List<Column> cols = retVal.column;
+                int sizeOfCols = cols.size();
+
+                for (int i = 0; i < sizeOfCols; i++) {
+
+                    boolean match = false;
+
+                    for (int j = 0; j < index.size(); j++) {
+                        if (i == j) {
+                            match = true;
+                            break;
+                        }
+                    }
+                    if (!match) {
+
+                        ps = conn.prepareStatement("alter table " + catalogName
+                            + "." + schema + "." + table + " add column "
+                            + createColumnSQL(cols.get(i)));
+                        ps.execute();
+                    }
+                }
+            }
+
+        } catch (ClassNotFoundException e) {
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found JDBC Driver Class!");
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: The connection was bad or Execute sql statment failed!");
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found jdbc.properties!");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: failed to parse jdbc.properties!");
+        } finally {
+
+            try {
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+
+            } catch (SQLException ex) {
+
+                throw new AppException("Error Info: Release db resouce failed");
+
+            }
+
+        }
+
+        return retVal;
+    }
+
+    private static String createTableSQL(List<Column> cols)
+    {
+
+        StringBuffer ret = new StringBuffer();
+
+        int size = cols.size();
+
+        int last_pos = size - 1;
+        for (int i = 0; i < size; i++) {
+
+            if (i == last_pos) {
+
+                ret.append(createColumnSQL(cols.get(i)));
+
+            } else {
+                ret.append(createColumnSQL(cols.get(i)));
+                ret.append(",");
+            }
+        }
+
+        return ret.toString();
+    }
+
+    private static String createColumnSQL(Column col)
+    {
+
+        StringBuffer ret = new StringBuffer();
+        String dataType = col.datatype.toUpperCase();
+
+        if (dataType.indexOf(Constants.CHAR_TYPE) != -1) {
+
+            ret.append(col.name + " " + col.datatype + "(" + col.precision
+                + ")");
+
+        } else if ((dataType.indexOf(Constants.DECIMAL_TYPE) != -1)
+            || (dataType.indexOf(Constants.NUMERIC_TYPE) != -1))
+        {
+
+            ret.append(col.name + " " + col.datatype + "(" + col.precision
+                + ")");
+
+        } else if (dataType.indexOf(Constants.BINARY_TYPE) != -1) {
+
+            ret.append(col.name + " " + col.datatype + "(" + col.precision
+                + ")");
+
+        } else {
+
+            ret.append(col.name + " " + col.datatype);
+        }
+
+        if (!col.is_nullable) {
+            ret.append(" not null");
+        }
+
+        return ret.toString();
+
+    }
+
     public static void main(String[] args)
     {
 
@@ -1597,19 +1827,53 @@ public class DBAccess
             // test getSchemaByName
             String catalog = "LOCALDB";
             String schema = "RAY";
-            Schema obj = DBAccess.getSchemaByName(catalog, schema);
+            // Schema obj = DBAccess.getSchemaByName(catalog, schema);
+            //
+            // System.out.println(obj.uuid + ":" + obj.name);
+            // for (Table te : obj.tables) {
+            //
+            // System.out.println(te.uuid + "." + te.name + "." + te.schema
+            // + "." + te.catalog);
+            // }
+            // System.out.println();
+            //
+            // // test putSchema
+            // obj.name = "RayTest";
+            // DBAccess.putSchema(catalog, obj);
 
-            System.out.println(obj.uuid + ":" + obj.name);
-            for (Table te : obj.tables) {
+            TableDetails td = new TableDetails();
 
-                System.out.println(te.uuid + "." + te.name + "." + te.schema
-                    + "." + te.catalog);
-            }
-            System.out.println();
+            List<Column> cols = new ArrayList<Column>();
 
-            // test putSchema
-            obj.name = "RayTest";
-            DBAccess.putSchema(catalog, obj);
+            Column col1 = new Column();
+            col1.name = "ID";
+            col1.datatype = "INT";
+            col1.precision = 0;
+            col1.is_nullable = true;
+
+            cols.add(col1);
+
+            Column col2 = new Column();
+            col2.name = "NAME";
+            col2.datatype = "VARCHAR";
+            col2.precision = 255;
+            col2.is_nullable = false;
+
+            cols.add(col2);
+
+            Column col3 = new Column();
+            col3.name = "DEPARTMENT";
+            col3.datatype = "VARCHAR";
+            col3.precision = 255;
+            col3.is_nullable = false;
+
+            cols.add(col3);
+
+            td.column = cols;
+
+            String table = "POSTTESTTB";
+
+            DBAccess.postTableDetails(catalog, schema, table, td);
 
         } catch (AppException e) {
 

@@ -85,4 +85,10 @@ public class DBServiceImp
         return DBAccess.putSchema(catalogName, schema);
     }
 
+    public TableDetails postTableDetails(String catalogName, String schema, String table, TableDetails td)
+        throws AppException
+    {
+        return DBAccess.postTableDetails(catalogName, schema, table, td);
+    }
+
 }
