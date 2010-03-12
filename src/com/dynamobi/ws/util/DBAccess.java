@@ -1188,8 +1188,8 @@ public class DBAccess
                 + "c.is_nullable AS Nullable, "
                 + "c.datatype AS DataType "
                 + "from SYS_ROOT.DBA_COLUMNS c LEFT OUTER JOIN SYS_ROOT.DBA_TABLES t ON t.table_name = c.table_name "
-                + "where t.table_type IN ('LOCAL TABLE', 'LOCAL VIEW')"
-                + "order by ObjectType,Object,ColumnOrder");
+                + "where t.table_type IN ('LOCAL TABLE', 'LOCAL VIEW') and t.catalog_name='LOCALDB' "
+                + "order by schema_name,ObjectType,Object,ColumnOrder");
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -1198,7 +1198,9 @@ public class DBAccess
                 int c = 1;
                 en.setType(rs.getString(c++));
                 String schemaName = rs.getString(c++);
-                en.setName(schemaName + "." + rs.getString(c++));
+                en.setSchemaName(schemaName);
+//                en.setName(schemaName + "." + rs.getString(c++));
+                en.setName(rs.getString(c++));
                 en.setColName(rs.getString(c++));
                 c++;
                 en.setColLength(rs.getInt(c++));
@@ -1222,28 +1224,48 @@ public class DBAccess
                 }
 
             }
-
+            String schemaName="";
             String objType = "";
             String objTable = "";
             boolean setflag = false;
             result.append("<node>");
 
             for (DBMeta obj : rows) {
-
-                if (!objType.equals(obj.getType())) {
-                    if (!"".equals(objType)) {
-                        result.append("</node></node>");
+              
+                
+                if (!schemaName.equals(obj.getSchemaName())) {
+                    if (!"".equals(schemaName)) {
+                        result.append("</node></node></node>");
                         setflag = true;
                     }
+                    schemaName = obj.getSchemaName();
+                    result.append("<node label=\"" + schemaName + "\">");
+                }
+                
+                if(setflag){
+                    
+                    setflag = true;
                     objType = obj.getType();
                     result.append("<node label=\"" + objType + "s\">");
+                    
+                }else{
+                    
+                    if (!objType.equals(obj.getType())) {
+                        if (!"".equals(objType)) {
+                            result.append("</node></node>");
+                            setflag = true;
+                        }
+                        objType = obj.getType();
+                        result.append("<node label=\"" + objType + "s\">");
+                    }
                 }
+
+
 
                 if (!objTable.equals(obj.getName())) {
                     if ((!"".equals(objTable)) && setflag == false)
                         result.append("</node>");
                     objTable = obj.getName();
-
                     List<String> foundRows = cache.get(objType + "." + objTable);
                     String colstring = "";
                     int x = 0;
@@ -1255,7 +1277,7 @@ public class DBAccess
                     }
                     result.append("<node label=\"" + objTable
                         + "\" sqlquery=\"SELECT " + colstring + " FROM "
-                        + objTable + "\">");
+                        + schemaName+"."+objTable + "\">");
                 }
 
                 if ((!"".equals(obj.getColName()))
@@ -1283,7 +1305,7 @@ public class DBAccess
                 setflag = false;
 
             }
-            result.append("</node></node></node>");
+            result.append("</node></node></node></node>");
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -1841,41 +1863,45 @@ public class DBAccess
             // obj.name = "RayTest";
             // DBAccess.putSchema(catalog, obj);
 
-            TableDetails td = new TableDetails();
+//            TableDetails td = new TableDetails();
+//
+//            List<Column> cols = new ArrayList<Column>();
+//
+//            Column col1 = new Column();
+//            col1.name = "ID";
+//            col1.datatype = "INT";
+//            col1.precision = 0;
+//            col1.is_nullable = true;
+//
+//            cols.add(col1);
+//
+//            Column col2 = new Column();
+//            col2.name = "NAME";
+//            col2.datatype = "VARCHAR";
+//            col2.precision = 255;
+//            col2.is_nullable = false;
+//
+//            cols.add(col2);
+//
+//            Column col3 = new Column();
+//            col3.name = "DEPARTMENT";
+//            col3.datatype = "VARCHAR";
+//            col3.precision = 255;
+//            col3.is_nullable = false;
+//
+//            cols.add(col3);
+//
+//            td.column = cols;
+//
+//            String table = "POSTTESTTB";
+//
+//            DBAccess.postTableDetails(catalog, schema, table, td);
+            
+                System.out.println(DBAccess.getDBMetaData());
+                
 
-            List<Column> cols = new ArrayList<Column>();
 
-            Column col1 = new Column();
-            col1.name = "ID";
-            col1.datatype = "INT";
-            col1.precision = 0;
-            col1.is_nullable = true;
-
-            cols.add(col1);
-
-            Column col2 = new Column();
-            col2.name = "NAME";
-            col2.datatype = "VARCHAR";
-            col2.precision = 255;
-            col2.is_nullable = false;
-
-            cols.add(col2);
-
-            Column col3 = new Column();
-            col3.name = "DEPARTMENT";
-            col3.datatype = "VARCHAR";
-            col3.precision = 255;
-            col3.is_nullable = false;
-
-            cols.add(col3);
-
-            td.column = cols;
-
-            String table = "POSTTESTTB";
-
-            DBAccess.postTableDetails(catalog, schema, table, td);
-
-        } catch (AppException e) {
+        } catch (Exception e) {
 
             e.printStackTrace();
         }

@@ -10,7 +10,9 @@ package com.dynamobi.ws.domain;
  */
 public class DBMeta {
 	
-	private String type;
+	private String schemaName;
+    
+    private String type;
 	
 	private String name;
 	
@@ -69,6 +71,16 @@ public class DBMeta {
 	public void setDataType(String dataType) {
 		this.dataType = dataType;
 	}
+
+    public String getSchemaName()
+    {
+        return schemaName;
+    }
+
+    public void setSchemaName(String schemaName)
+    {
+        this.schemaName = schemaName;
+    }
 	
 	
 
