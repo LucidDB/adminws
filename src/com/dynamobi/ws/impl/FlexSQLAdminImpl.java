@@ -34,7 +34,7 @@ public class FlexSQLAdminImpl
 
         String ret="";
         try {
-            ret = DBAccess.getDBMetaData();
+            ret = DBAccess.getDBMetaData(connection);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

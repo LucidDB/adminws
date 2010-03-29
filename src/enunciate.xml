@@ -2,7 +2,7 @@
 <enunciate label="dynamobi"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.17.xsd">
-  <!-- <deployment host="www.dynamobi.com" context="api"/> -->
+  <deployment host="localhost:8080" context="adminws"/> 
   
   <modules>
     <xfire-client disabled="true"/>

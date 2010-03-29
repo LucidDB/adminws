@@ -1,5 +1,6 @@
 package com.dynamobi.ws.util;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.dynamobi.ws.domain.Catalog;
 import com.dynamobi.ws.domain.Column;
@@ -22,9 +25,8 @@ import com.dynamobi.ws.domain.SystemParameter;
 import com.dynamobi.ws.domain.Table;
 import com.dynamobi.ws.domain.TableDetails;
 import com.dynamobi.ws.domain.TablesInfo;
-import com.dynamobi.ws.util.JDBCUtil;
-
-import java.io.FileNotFoundException;
+import com.dynamobi.ws.domain.RelNode;
+import com.dynamobi.ws.domain.ShowPlanEntity;
 
 /**
  * Get Tables' info from database
@@ -34,6 +36,8 @@ import java.io.FileNotFoundException;
  */
 public class DBAccess
 {
+    public static String REGEX1 = "(\\w+)[\\(|:]";
+    public static String REGEX2 = ":\\srowcount\\s=\\s(.+),\\scumulative\\scost\\s=\\s(.+)";
 
     private DBAccess()
     {
@@ -1160,7 +1164,7 @@ public class DBAccess
 
     }
 
-    public static String getDBMetaData()
+    public static String getDBMetaData(String connection)
         throws Exception
     {
 
@@ -1188,8 +1192,9 @@ public class DBAccess
                 + "c.is_nullable AS Nullable, "
                 + "c.datatype AS DataType "
                 + "from SYS_ROOT.DBA_COLUMNS c LEFT OUTER JOIN SYS_ROOT.DBA_TABLES t ON t.table_name = c.table_name "
-                + "where t.table_type IN ('LOCAL TABLE', 'LOCAL VIEW') and t.catalog_name='LOCALDB' "
+                + "where t.table_type IN ('LOCAL TABLE', 'LOCAL VIEW') and t.catalog_name=? "
                 + "order by schema_name,ObjectType,Object,ColumnOrder");
+            ps.setString(1, connection);
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -1199,7 +1204,7 @@ public class DBAccess
                 en.setType(rs.getString(c++));
                 String schemaName = rs.getString(c++);
                 en.setSchemaName(schemaName);
-//                en.setName(schemaName + "." + rs.getString(c++));
+                // en.setName(schemaName + "." + rs.getString(c++));
                 en.setName(rs.getString(c++));
                 en.setColName(rs.getString(c++));
                 c++;
@@ -1224,15 +1229,14 @@ public class DBAccess
                 }
 
             }
-            String schemaName="";
+            String schemaName = "";
             String objType = "";
             String objTable = "";
             boolean setflag = false;
             result.append("<node>");
 
             for (DBMeta obj : rows) {
-              
-                
+
                 if (!schemaName.equals(obj.getSchemaName())) {
                     if (!"".equals(schemaName)) {
                         result.append("</node></node></node>");
@@ -1241,15 +1245,15 @@ public class DBAccess
                     schemaName = obj.getSchemaName();
                     result.append("<node label=\"" + schemaName + "\">");
                 }
-                
-                if(setflag){
-                    
+
+                if (setflag) {
+
                     setflag = true;
                     objType = obj.getType();
                     result.append("<node label=\"" + objType + "s\">");
-                    
-                }else{
-                    
+
+                } else {
+
                     if (!objType.equals(obj.getType())) {
                         if (!"".equals(objType)) {
                             result.append("</node></node>");
@@ -1259,8 +1263,6 @@ public class DBAccess
                         result.append("<node label=\"" + objType + "s\">");
                     }
                 }
-
-
 
                 if (!objTable.equals(obj.getName())) {
                     if ((!"".equals(objTable)) && setflag == false)
@@ -1277,7 +1279,7 @@ public class DBAccess
                     }
                     result.append("<node label=\"" + objTable
                         + "\" sqlquery=\"SELECT " + colstring + " FROM "
-                        + schemaName+"."+objTable + "\">");
+                        + schemaName + "." + objTable + "\">");
                 }
 
                 if ((!"".equals(obj.getColName()))
@@ -1334,6 +1336,7 @@ public class DBAccess
         }
 
         return result.toString();
+
     }
 
     public static String execSQL(
@@ -1393,7 +1396,104 @@ public class DBAccess
 
             } else if ("showplan".equals(sqlquerytype)) {
 
-                // TODO: how to do showplan
+                ps = conn.prepareStatement("explain plan including all attributes with implementation for "
+                    + sql);
+                rs = ps.executeQuery();
+
+                String tmp = "";
+                List<RelNode> nodes = new ArrayList<RelNode>();
+                int idx = 1;
+
+                while (rs.next()) {
+
+                    RelNode node = new RelNode();
+                    node.setCurrentId(idx);
+                    String info = rs.getString(1);
+                    if (info.contains(": rowcount =")) {
+
+                        if (!tmp.equals(""))
+                            info = tmp + info;
+                        tmp = "";
+
+                    } else {
+
+                        tmp = tmp + info;
+                        continue;
+                    }
+
+                    node.setNumOfSpaces((info.length() - (info.trim().length())));
+                    ShowPlanEntity entity = new ShowPlanEntity();
+                    info = info.trim();
+
+                    Pattern pattern = Pattern.compile(REGEX1);
+                    Matcher matcher = pattern.matcher(info);
+
+                    if (matcher.find()) {
+
+                        entity.setPhysicalOp(matcher.group(1));
+                        entity.setLogicalOp(matcher.group(1));
+                    } else {
+
+                        throw new Exception(
+                            "Error in showPlan: failed to parse the explain plan line: "
+                                + info);
+                    }
+
+                    pattern = Pattern.compile(REGEX2);
+                    matcher = pattern.matcher(info);
+
+                    if (matcher.find()) {
+
+                        entity.setEstimateRows(matcher.group(1).trim());
+                        entity.setTotalSubtreeCost(matcher.group(2).trim());
+
+                    } else {
+
+                        throw new Exception(
+                            "Error in showPlan: failed to parse the explain plan line: "
+                                + info);
+                    }
+
+                    entity.setStmtText(info);
+                    entity.setStmtId(1);
+                    node.setShowPlanEntity(entity);
+                    nodes.add(node);
+                    idx++;
+                }
+
+                List<RelNode> output = buildRelationship(nodes);
+
+                StringBuffer sb = new StringBuffer();
+
+                sb.append("<showplan>");
+
+                for (RelNode node : output) {
+
+                    sb.append("<Table>").append(
+                        "<StmtText> <![CDATA[ "
+                            + node.getShowPlanEntity().getStmtText()
+                            + " ]]></StmtText>").append(
+                        "<StmtId>" + node.getShowPlanEntity().getStmtId()
+                            + "</StmtId>").append(
+                        "<NodeId>" + node.getCurrentId() + "</NodeId>").append(
+                        "<Parent>" + node.getParentId() + "</Parent>").append(
+                        "<PhysicalOp>"
+                            + node.getShowPlanEntity().getPhysicalOp()
+                            + "</PhysicalOp>").append(
+                        "<LogicalOp>" + node.getShowPlanEntity().getLogicalOp()
+                            + "</LogicalOp>").append(
+                        "<EstimateRows>"
+                            + node.getShowPlanEntity().getEstimateRows()
+                            + "</EstimateRows>").append(
+                        "<TotalSubtreeCost>"
+                            + node.getShowPlanEntity().getTotalSubtreeCost()
+                            + "</TotalSubtreeCost>").append(
+                        "<level>" + node.getLevel() + "</level>").append(
+                        "</Table>");
+                }
+                sb.append("</showplan>");
+                datamap = "StmtText,StmtId,NodeId,Parent,PhysicalOp,LogicalOp,EstimateRows,TotalSubtreeCost";
+                datatables = sb.toString();
 
             } else if ("SELECT".equals(sqlcmd) || "EXEC".equals(sqlcmd)
                 || "EXECUTE".equals(sqlcmd))
@@ -1452,8 +1552,8 @@ public class DBAccess
             datamap = "Error";
             executiontime = "";
             recordcount = "";
-            datatables = "<NewDataSet><Table><Error>Error Executing Query: "
-                + errormsg + "</Error></Table></NewDataSet>";
+            datatables = "<NewDataSet><Table><Error> <![CDATA[ Error Executing Query: "
+                + errormsg + "  ]]></Error></Table></NewDataSet>";
 
         } finally {
 
@@ -1488,6 +1588,67 @@ public class DBAccess
             executiontime,
             recordcount,
             datatables);
+
+    }
+
+    private static List<RelNode> buildRelationship(List<RelNode> input)
+    {
+
+        List<RelNode> ret = input;
+        RelNode firstNode = null;
+
+        for (int i = 0; i < ret.size(); i++) {
+
+            RelNode node = ret.get(i);
+            if (i == 0) {
+
+                node.setParentId(0);
+                node.setLevel(0);
+                firstNode = node;
+
+            } else {
+
+                RelNode test = firstNode;
+
+                while (true) {
+
+                    if (test.getChildrenIds() == null) {
+
+                        if (test.getNumOfSpaces() < node.getNumOfSpaces()) {
+
+                            node.setParentId(test.getCurrentId());
+                            test.setChildrenIds(new ArrayList<Integer>());
+                            test.getChildrenIds().add(node.getCurrentId());
+                            node.setLevel(test.getLevel() + 1);
+                            break;
+                        }
+                    } else {
+
+                        int maxChild_id = test.getChildrenIds().get(
+                            test.getChildrenIds().size() - 1);
+                        RelNode selectedNode = ret.get(maxChild_id - 1);
+
+                        if (selectedNode.getNumOfSpaces() < node.getNumOfSpaces())
+                        {
+
+                            test = selectedNode;
+
+                        } else {
+
+                            node.setParentId(test.getCurrentId());
+                            test.getChildrenIds().add(node.getCurrentId());
+                            node.setLevel(test.getLevel() + 1);
+
+                            break;
+                        }
+
+                    }
+                }
+
+            }
+
+        }
+        return ret;
 
     }
 
@@ -1797,114 +1958,6 @@ public class DBAccess
 
     public static void main(String[] args)
     {
-
-        try {
-            // List<Table> list = DBAccess.getTableInfo("RAY");
-            // for (Table te : list) {
-            //
-            // System.out.println(te.catalog + "." + te.schema + "." + te.name);
-            // }
-            //
-            // SystemParameter en =
-            // DBAccess.findSystemParameterByName("javaCompilerClassName");
-            // DBAccess.updateSystemParameter("fennelDisabled", "false");
-            // System.out.println(en.getParamName() + ":" + en.getParamValue());
-            //
-            // Counter co =
-            // DBAccess.findPerformanceCounterByName("JvmMemoryUnused");
-            //
-            // System.out.println(co.getSourceName() + ":" + co.getCounterName()
-            // + ":" + co.getCounterUnits() + ":" + co.getCounterValue());
-
-            // List<ColumnStats> cols = DBAccess.getAllColumnStats();
-            //            
-            // for (ColumnStats te : cols) {
-            //
-            // System.out.println(te.getCatalogName() + "."
-            // + te.getSchemaName() + "."
-            // + te.getTableName() + "."
-            // + te.getColumnName() + "."
-            // + te.getDistinctValueCount() + "."
-            // + te.isDistinctValueCountEstimated() + "."
-            // + te.getPercentSampled() + "."
-            // + te.getSampleSize()+ "."
-            // );
-            // }
-            //            
-            // List<ColumnStats> cols = DBAccess.findColumnStats(
-            // "LOCALDB",
-            // "RAY",
-            // "",
-            // "NAME");
-            //
-            // for (ColumnStats te : cols) {
-            //
-            // System.out.println(te.getCatalogName() + "."
-            // + te.getSchemaName() + "." + te.getTableName() + "."
-            // + te.getColumnName() + "." + te.getDistinctValueCount()
-            // + "." + te.isDistinctValueCountEstimated() + "."
-            // + te.getPercentSampled() + "." + te.getSampleSize() + ".");
-            // }
-
-            // test getSchemaByName
-            String catalog = "LOCALDB";
-            String schema = "RAY";
-            // Schema obj = DBAccess.getSchemaByName(catalog, schema);
-            //
-            // System.out.println(obj.uuid + ":" + obj.name);
-            // for (Table te : obj.tables) {
-            //
-            // System.out.println(te.uuid + "." + te.name + "." + te.schema
-            // + "." + te.catalog);
-            // }
-            // System.out.println();
-            //
-            // // test putSchema
-            // obj.name = "RayTest";
-            // DBAccess.putSchema(catalog, obj);
-
-//            TableDetails td = new TableDetails();
-//
-//            List<Column> cols = new ArrayList<Column>();
-//
-//            Column col1 = new Column();
-//            col1.name = "ID";
-//            col1.datatype = "INT";
-//            col1.precision = 0;
-//            col1.is_nullable = true;
-//
-//            cols.add(col1);
-//
-//            Column col2 = new Column();
-//            col2.name = "NAME";
-//            col2.datatype = "VARCHAR";
-//            col2.precision = 255;
-//            col2.is_nullable = false;
-//
-//            cols.add(col2);
-//
-//            Column col3 = new Column();
-//            col3.name = "DEPARTMENT";
-//            col3.datatype = "VARCHAR";
-//            col3.precision = 255;
-//            col3.is_nullable = false;
-//
-//            cols.add(col3);
-//
-//            td.column = cols;
-//
-//            String table = "POSTTESTTB";
-//
-//            DBAccess.postTableDetails(catalog, schema, table, td);
-            
-                System.out.println(DBAccess.getDBMetaData());
-                
-
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-        }
 
     }
 
