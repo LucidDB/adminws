@@ -3,7 +3,9 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.17.xsd">
   <deployment host="localhost:8080" context="adminws"/> 
-  
+  <namespaces>
+	  <namespace id="dynamo" uri="http://domain.ws.dynamobi.com" /> 
+  </namespaces>
   <modules>
     <xfire-client disabled="true"/>
     <amf disabled="true"/>
