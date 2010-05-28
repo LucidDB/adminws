@@ -20,13 +20,13 @@ import com.dynamobi.ws.domain.Column;
 import com.dynamobi.ws.domain.ColumnStats;
 import com.dynamobi.ws.domain.Counter;
 import com.dynamobi.ws.domain.DBMeta;
+import com.dynamobi.ws.domain.RelNode;
 import com.dynamobi.ws.domain.Schema;
+import com.dynamobi.ws.domain.ShowPlanEntity;
 import com.dynamobi.ws.domain.SystemParameter;
 import com.dynamobi.ws.domain.Table;
 import com.dynamobi.ws.domain.TableDetails;
 import com.dynamobi.ws.domain.TablesInfo;
-import com.dynamobi.ws.domain.RelNode;
-import com.dynamobi.ws.domain.ShowPlanEntity;
 
 /**
  * Get Tables' info from database
@@ -1164,7 +1164,7 @@ public class DBAccess
 
     }
 
-    public static String getDBMetaData(String connection)
+    public static String getDBMetaData(String connection, String schema)
         throws Exception
     {
 
@@ -1194,7 +1194,7 @@ public class DBAccess
                 + "from SYS_ROOT.DBA_COLUMNS c LEFT OUTER JOIN SYS_ROOT.DBA_TABLES t ON t.table_name = c.table_name "
                 + "where t.table_type IN ('LOCAL TABLE', 'LOCAL VIEW') and t.catalog_name=? "
                 + "order by schema_name,ObjectType,Object,ColumnOrder");
-            ps.setString(1, connection);
+            ps.setString(1, schema);
             rs = ps.executeQuery();
 
             while (rs.next()) {

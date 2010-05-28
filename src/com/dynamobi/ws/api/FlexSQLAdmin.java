@@ -1,6 +1,8 @@
 package com.dynamobi.ws.api;
 
 import javax.jws.WebService;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 
 /**
  * WebService interface for FlexSQLAdmin
@@ -9,6 +11,7 @@ import javax.jws.WebService;
  * 
  */
 @WebService
+@PermitAll
 public interface FlexSQLAdmin
 {
     /**
@@ -16,7 +19,8 @@ public interface FlexSQLAdmin
      * @param connection
      * @return
      */
-    public String getDBMetaData(String connection);
+    @RolesAllowed( {"Admin","Authenticated"} )
+    public String getDBMetaData(String connection, String schema);
     /**
      * exec SQL
      * @param connection
@@ -25,6 +29,7 @@ public interface FlexSQLAdmin
      * @param toomany
      * @return 
      */
+    @RolesAllowed( {"Admin","Authenticated"} )
     public String execSQL(String connection, String sqlquerytype, String sql, int toomany);
     
     /**
@@ -35,5 +40,6 @@ public interface FlexSQLAdmin
      * @param toomany
      * @return
      */
+    @RolesAllowed( {"Admin","Authenticated"} )
     public String handleUpdate(String connection, String testsql, String sql, int toomany);
 }

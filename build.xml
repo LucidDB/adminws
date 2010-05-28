@@ -4,6 +4,7 @@
 <project default="enunciate">
 	
 	<property name="webapp.dir" value="/Users/ngoodman/dev/eigenbase_workspace/dynamodb-services/bundle"/>
+	<!-- <property name="webapp.dir" value="D:\\dev\\jetty-6.1.7\\webapps"/> -->
 
   <!--The ${enunciate.home} property should point to the Enunciate home distribution directory. -->
   <property name="enunciate.home" value="${basedir}"/>
@@ -13,6 +14,9 @@
   <target name="enunciate" depends="clean">
     <path id="enunciate.classpath">
       <fileset dir="${enunciate.home}/lib">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${enunciate.home}/lib/modules/spring">
         <include name="*.jar"/>
       </fileset>
     </path>

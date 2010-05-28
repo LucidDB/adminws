@@ -7,6 +7,7 @@
 	<classpathentry kind="lib" path="lib/apt-jelly-freemarker-2.8.jar"/>
 	<classpathentry kind="lib" path="lib/asm-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-beanutils-1.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec18621.jar"/>
 	<classpathentry kind="lib" path="lib/commons-digester-1.7.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/dynamobi-client.jar"/>
@@ -19,10 +20,12 @@
 	<classpathentry kind="lib" path="lib/enunciate-docs-1.17.jar"/>
 	<classpathentry kind="lib" path="lib/enunciate-jaxws-client-1.17.jar"/>
 	<classpathentry kind="lib" path="lib/enunciate-jaxws-ri-1.17.jar"/>
+	<classpathentry kind="lib" path="lib/enunciate-jaxws-ri-rt-1.17.jar"/>
 	<classpathentry kind="lib" path="lib/enunciate-jaxws-support-1.17.jar"/>
 	<classpathentry kind="lib" path="lib/enunciate-jersey-1.17.jar"/>
 	<classpathentry kind="lib" path="lib/enunciate-jersey-rt-1.17.jar"/>
 	<classpathentry kind="lib" path="lib/enunciate-obj-c-1.17.jar"/>
+	<classpathentry kind="lib" path="lib/enunciate-rt-1.17.jar"/>
 	<classpathentry kind="lib" path="lib/enunciate-ruby-1.17.jar"/>
 	<classpathentry kind="lib" path="lib/enunciate-xml-1.17.jar"/>
 	<classpathentry kind="lib" path="lib/freemarker-2.3.14.jar"/>
@@ -32,7 +35,9 @@
 	<classpathentry kind="lib" path="lib/jackson-xc-1.2.0.jar"/>
 	<classpathentry kind="lib" path="lib/jaxb-api-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/jaxb-impl-2.1.11.jar"/>
+	<classpathentry kind="lib" path="lib/jaxws-api-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/jaxws-api-2.1-1.jar"/>
+	<classpathentry kind="lib" path="lib/jaxws-rt-2.1.7.jar"/>
 	<classpathentry kind="lib" path="lib/jdom-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/jersey-core-1.1.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/jersey-server-1.1.4.1.jar"/>
@@ -41,11 +46,49 @@
 	<classpathentry kind="lib" path="lib/junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/LucidDbClient.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/mimepull-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/resolver-20050927.jar"/>
+	<classpathentry kind="lib" path="lib/saaj-api-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/saaj-impl-1.3.3.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.3.jar"/>
 	<classpathentry kind="lib" path="lib/stax-api-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/stax-api-1.0-2.jar"/>
+	<classpathentry kind="lib" path="lib/stax-ex-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/streambuffer-0.9.jar"/>
+	<classpathentry kind="lib" path="lib/wstx-asl-3.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/wstx-asl-3.2.7.jar"/>
 	<classpathentry kind="lib" path="lib/xfire-jsr181-api-1.0-M1.jar"/>
-	<classpathentry kind="lib" path="lib/enunciate-rt-1.17.jar"/>
-	<classpathentry kind="lib" path="lib/modules/rest/enunciate-rest-1.17.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/aopalliance-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/cglib-nodep-2.1_3.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/commons-fileupload-1.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/commons-io-1.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/enunciate-jaxws-ri-rt-1.17.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/enunciate-rt-1.17.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/enunciate-spring-app-1.17.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/enunciate-spring-app-rt-1.17.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/enunciate-spring-jaxws-rt-1.17.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/jaxws-rt-2.1.7.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/jaxws-spring-1.8.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/jersey-spring-1.1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/mimepull-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/resolver-20050927.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/saaj-api-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/saaj-impl-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-aop-2.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-beans-2.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-context-2.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-context-support-2.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-core-2.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-jdbc-2.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-security-core-2.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-security-core-tiger-2.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-security-oauth-2.6.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-security-openid-2.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-tx-2.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-web-2.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/spring-webmvc-2.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/stax-ex-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/streambuffer-0.9.jar"/>
+	<classpathentry kind="lib" path="lib/modules/spring/xbean-spring-2.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
