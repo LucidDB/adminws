@@ -3,7 +3,7 @@
 <!--Ant build file for building the sample API.-->
 <project default="enunciate">
 	
-	<property name="webapp.dir" value="/Users/ngoodman/dev/eigenbase_workspace/dynamodb-services/bundle"/>
+	<property name="webapp.dir" value="/Users/ngoodman/dev/jetty/current/webapps"/>
 	<!-- <property name="webapp.dir" value="D:\\dev\\jetty-6.1.7\\webapps"/> -->
 
   <!--The ${enunciate.home} property should point to the Enunciate home distribution directory. -->
@@ -35,13 +35,13 @@
   		compileDir="${basedir}/target/compile">
       <include name="**/*.java"/>
       <classpath refid="enunciate.classpath"/>
-      <export artifactId="war.file" destination="target/dynamobi.war"/>
+      <export artifactId="war.file" destination="target/adminws.war"/>
       <export artifactId="jaxws.client.library.binaries" destination="target/dynamobi-client.jar"/>
     </enunciate>
   </target>
 	
  <target name="deploy" depends="enunciate">
-	<copy file="target/dynamobi.war" tofile="${webapp.dir}/adminws.war"/>
+	<copy file="target/adminws.war" tofile="${webapp.dir}/adminws.war"/>
 </target>
 </project>
 
