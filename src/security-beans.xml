@@ -28,12 +28,12 @@
 		</property>
 		<property name="authoritiesByUsernameQuery">
 			<value>
-				<![CDATA[select username, authority from pentaho_granted_authorities where username = ?  order by authority]]>
+				<![CDATA[select username, authority from (select  gte."name" username, me."name" authority from sys_fem."Security"."Grant" g inner join sys_fem."Security"."AuthId" gto on      g."Grantor" = gto."mofId" inner join sys_fem."Security"."AuthId" gte on      g."Grantee" = gte."mofId" inner join sys_cwm."Core"."ModelElement" me on      g."Element" = me."mofId" where g."action" = 'INHERIT_ROLE') auth where username = ?  order by authority]]>
 			</value>
 		</property>
 		<property name="usersByUsernameQuery">
 			<value>
-				<![CDATA[SELECT username, password, enabled FROM pentaho_users WHERE username = ? and password is not null ORDER BY username]]>
+				<![CDATA[SELECT username, password, enabled FROM (select "name" as username, "encryptedPassword" as password, true as enabled from sys_fem."Security"."User") spring_users WHERE username = ? ORDER BY username]]>
 			</value>
 		</property>
 	</bean>
@@ -42,9 +42,9 @@
 		<property name="driverClassName"
 			value="org.luciddb.jdbc.LucidDbClientDriver" />
 		<property name="url"
-			value="jdbc:luciddb:http://localhost;schema=APPLIB" />
+			value="jdbc:luciddb:http://rifle;schema=APPLIB" />
 		<property name="username" value="sa" />
-		<property name="password" value="" />
+		<property name="password" value="sa" />
 	</bean>
 
 	<bean id="passwordEncoder"

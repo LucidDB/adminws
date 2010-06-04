@@ -104,7 +104,7 @@ public class DBAccess
                     s.uuid = rs_schema.getString(2);
                     c.schema.add(s);
 
-                    ps = conn.prepareStatement("select table_name, lineage_id from sys_root.dba_tables where catalog_name = ? and schema_name = ? and table_type = 'LOCAL TABLE'");
+                    ps = conn.prepareStatement("select table_name, lineage_id from sys_root.dba_tables where catalog_name = ? and schema_name = ? and table_type IN ('LOCAL TABLE', 'FOREIGN TABLE')");
                     ps.setString(1, c.name);
                     ps.setString(2, s.name);
                     rs_table = ps.executeQuery();
@@ -187,7 +187,7 @@ public class DBAccess
 
             StringBuffer sb = new StringBuffer();
             sb.append("select table_name, schema_name,catalog_name, lineage_id from sys_root.dba_tables where ");
-            sb.append(" TABLE_TYPE = 'LOCAL TABLE'");
+            sb.append(" TABLE_TYPE IN ('LOCAL TABLE', 'FOREIGN TABLE')");
             sb.append(" AND schema_name = ?");
 
             ps = conn.prepareStatement(sb.toString());
@@ -1182,6 +1182,7 @@ public class DBAccess
             ps = conn.prepareStatement("select "
                 + "case t.table_type "
                 + "when 'LOCAL TABLE' then 'Table' "
+                + "when 'FOREIGN TABLE' then 'View' "
                 + "when 'LOCAL VIEW' then 'View' "
                 + "end as ObjectType, "
                 + "c.schema_name, "
@@ -1192,7 +1193,7 @@ public class DBAccess
                 + "c.is_nullable AS Nullable, "
                 + "c.datatype AS DataType "
                 + "from SYS_ROOT.DBA_COLUMNS c LEFT OUTER JOIN SYS_ROOT.DBA_TABLES t ON t.table_name = c.table_name "
-                + "where t.table_type IN ('LOCAL TABLE', 'LOCAL VIEW') and t.catalog_name=? "
+                + "where t.table_type IN ('LOCAL TABLE', 'LOCAL VIEW', 'FOREIGN TABLE') and t.catalog_name=? "
                 + "order by schema_name,ObjectType,Object,ColumnOrder");
             ps.setString(1, schema);
             rs = ps.executeQuery();
