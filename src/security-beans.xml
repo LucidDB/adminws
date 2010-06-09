@@ -51,7 +51,7 @@
 UNION 
 select  gte."name" username, 'Authenticated' as authority from sys_fem."Security"."AuthId" gte 
 ) auth  
-where username = 'sa']]>
+where username = ?]]>
 			</value>
 		</property>
 		<property name="usersByUsernameQuery">
