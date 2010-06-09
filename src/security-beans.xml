@@ -56,7 +56,7 @@ where username = 'sa']]>
 		</property>
 		<property name="usersByUsernameQuery">
 			<value>
-				<![CDATA[SELECT username, case when password is null then '' else password end as password, enabled FROM (select "name" as username, "encryptedPassword" as password, true as enabled from sys_fem."Security"."User") spring_users WHERE username = ? ORDER BY username]]>
+				<![CDATA[SELECT username, password, enabled FROM (select "name" as username, "encryptedPassword" as password, true as enabled from sys_fem."Security"."User") spring_users WHERE username = ? ORDER BY username]]>
 			</value>
 		</property>
 	</bean>
