@@ -19,8 +19,26 @@
 		<property name="passwordEncoder">
 			<ref bean="passwordEncoder" />
 		</property>
+		<property name="userCache" ref="userCache" />
 	</bean>
 
+	<bean id="cacheManager"
+		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation"
+			value="classpath:/ehcache-failsafe.xml" />
+	</bean>
+
+	<bean id="userCacheBackend"
+		class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager" ref="cacheManager" />
+		<property name="cacheName" value="userCache" />
+	</bean>
+
+	<bean id="userCache"
+		class="org.springframework.security.providers.dao.cache.EhCacheBasedUserCache">
+		<property name="cache" ref="userCacheBackend" />
+	</bean>
+	
 	<bean id="userDetailsService"
 		class="org.springframework.security.userdetails.jdbc.JdbcDaoImpl">
 		<property name="dataSource">
@@ -33,10 +51,11 @@
 		</property>
 		<property name="usersByUsernameQuery">
 			<value>
-				<![CDATA[SELECT username, password, enabled FROM (select "name" as username, "encryptedPassword" as password, true as enabled from sys_fem."Security"."User") spring_users WHERE username = ? ORDER BY username]]>
+				<![CDATA[SELECT username, case when password is null then '' else password end as password, enabled FROM (select "name" as username, "encryptedPassword" as password, true as enabled from sys_fem."Security"."User") spring_users WHERE username = ? ORDER BY username]]>
 			</value>
 		</property>
 	</bean>
+	
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName"
