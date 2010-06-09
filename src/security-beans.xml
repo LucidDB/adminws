@@ -46,7 +46,12 @@
 		</property>
 		<property name="authoritiesByUsernameQuery">
 			<value>
-				<![CDATA[select username, authority from (select  gte."name" username, me."name" authority from sys_fem."Security"."Grant" g inner join sys_fem."Security"."AuthId" gto on      g."Grantor" = gto."mofId" inner join sys_fem."Security"."AuthId" gte on      g."Grantee" = gte."mofId" inner join sys_cwm."Core"."ModelElement" me on      g."Element" = me."mofId" where g."action" = 'INHERIT_ROLE') auth where username = ?  order by authority]]>
+				<![CDATA[select username, authority from 
+(select  gte."name" username, me."name" authority from sys_fem."Security"."Grant" g inner join sys_fem."Security"."AuthId" gto on      g."Grantor" = gto."mofId" inner join sys_fem."Security"."AuthId" gte on      g."Grantee" = gte."mofId" inner join sys_cwm."Core"."ModelElement" me on      g."Element" = me."mofId" where g."action" = 'INHERIT_ROLE'
+UNION 
+select  gte."name" username, 'Authenticated' as authority from sys_fem."Security"."AuthId" gte 
+) auth  
+where username = 'sa']]>
 			</value>
 		</property>
 		<property name="usersByUsernameQuery">
@@ -61,7 +66,7 @@
 		<property name="driverClassName"
 			value="org.luciddb.jdbc.LucidDbClientDriver" />
 		<property name="url"
-			value="jdbc:luciddb:http://rifle;schema=APPLIB" />
+			value="jdbc:luciddb:http://localhost;schema=APPLIB" />
 		<property name="username" value="sa" />
 		<property name="password" value="sa" />
 	</bean>
