@@ -28,6 +28,9 @@ import com.dynamobi.ws.domain.Table;
 import com.dynamobi.ws.domain.TableDetails;
 import com.dynamobi.ws.domain.TablesInfo;
 
+import org.springframework.security.Authentication;
+import org.springframework.security.context.SecurityContextHolder;
+
 /**
  * Get Tables' info from database
  * 
@@ -44,7 +47,7 @@ public class DBAccess
 
     }
 
-    public static Connection getConnenction()
+    public static Connection getConnection()
         throws ClassNotFoundException, SQLException, FileNotFoundException,
         IOException
     {
@@ -52,13 +55,16 @@ public class DBAccess
         Properties pro = new Properties();
         pro.load(DBAccess.class.getResourceAsStream("/jdbc.properties"));
         Class.forName(pro.getProperty("jdbc.driver"));
+
+        final String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        final String password = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
+
         Connection conn = DriverManager.getConnection(
             pro.getProperty("jdbc.url"),
-            pro.getProperty("jdbc.username"),
-            pro.getProperty("jdbc.password"));
+            username,
+            password);
 
         return conn;
-
     }
 
     public static TablesInfo getTablesInfo()
@@ -74,7 +80,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             ps = conn.prepareStatement("select distinct catalog_name, catalog_name from sys_root.dba_schemas order by 1");
             rs_cat = ps.executeQuery();
@@ -183,7 +189,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             StringBuffer sb = new StringBuffer();
             sb.append("select table_name, schema_name,catalog_name, lineage_id from sys_root.dba_tables where ");
@@ -266,7 +272,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             ps = conn.prepareStatement("select column_name from sys_root.dba_columns where table_name =? and schema_name=?");
             ps.setString(1, tableName);
@@ -338,7 +344,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             ps = conn.prepareStatement("select param_name, param_value from sys_root.dba_system_parameters where param_name = ?");
             ps.setString(1, paramName);
@@ -409,7 +415,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             ps = conn.prepareStatement("select param_name, param_value from sys_root.dba_system_parameters");
             rs = ps.executeQuery();
@@ -481,7 +487,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
             String sql = "alter system set \"" + paramName + "\" = '"
                 + paramValue + "'";
             System.out.println(sql);
@@ -544,7 +550,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             ps = conn.prepareStatement("select source_name, counter_name, counter_units, counter_value  from SYS_ROOT.DBA_PERFORMANCE_COUNTERS");
             rs = ps.executeQuery();
@@ -617,7 +623,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             ps = conn.prepareStatement("select source_name, counter_name, counter_units, counter_value  from SYS_ROOT.DBA_PERFORMANCE_COUNTERS where counter_name = ?");
             ps.setString(1, counterName);
@@ -689,7 +695,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             ps = conn.prepareStatement("select catalog_name, schema_name, table_name, column_name, distinct_value_count, is_distinct_value_count_estimated, percent_sampled, sample_size from sys_root.dba_column_stats");
             rs = ps.executeQuery();
@@ -770,7 +776,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             StringBuffer sql = new StringBuffer();
 
@@ -883,7 +889,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             StringBuffer sb = new StringBuffer();
 
@@ -1010,7 +1016,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             StringBuffer sb = new StringBuffer();
 
@@ -1112,7 +1118,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             ps = conn.prepareStatement("create or replace schema "
                 + catalogName.trim() + "." + ret.name.trim());
@@ -1177,7 +1183,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             ps = conn.prepareStatement("select "
                 + "case t.table_type "
@@ -1362,7 +1368,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             String mySql = sql.toLowerCase();
             String sqlcmd = "SELECT";
@@ -1667,7 +1673,7 @@ public class DBAccess
         ResultSet rs = null;
 
         try {
-            conn = getConnenction();
+            conn = getConnection();
             ps = conn.prepareStatement(testsql);
             rs = ps.executeQuery();
 
@@ -1742,7 +1748,7 @@ public class DBAccess
 
         try {
 
-            conn = getConnenction();
+            conn = getConnection();
 
             StringBuffer sb = new StringBuffer();
             sb.append("select count(1) from sys_root.dba_tables where ");
