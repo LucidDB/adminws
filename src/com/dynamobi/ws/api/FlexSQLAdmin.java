@@ -8,6 +8,9 @@ import javax.annotation.security.RolesAllowed;
  * WebService interface for FlexSQLAdmin
  * @author Ray Zhang
  * @since Feb 04,2010
+ *
+ * @author Kevin Secretan
+ * @since June 15, 2010
  * 
  */
 @WebService
@@ -16,6 +19,7 @@ public interface FlexSQLAdmin
 {
     /**
      * 
+     * Note: "schema" is really "catalog", fixme for future.
      * @param connection
      * @return
      */

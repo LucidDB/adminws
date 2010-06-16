@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -36,6 +36,9 @@ import org.springframework.security.context.SecurityContextHolder;
  * 
  * @author Ray Zhang
  * @since Jan-12-2010
+ *
+ * @author Kevin Secretan
+ * @since June-14-2010
  */
 public class DBAccess
 {
@@ -56,8 +59,17 @@ public class DBAccess
         pro.load(DBAccess.class.getResourceAsStream("/jdbc.properties"));
         Class.forName(pro.getProperty("jdbc.driver"));
 
-        final String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        final String password = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
+        // Need to check for a null auth for unit testing.
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        final String username;
+        final String password;
+        if (auth != null) {
+          username = auth.getName();
+          password = auth.getCredentials().toString();
+        } else {
+          username = "sa";
+          password = "sa";
+        }
 
         Connection conn = DriverManager.getConnection(
             pro.getProperty("jdbc.url"),
@@ -1170,12 +1182,10 @@ public class DBAccess
 
     }
 
-    public static String getDBMetaData(String connection, String schema)
+    public static String getDBMetaData(String connection, String catalog)
         throws Exception
     {
 
-        List<DBMeta> rows = new ArrayList<DBMeta>();
-        Map<String, List<String>> cache = new HashMap<String, List<String>>();
         StringBuffer result = new StringBuffer();
         Connection conn = null;
         PreparedStatement ps = null;
@@ -1201,120 +1211,92 @@ public class DBAccess
                 + "from SYS_ROOT.DBA_COLUMNS c LEFT OUTER JOIN SYS_ROOT.DBA_TABLES t ON t.table_name = c.table_name "
                 + "where t.table_type IN ('LOCAL TABLE', 'LOCAL VIEW', 'FOREIGN TABLE') and t.catalog_name=? "
                 + "order by schema_name,ObjectType,Object,ColumnOrder");
-            ps.setString(1, schema);
+            ps.setString(1, catalog);
             rs = ps.executeQuery();
 
+            /* This 'monstrosity' makes perfect sense if you don't think too hard about the data types,
+             * here's a java-less sample:
+             * meta_data =
+             * {
+             *  'schema_name' : 
+             *                  {'table_type (either View or Table)' :
+             *                          {  'table_name' :
+             *                                   {'column_name' : 'column data (e.g. "(INTEGER, NULL)")',
+             *                                   'column2_name' : 'column_data',
+             *                                   'column3_name' : 'column_data' }
+             *                            , 'table2_name' : {'column_name' : 'data'}
+             *                           }
+             *                    , 'possible second type' : {etc}
+             *                  }
+             *  , 'other_schema' : {etc}
+             * }
+             * 
+             * This makes it super intuitive to build the XML structure looping through these,
+             * again if you ignore the verbose data typing. Scroll down to the loops and check out
+             * the xml if you're still confused.
+             */
+
+            Map<String, Map<String, Map<String, Map<String, String>>> > meta_data = new LinkedHashMap<String, Map<String, Map<String, Map<String, String>>> >();
+
             while (rs.next()) {
-
-                DBMeta en = new DBMeta();
                 int c = 1;
-                en.setType(rs.getString(c++));
+                String type = rs.getString(c++);
                 String schemaName = rs.getString(c++);
-                en.setSchemaName(schemaName);
-                // en.setName(schemaName + "." + rs.getString(c++));
-                en.setName(rs.getString(c++));
-                en.setColName(rs.getString(c++));
+                String name = rs.getString(c++);
+                String col_name = rs.getString(c++);
                 c++;
-                en.setColLength(rs.getInt(c++));
-                en.setColIsNull(rs.getBoolean(c++));
-                en.setDataType(rs.getString(c++));
-                rows.add(en);
-                String key = en.getType() + "." + en.getName();
-                if (cache.containsKey(key)) {
+                int col_len = rs.getInt(c++);
+                boolean is_null = rs.getBoolean(c++);
+                String data_type = rs.getString(c++);
 
-                    List<String> value = (List<String>) cache.get(key);
-                    value.add(en.getColName());
-                    cache.put(key, value);
-
-                } else {
-
-                    List<String> value = new ArrayList<String>();
-
-                    value.add(en.getColName());
-                    cache.put(key, value);
-
+                if (!meta_data.containsKey(schemaName)) {
+                  Map<String, Map<String, Map<String, String>> > new_schema = new LinkedHashMap<String, Map<String, Map<String, String>> >();
+                  meta_data.put(schemaName, new_schema);
+                }
+                if (!meta_data.get(schemaName).containsKey(type)) {
+                  Map<String, Map<String, String> > new_type = new LinkedHashMap<String, Map<String, String>>();
+                  meta_data.get(schemaName).put(type, new_type);
+                }
+                if (!meta_data.get(schemaName).get(type).containsKey(name)) {
+                  Map<String, String> new_table = new LinkedHashMap<String, String>();
+                  meta_data.get(schemaName).get(type).put(name, new_table);
+                }
+                if (!meta_data.get(schemaName).get(type).get(name).containsKey(col_name)) {
+                  String null_str = (is_null) ? "NULL" : "NOT NULL";
+                  String col_info = "(" + data_type + ", " + null_str + ")";
+                  meta_data.get(schemaName).get(type).get(name).put(col_name, col_info);
                 }
 
             }
-            String schemaName = "";
-            String objType = "";
-            String objTable = "";
-            boolean setflag = false;
-            result.append("<node>");
 
-            for (DBMeta obj : rows) {
+            // Now build the XML to be returned to the client.
+            result.append("<node label=\"Schemas\">\n"); // root node for our metadata
 
-                if (!schemaName.equals(obj.getSchemaName())) {
-                    if (!"".equals(schemaName)) {
-                        result.append("</node></node></node>");
-                        setflag = true;
-                    }
-                    schemaName = obj.getSchemaName();
-                    result.append("<node label=\"" + schemaName + "\">");
+            for (Map.Entry<String, Map<String, Map<String, Map<String, String>>> > schema : meta_data.entrySet()) {
+              result.append("<node label=\"" + schema.getKey() + "\">\n");
+              for (Map.Entry<String, Map<String, Map<String, String>>> type : schema.getValue().entrySet()) {
+                result.append("  <node label=\"" + type.getKey() + "s\">\n");
+                for (Map.Entry<String, Map<String, String>> table : type.getValue().entrySet()) {
+                  String table_data = "    <node label=\"" + table.getKey() + "\" sqlquery=\"SELECT ";
+                  String column_data = "";
+                  for (Map.Entry<String, String> column : table.getValue().entrySet()) {
+                    column_data += "      <node column=\"" + column.getKey() + "\" label=\"" + column.getKey()
+                      + " " + column.getValue() + "\" />\n";
+                    table_data += "&quot;" + column.getKey() + "&quot;, ";
+                  }
+                  // chop off the last comma-space and finish the node
+                  table_data = table_data.substring(0, table_data.lastIndexOf(", ")) + " FROM " + schema.getKey()
+                    + "." + table.getKey() + "\">\n";
+                  result.append(table_data);
+                  result.append(column_data);
+                  result.append("    </node>\n"); // table
                 }
-
-                if (setflag) {
-
-                    setflag = true;
-                    objType = obj.getType();
-                    result.append("<node label=\"" + objType + "s\">");
-
-                } else {
-
-                    if (!objType.equals(obj.getType())) {
-                        if (!"".equals(objType)) {
-                            result.append("</node></node>");
-                            setflag = true;
-                        }
-                        objType = obj.getType();
-                        result.append("<node label=\"" + objType + "s\">");
-                    }
-                }
-
-                if (!objTable.equals(obj.getName())) {
-                    if ((!"".equals(objTable)) && setflag == false)
-                        result.append("</node>");
-                    objTable = obj.getName();
-                    List<String> foundRows = cache.get(objType + "." + objTable);
-                    String colstring = "";
-                    int x = 0;
-                    for (String col : foundRows) {
-                        colstring += "&quot;" + col + "&quot;";
-                        x++;
-                        if (x < foundRows.size())
-                            colstring += ",";
-                    }
-                    result.append("<node label=\"" + objTable
-                        + "\" sqlquery=\"SELECT " + colstring + " FROM "
-                        + schemaName + "." + objTable + "\">");
-                }
-
-                if ((!"".equals(obj.getColName()))
-                    && (!"None".equals(obj.getColName())))
-                {
-                    result.append("<node column=\"" + obj.getColName()
-                        + "\" label=\"" + obj.getColName() + " ("
-                        + obj.getDataType());
-                    if (obj.getColLength() > 0) {
-                        result.append("(" + obj.getColLength() + "), ");
-                    } else {
-                        result.append(", ");
-                    }
-                    if (obj.isColIsNull()) {
-
-                        result.append("Null" + ")\"></node>");
-                    } else {
-                        result.append(" NOT Null" + ")\"></node>");
-                    }
-
-                } else if ("None".equals(obj.getColName())) {
-                    result.append("<node column=\"" + obj.getColName()
-                        + "\" label=\"" + obj.getColName() + "\"></node>");
-                }
-                setflag = false;
-
+                result.append("  </node>\n"); // type
+              }
+              result.append("</node>\n"); // schema
             }
-            result.append("</node></node></node></node>");
+
+            result.append("</node>\n"); // root node
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -1343,7 +1325,6 @@ public class DBAccess
         }
 
         return result.toString();
-
     }
 
     public static String execSQL(

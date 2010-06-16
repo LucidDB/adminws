@@ -13,6 +13,9 @@ import com.dynamobi.ws.util.DBAccess;
  * 
  * @author Ray Zhang
  * @since Feb 04,2010
+ *
+ * @author Kevin Secretan
+ * @since June 15, 2010
  */
 @WebService(
 
@@ -30,6 +33,7 @@ public class FlexSQLAdminImpl
      */
     public String getDBMetaData(String connection, String schema)
     {
+        // Note: "schema" is really "catalog", fixme for future.
 
         String ret = "";
         try {
