@@ -1361,7 +1361,10 @@ public class DBAccess
                 sqlcmd = "UPDATE";
             } else if (mySql.startsWith("delete")) {
                 sqlcmd = "DELETE";
+            } else if (mySql.startsWith("call")) {
+                sqlcmd = "CALL";
             }
+
 
             // TODO:Find the first operator
 
@@ -1483,8 +1486,7 @@ public class DBAccess
                 datamap = "StmtText,StmtId,NodeId,Parent,PhysicalOp,LogicalOp,EstimateRows,TotalSubtreeCost";
                 datatables = sb.toString();
 
-            } else if ("SELECT".equals(sqlcmd) || "EXEC".equals(sqlcmd)
-                || "EXECUTE".equals(sqlcmd))
+            } else if ("SELECT".equals(sqlcmd) )
             {
 
                 long start = System.currentTimeMillis();
@@ -1521,7 +1523,22 @@ public class DBAccess
 
                 }
 
-            } else {
+            } else if ( "CALL".equals(sqlcmd)) {
+            	long start = System.currentTimeMillis();
+
+                ps = conn.prepareStatement(sql);
+
+
+                ps.execute();
+                long end = System.currentTimeMillis() - start;
+
+                executiontime = String.valueOf(end);
+                datatables = "<NewDataSet><Table><" + sqlcmd + ">"
+                + "Command excuted successfully </" + sqlcmd
+                + "></Table></NewDataSet>";
+            	
+            }
+            else {
 
                 long start = System.currentTimeMillis();
 
