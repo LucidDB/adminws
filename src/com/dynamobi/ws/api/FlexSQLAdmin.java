@@ -18,13 +18,12 @@ import javax.annotation.security.RolesAllowed;
 public interface FlexSQLAdmin
 {
     /**
-     * 
-     * Note: "schema" is really "catalog", fixme for future.
      * @param connection
+     * @param catalog
      * @return
      */
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String getDBMetaData(String connection, String schema);
+    public String getDBMetaData(String connection, String catalog);
     /**
      * exec SQL
      * @param connection

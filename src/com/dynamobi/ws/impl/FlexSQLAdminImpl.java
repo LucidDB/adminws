@@ -31,13 +31,11 @@ public class FlexSQLAdminImpl
      * 
      * @see com.flexsqladmin.api.FlexSQLAdmin#getDBMetaData()
      */
-    public String getDBMetaData(String connection, String schema)
+    public String getDBMetaData(String connection, String catalog)
     {
-        // Note: "schema" is really "catalog", fixme for future.
-
         String ret = "";
         try {
-            ret = DBAccess.getDBMetaData(connection, schema);
+            ret = DBAccess.getDBMetaData(connection, catalog);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
