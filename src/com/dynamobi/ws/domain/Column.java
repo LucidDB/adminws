@@ -26,6 +26,15 @@ public class Column
 	@XmlAttribute public Integer distinct_value_count;
 	@XmlAttribute public Boolean distinct_value_count_estimated;
 	@XmlAttribute public Date last_analyze_time;
-	
+
+  public String toString() {
+    return "uuid: " + uuid + "\nname: " + name + "\nordinal_position: "
+      + ordinal_position + "\ndatatype: " + datatype
+      + "\nprecision: " + precision + "\ndec_digits: " + dec_digits
+      + "\nis_nullable: " + is_nullable + "\nremarks: " + remarks
+      + "\ndistinct_value_count: " + distinct_value_count
+      + "\ndistinct_value_count_estimated: " + distinct_value_count_estimated
+      + "\nlast_analyze_time: " + last_analyze_time;
+  }
 
 }

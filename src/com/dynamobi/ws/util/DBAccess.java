@@ -67,8 +67,8 @@ public class DBAccess
           username = auth.getName();
           password = auth.getCredentials().toString();
         } else {
-          username = "sa";
-          password = "sa";
+          username = pro.getProperty("jdbc.username");
+          password = pro.getProperty("jdbc.password");
         }
 
         Connection conn = DriverManager.getConnection(

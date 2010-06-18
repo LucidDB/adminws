@@ -34,6 +34,16 @@ public class TableDetails
 	@XmlElement public List<Column> column;
 	
 	
+  public String toString() {
+    return "uuid: " + uuid + "\nname: " + name + "\nschema: " + schema
+      + "\ncatalog: " + catalog + "\ncreate_time: " + create_time.toString()
+      + "\nlast_analyze_row_count: " + last_analyze_row_count
+      + "\nlast_analyze_timestamp: " + last_analyze_timestamp
+      + "\ncurrent_row_count: " + current_row_count
+      + "\ndeleted_row_count: " + deleted_row_count
+      + "\ntable_type: " + table_type
+      + "\ncolumns: " + column.toString();
+  }
 	
 	
 	
