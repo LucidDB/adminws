@@ -69,9 +69,10 @@ public interface TableDetailsService {
   @WebMethod
   @POST
   @Path("/{catalog}/{schema}/{table}")
+  @RolesAllowed( {"Admin","Authenticated"} )
   @Consumes ("application/xml")
     public TableDetails postTableDetails(@PathParam("catalog") String catalog,
-        @PathParam("schema")String schema,
+        @PathParam("schema") String schema,
         @PathParam("table") String table, TableDetails details) throws AppException;
 
 }

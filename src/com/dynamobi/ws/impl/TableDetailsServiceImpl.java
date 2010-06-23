@@ -64,10 +64,15 @@ public class TableDetailsServiceImpl implements TableDetailsService {
     return DBAccess.putSchema(catalogName, schema);
   }
 
-  public TableDetails postTableDetails(String catalogName, String schema,
+  public TableDetails postTableDetails(String catalog, String schema,
       String table, TableDetails details) throws AppException
   {
-    return DBAccess.postTableDetails(catalogName, schema, table, details);
+    if (details == null) {
+      System.out.println("Null given");
+      return new TableDetails();
+    }
+    System.out.println(details);
+    return DBAccess.postTableDetails(catalog, schema, table, details);
   }
 
 }

@@ -1363,6 +1363,8 @@ public class DBAccess
                 sqlcmd = "DELETE";
             } else if (mySql.startsWith("call")) {
                 sqlcmd = "CALL";
+            } else if (mySql.startsWith("create view")) {
+                sqlcmd = "CREATE VIEW";
             }
 
 
@@ -1537,6 +1539,17 @@ public class DBAccess
                 + "Command excuted successfully </" + sqlcmd
                 + "></Table></NewDataSet>";
             	
+            } else if ("CREATE VIEW".equals(sqlcmd)) {
+                long start = System.currentTimeMillis();
+                ps = conn.prepareStatement(sql);
+                ps.execute();
+                long end = System.currentTimeMillis();
+                executiontime = String.valueOf(end - start);
+                datamap = "CREATE_VIEW";
+                datatables = "<NewDataSet><Table><CREATE_VIEW>"
+                + "Command excuted successfully</CREATE_VIEW>"
+                + "</Table></NewDataSet>";
+
             }
             else {
 
