@@ -1365,6 +1365,8 @@ public class DBAccess
                 sqlcmd = "CALL";
             } else if (mySql.startsWith("create view")) {
                 sqlcmd = "CREATE VIEW";
+            } else if (mySql.startsWith("drop view") || mySql.startsWith("drop table")) {
+              sqlcmd = "DROP";
             }
 
 
@@ -1550,8 +1552,17 @@ public class DBAccess
                 + "Command excuted successfully</CREATE_VIEW>"
                 + "</Table></NewDataSet>";
 
-            }
-            else {
+            } else if ("DROP".equals(sqlcmd)) {
+              long start = System.currentTimeMillis();
+              ps = conn.prepareStatement(sql);
+              ps.execute();
+              long end = System.currentTimeMillis();
+              executiontime = String.valueOf(end - start);
+              datamap = "DROP";
+              datatables = "<NewDataSet><Table><" + sqlcmd + ">"
+                + "Item Dropped Successfully</" + sqlcmd
+                + "></Table></NewDataSet>";
+            } else {
 
                 long start = System.currentTimeMillis();
 
