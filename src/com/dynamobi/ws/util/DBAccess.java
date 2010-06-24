@@ -502,7 +502,6 @@ public class DBAccess
             conn = getConnection();
             String sql = "alter system set \"" + paramName + "\" = '"
                 + paramValue + "'";
-            System.out.println(sql);
             ps = conn.prepareStatement(sql);
             ps.execute();
 
@@ -937,7 +936,7 @@ public class DBAccess
 
             ps = conn.prepareStatement("select dc.lineage_id, dc.column_name, dc.ordinal_position, dc.datatype,"
                 + "dc.\"PRECISION\", dc.dec_digits, dc.is_nullable, dc.remarks, dcs.distinct_value_count, dcs.is_distinct_value_count_estimated, "
-                + "dcs.last_analyze_time "
+                + "dcs.last_analyze_time " // + dc.default_value
                 + "from sys_root.dba_columns dc left join sys_root.dba_column_stats dcs on dc.table_name "
                 + " = dcs.table_name and dc.schema_name = dcs.schema_name and dc.catalog_name = dcs.catalog_name "
                 + "and dc.column_name = dcs.column_name "
@@ -962,6 +961,7 @@ public class DBAccess
                 c.distinct_value_count = rs.getInt(9);
                 c.distinct_value_count_estimated = rs.getBoolean(10);
                 c.last_analyze_time = rs.getDate(11);
+                c.default_value = "";//rs.getString(12);
 
                 columns.add(c);
 
@@ -1755,7 +1755,7 @@ public class DBAccess
             + datatables + "</sqlquery>";
     }
 
-    public static TableDetails postTableDetails(
+    public static boolean postTableDetails(
         String catalogName,
         String schema,
         String table,
@@ -1788,9 +1788,13 @@ public class DBAccess
             while (rs.next()) {
                 isExisting = rs.getLong(1);
             }
-            ;
 
             if (isExisting == 0) {
+
+                if (schema.toLowerCase().equals(schema))
+                  schema = "\"" + schema + "\"";
+                if (table.toLowerCase().equals(table))
+                  table = "\"" + table + "\"";
 
                 sb = new StringBuffer();
                 sb.append("create table " + catalogName + "." + schema + "."
@@ -1815,6 +1819,11 @@ public class DBAccess
                 ps.setString(3, table);
 
                 rs = ps.executeQuery();
+
+                if (schema.toLowerCase().equals(schema))
+                  schema = "\"" + schema + "\"";
+                if (table.toLowerCase().equals(table))
+                  table = "\"" + table + "\"";
 
                 List<Integer> index = new ArrayList<Integer>();
 
@@ -1923,7 +1932,7 @@ public class DBAccess
 
         }
 
-        return retVal;
+        return true;
     }
 
     private static String createTableSQL(List<Column> cols)
@@ -1977,12 +1986,30 @@ public class DBAccess
             ret.append(col.name + " " + col.datatype);
         }
 
+        if (!col.default_value.equals("")) {
+          if (!isNumericType(col.datatype))
+            ret.append(" DEFAULT '" + col.default_value + "'");
+          else
+            ret.append(" DEFAULT " + col.default_value);
+        }
+
         if (!col.is_nullable) {
             ret.append(" not null");
         }
 
         return ret.toString();
 
+    }
+
+    private static boolean isNumericType(String type) {
+      type = type.toUpperCase();
+      if (type.indexOf("INT") != -1 || type.indexOf("DEC") != -1 ||
+          type.indexOf("NUM") != -1 || type.indexOf("FLOAT") != -1 ||
+          type.indexOf("REAL") != -1 || type.indexOf("DOUBLE") != -1) {
+        return true;
+      }
+
+      return false;
     }
 
     public static void main(String[] args)

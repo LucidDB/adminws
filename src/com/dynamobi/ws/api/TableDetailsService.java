@@ -71,8 +71,8 @@ public interface TableDetailsService {
   @Path("/{catalog}/{schema}/{table}")
   @RolesAllowed( {"Admin","Authenticated"} )
   @Consumes ("application/xml")
-    public TableDetails postTableDetails(@PathParam("catalog") String catalog,
+    public boolean postTableDetails(@PathParam("catalog") String catalog,
         @PathParam("schema") String schema,
-        @PathParam("table") String table, TableDetails details) throws AppException;
+        @PathParam("table") String table, TableDetails details);
 
 }

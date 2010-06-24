@@ -22,6 +22,7 @@ public class Column
 	@XmlAttribute public Integer precision;
 	@XmlAttribute public Integer dec_digits;
 	@XmlAttribute public Boolean is_nullable;
+  @XmlAttribute public String default_value;
 	@XmlAttribute public String remarks;
 	@XmlAttribute public Integer distinct_value_count;
 	@XmlAttribute public Boolean distinct_value_count_estimated;
@@ -32,6 +33,7 @@ public class Column
       + ordinal_position + "\ndatatype: " + datatype
       + "\nprecision: " + precision + "\ndec_digits: " + dec_digits
       + "\nis_nullable: " + is_nullable + "\nremarks: " + remarks
+      + "\ndefault_value: " + default_value
       + "\ndistinct_value_count: " + distinct_value_count
       + "\ndistinct_value_count_estimated: " + distinct_value_count_estimated
       + "\nlast_analyze_time: " + last_analyze_time;
