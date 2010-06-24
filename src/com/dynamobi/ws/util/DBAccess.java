@@ -1577,6 +1577,7 @@ public class DBAccess
             }
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             errormsg = ex.getMessage();
             datamap = "Error";
             executiontime = "";

@@ -29,6 +29,9 @@ public class JDBCUtil
             for (int i = 1; i <= colCount; i++) {
                 String columnName = rsmd.getColumnName(i);
                 String value = rs.getString(i);
+                if (value != null && (value.indexOf("<") != -1 || value.indexOf(">") != -1)) {
+                  value = "<![CDATA[" + value + "]]>";
+                }
                 ret.append("<"+columnName+">"+ value);
                 ret.append("</"+columnName+">");
             }
