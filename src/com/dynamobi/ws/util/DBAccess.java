@@ -1352,7 +1352,7 @@ public class DBAccess
             conn = getConnection();
 
             String mySql = sql.toLowerCase();
-            String sqlcmd = "SELECT";
+            String sqlcmd = "";
             if (mySql.startsWith("select")) {
                 sqlcmd = "SELECT";
             } else if (mySql.startsWith("insert")) {
@@ -1565,14 +1565,14 @@ public class DBAccess
             } else {
 
                 long start = System.currentTimeMillis();
-
                 ps = conn.prepareStatement(sql);
-
                 recordcount = String.valueOf(ps.executeUpdate());
                 long end = System.currentTimeMillis() - start;
                 executiontime = String.valueOf(end);
-                datatables = "<NewDataSet><Table><" + sqlcmd + ">"
-                    + recordcount + " row(s) affected</" + sqlcmd
+                datamap = "Query";
+                datatables = "<NewDataSet><Table><Query>"
+                    + "Query Executed Successfully, " + 
+                    recordcount + " row(s) affected.</Query"
                     + "></Table></NewDataSet>";
             }
 
@@ -1600,7 +1600,7 @@ public class DBAccess
                 }
 
             } catch (SQLException ex) {
-
+                ex.printStackTrace();
                 errormsg = ex.getMessage();
                 datamap = "Error";
                 executiontime = "";
