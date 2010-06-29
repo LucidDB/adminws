@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import javax.jws.WebService;
 import javax.ws.rs.Path;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import com.dynamobi.ws.api.UsersAndRolesService;
 import com.dynamobi.ws.domain.UserDetails;
@@ -23,11 +25,26 @@ import com.dynamobi.ws.util.DBAccess;
 public class UsersAndRolesServiceImpl implements UsersAndRolesService {
 
   public List<UserDetails> getUsersDetails() throws AppException {
-    return new ArrayList<UserDetails>();
+    List<UserDetails> details = new ArrayList<UserDetails>();
+    try {
+      ResultSet rs = DBAccess.rawResultExec("SELECT * FROM sys_root.dba_users");
+      while (rs.next()) {
+        UserDetails ud = new UserDetails();
+        ud.name = rs.getString(1);
+        ud.password = rs.getString(2);
+        ud.creation_timestamp = rs.getString(3);
+        ud.modification_timestamp = rs.getString(4);
+        details.add(ud);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return details;
   }
 
-  public SessionInfo getCurrentSessions() throws AppException {
-    return new SessionInfo(); // necessary?
+  public List<SessionInfo> getCurrentSessions() throws AppException {
+    return DBAccess.getCurrentSessions();
   }
 
   public boolean addNewUser(String user, String password) throws AppException {

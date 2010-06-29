@@ -47,26 +47,26 @@ public interface UsersAndRolesService {
   @GET
   @Path("/sessions")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public SessionInfo getCurrentSessions() throws AppException;
+  public List<SessionInfo> getCurrentSessions() throws AppException;
 
   @WebMethod
   @POST
   @Path("/add/{user}/{password}")
-  @RolesAllowed( {"Admin"} )
+  @RolesAllowed( {"Admin", "Authenticated"} )
   public boolean addNewUser(@PathParam("user") String user,
                @PathParam("password") String password) throws AppException;
 
   @WebMethod
   @POST
   @Path("/delete/{user}")
-  @RolesAllowed( {"Admin"} )
+  @RolesAllowed( {"Admin", "Authenticated"} )
   public boolean deleteUser(@PathParam("user") String user)
                  throws AppException;
 
   @WebMethod
   @POST
   @Path("/roles")
-  @RolesAllowed( {"Admin"} )
+  @RolesAllowed( {"Admin", "Authenticated"} )
   @Consumes ("application/xml")
   public boolean modifyUsers(List<UserDetails> details) throws AppException;
 

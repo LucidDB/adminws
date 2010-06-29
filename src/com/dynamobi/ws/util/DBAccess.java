@@ -27,6 +27,7 @@ import com.dynamobi.ws.domain.SystemParameter;
 import com.dynamobi.ws.domain.Table;
 import com.dynamobi.ws.domain.TableDetails;
 import com.dynamobi.ws.domain.TablesInfo;
+import com.dynamobi.ws.domain.SessionInfo;
 
 import org.springframework.security.Authentication;
 import org.springframework.security.context.SecurityContextHolder;
@@ -1754,6 +1755,79 @@ public class DBAccess
             + "</edittable><executiontime>" + executiontime
             + "</executiontime><recordcount>" + recordcount + "</recordcount>"
             + datatables + "</sqlquery>";
+    }
+
+    public static ResultSet rawResultExec(String query) {
+      Connection conn = null;
+      PreparedStatement ps = null;
+      ResultSet rs = null;
+
+      try {
+        conn = getConnection();
+        ps = conn.prepareStatement(query);
+        rs = ps.executeQuery();
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      } finally {
+        try {
+          if (rs != null) {
+            rs.close();
+          }
+          if (ps != null) {
+            ps.close();
+          }
+          if (conn != null) {
+            conn.close();
+          }
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+      return rs;
+    }
+
+    public static List<SessionInfo> getCurrentSessions() {
+
+      Connection conn = null;
+      PreparedStatement ps = null;
+      ResultSet rs = null;
+
+      List<SessionInfo> retVal = new ArrayList<SessionInfo>();
+
+      try {
+        final String q = "SELECT s.session_id, s.connect_url, s.current_user_name, s2.sql_text FROM sys_root.dba_sessions s LEFT JOIN sys_root.dba_sql_statements s2 ON s.session_id = s2.session_id";
+        conn = getConnection();
+        ps = conn.prepareStatement(q);
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
+          SessionInfo si = new SessionInfo();
+          int c = 1;
+          si.id = rs.getInt(c++);
+          si.connect_url = rs.getString(c++);
+          si.user = rs.getString(c++);
+          si.query = rs.getString(c++);
+
+          retVal.add(si);
+        }
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      } finally {
+        try {
+          if (rs != null) {
+            rs.close();
+          }
+          if (ps != null) {
+            ps.close();
+          }
+          if (conn != null) {
+            conn.close();
+          }
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+      return retVal;
     }
 
     public static boolean postTableDetails(

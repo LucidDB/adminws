@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 
+
 /**
  * Holds UserDetails info
  * @author Kevin Secretan
@@ -19,10 +20,14 @@ public class UserDetails {
 
   @XmlAttribute public String name;
   @XmlAttribute public String password;
+  @XmlAttribute public String creation_timestamp;
+  @XmlAttribute public String modification_timestamp;
 
   public String toString() {
     return
      "\nname: " + name +
-     "\npassword: " + password;
+     "\npassword: " + password +
+     "\ncreation_timestamp: " + creation_timestamp +
+     "\nmodification_timestamp: " + modification_timestamp;
   }
 }
