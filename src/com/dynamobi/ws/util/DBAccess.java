@@ -1757,7 +1757,7 @@ public class DBAccess
             + datatables + "</sqlquery>";
     }
 
-    public static ResultSet rawResultExec(String query) {
+    public static ResultSet rawResultExec(String query) throws SQLException {
       Connection conn = null;
       PreparedStatement ps = null;
       ResultSet rs = null;
@@ -1765,7 +1765,11 @@ public class DBAccess
       try {
         conn = getConnection();
         ps = conn.prepareStatement(query);
-        rs = ps.executeQuery();
+        if (ps.execute()) {
+          rs = ps.getResultSet();
+        }
+      } catch (SQLException ex) {
+        throw ex;
       } catch (Exception ex) {
         ex.printStackTrace();
       } finally {

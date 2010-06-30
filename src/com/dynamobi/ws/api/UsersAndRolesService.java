@@ -53,14 +53,21 @@ public interface UsersAndRolesService {
   @POST
   @Path("/add/{user}/{password}")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public boolean addNewUser(@PathParam("user") String user,
+  public String addNewUser(@PathParam("user") String user,
+               @PathParam("password") String password) throws AppException;
+
+  @WebMethod
+  @POST
+  @Path("/modify/{user}/{password}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public String modifyUser(@PathParam("user") String user,
                @PathParam("password") String password) throws AppException;
 
   @WebMethod
   @POST
   @Path("/delete/{user}")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public boolean deleteUser(@PathParam("user") String user)
+  public String deleteUser(@PathParam("user") String user)
                  throws AppException;
 
   @WebMethod
