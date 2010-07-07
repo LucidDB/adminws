@@ -937,7 +937,7 @@ public class DBAccess
 
             ps = conn.prepareStatement("select dc.lineage_id, dc.column_name, dc.ordinal_position, dc.datatype,"
                 + "dc.\"PRECISION\", dc.dec_digits, dc.is_nullable, dc.remarks, dcs.distinct_value_count, dcs.is_distinct_value_count_estimated, "
-                + "dcs.last_analyze_time " // + dc.default_value
+                + "dcs.last_analyze_time, dc.default_value "
                 + "from sys_root.dba_columns dc left join sys_root.dba_column_stats dcs on dc.table_name "
                 + " = dcs.table_name and dc.schema_name = dcs.schema_name and dc.catalog_name = dcs.catalog_name "
                 + "and dc.column_name = dcs.column_name "
@@ -962,7 +962,7 @@ public class DBAccess
                 c.distinct_value_count = rs.getInt(9);
                 c.distinct_value_count_estimated = rs.getBoolean(10);
                 c.last_analyze_time = rs.getDate(11);
-                c.default_value = "";//rs.getString(12);
+                c.default_value = rs.getString(12);
 
                 columns.add(c);
 
@@ -1235,6 +1235,10 @@ public class DBAccess
              * This makes it super intuitive to build the XML structure looping through these,
              * again if you ignore the verbose data typing. Scroll down to the loops and check out
              * the xml if you're still confused.
+             *
+             * TODO: Admittedly we should probably be populating a
+             * struct/object in domain with the data and not formatting
+             * the XML directly here. Plus this is really bad XML design.
              */
 
             Map<String, Map<String, Map<String, Map<String, String>>> > meta_data = new LinkedHashMap<String, Map<String, Map<String, Map<String, String>>> >();
