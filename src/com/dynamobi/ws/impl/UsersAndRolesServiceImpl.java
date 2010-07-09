@@ -2,6 +2,8 @@ package com.dynamobi.ws.impl;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.jws.WebService;
 import javax.ws.rs.Path;
@@ -12,6 +14,7 @@ import com.dynamobi.ws.api.UsersAndRolesService;
 import com.dynamobi.ws.domain.UserDetails;
 import com.dynamobi.ws.domain.SessionInfo;
 import com.dynamobi.ws.domain.RolesDetails;
+import com.dynamobi.ws.domain.RolesDetailsHolder;
 import com.dynamobi.ws.domain.PermissionsInfo;
 import com.dynamobi.ws.util.AppException;
 import com.dynamobi.ws.util.DBAccess;
@@ -96,26 +99,71 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
     return false;
   }
 
-  public List<RolesDetails> getRolesDetails() throws AppException {
+  public RolesDetailsHolder getRolesDetails() throws AppException {
     String query = "SELECT granted_catalog, granted_schema, granted_element, "
-      + "grantee, grantor, action, table_type, with_grant_option "
+      + "grantee, grantor, action, role_name, grant_type, table_type, with_grant_option "
       + "FROM sys_root.dba_element_grants "
-      + "WHERE grant_type = 'Role' AND gte.\"name\" <> 'PUBLIC' "
-      + "AND gto.\"name\" <> '_SYSTEM'";
-    List<RolesDetails> details = new ArrayList<RolesDetails>();
+      + "WHERE (grant_type = 'Role' AND grantee <> 'PUBLIC' "
+      + "AND grantee <> '_SYSTEM') OR action = 'INHERIT_ROLE'";
+    Map<String, RolesDetails> details = new LinkedHashMap<String, RolesDetails>();
+    Map<String, PermissionsInfo> perms = new LinkedHashMap<String, PermissionsInfo>();
     try {
       ResultSet rs = DBAccess.rawResultExec(query);
       while (rs.next()) {
         int col = 1;
-        RolesDetails rd = new RolesDetails();
-        rd.name = rs.getString(col++);
-        details.add(rd);
+        final String catalog = rs.getString(col++);
+        final String schema = rs.getString(col++);
+        final String element = rs.getString(col++);
+        final String grantee = rs.getString(col++);
+        final String grantor = rs.getString(col++);
+        final String action = rs.getString(col++);
+        final String role_name = rs.getString(col++);
+        final String grant_type = rs.getString(col++);
+        final String table_type = rs.getString(col++);
+        final boolean with_grant = rs.getBoolean(col++);
+
+        RolesDetails rd;
+        if (!details.containsKey(role_name)) {
+          rd = new RolesDetails();
+          rd.name = role_name;
+          details.put(role_name, rd);
+        } else {
+          rd = details.get(role_name);
+        }
+
+        // Dealing with a users or permissions entry?
+        if (grant_type.equals("User")) {
+          rd.users.add(grantee);
+          if (with_grant) {
+            rd.users_with_grant_option.add(grantee);
+          }
+        } else if (grant_type.equals("Role")) {
+          final String key = role_name + catalog + schema + element + table_type;
+          PermissionsInfo p;
+          if (!perms.containsKey(key)) {
+            p = new PermissionsInfo();
+            p.catalog_name = catalog;
+            p.schema_name = schema;
+            p.item_name = element;
+            p.item_type = table_type;
+            perms.put(key, p);
+            rd.permissions.add(p);
+          } else {
+            p = perms.get(key);
+          }
+          p.actions.add(action);
+        } else {
+          throw new AppException("Unknown grant type");
+        }
+
       }
     } catch (SQLException e) {
       e.printStackTrace();
     }
 
-    return details;
+    RolesDetailsHolder rh = new RolesDetailsHolder();
+    rh.value.addAll(details.values());
+    return rh;
   }
 
   public String addNewRole(String role) throws AppException {

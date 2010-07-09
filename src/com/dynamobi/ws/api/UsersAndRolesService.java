@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import com.dynamobi.ws.domain.UserDetails;
 import com.dynamobi.ws.domain.SessionInfo;
 import com.dynamobi.ws.domain.RolesDetails;
+import com.dynamobi.ws.domain.RolesDetailsHolder;
 import com.dynamobi.ws.domain.PermissionsInfo;
 import com.dynamobi.ws.util.AppException;
 
@@ -76,7 +77,7 @@ public interface UsersAndRolesService {
   @POST
   @Path("/roles")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public List<RolesDetails> getRolesDetails() throws AppException;
+  public RolesDetailsHolder getRolesDetails() throws AppException;
 
   @WebMethod
   @POST
