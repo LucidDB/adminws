@@ -61,7 +61,24 @@ where username = ?]]>
 		</property>
 	</bean>
 	
-	<bean id="dataSource"
+    
+  <!--<bean id="dataSource"
+    class="com.dynamobi.ws.util.ConnDriverManagerDataSource" />
+  <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" />
+    -->
+    
+   <bean id="dataSource" class="com.mchange.v2.c3p0.mbean.C3P0PooledDataSource"
+          >
+     
+      <attribute name="JndiName">java:PooledDS</attribute>
+      <attribute name="JdbcUrl">jdbc:luciddb:http://localhost</attribute>
+      <attribute name="DriverClass">org.luciddb.jdbc.LucidDbClientDriver</attribute>
+      <attribute name="User">sa</attribute>
+      <attribute name="Password">sa</attribute>
+    </bean>
+
+  <!--
+  <bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName"
 			value="org.luciddb.jdbc.LucidDbClientDriver" />
@@ -70,6 +87,7 @@ where username = ?]]>
 		<property name="username" value="sa" />
 		<property name="password" value="sa" />
 	</bean>
+  -->
 
 	<bean id="passwordEncoder"
 		class="com.dynamobi.ws.util.LucidDBEncoder">

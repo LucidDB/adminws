@@ -15,6 +15,8 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+//import com.dynamo.ws.util.ConnDriverManagerDataSource;
+
 import com.dynamobi.ws.domain.Catalog;
 import com.dynamobi.ws.domain.Column;
 import com.dynamobi.ws.domain.ColumnStats;
@@ -59,6 +61,7 @@ public class DBAccess
 
         Properties pro = new Properties();
         pro.load(DBAccess.class.getResourceAsStream("/jdbc.properties"));
+        // Registers driver with the manager
         Class.forName(pro.getProperty("jdbc.driver"));
 
         // Need to check for a null auth for unit testing.
@@ -77,6 +80,9 @@ public class DBAccess
             pro.getProperty("jdbc.url"),
             username,
             password);
+            
+        //Connection conn = ConnDriverManagerDataSource.getConnection();
+        //Connection conn = DriverManager.getConnection();
 
         return conn;
     }
