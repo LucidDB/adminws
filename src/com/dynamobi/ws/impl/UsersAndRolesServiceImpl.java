@@ -29,6 +29,10 @@ import com.dynamobi.ws.util.DBAccess;
 @Path("/users")
 public class UsersAndRolesServiceImpl implements UsersAndRolesService {
 
+
+  /* TODO: use prepared statements / better db interface
+   */
+
   public List<UserDetails> getUsersDetails() throws AppException {
     List<UserDetails> details = new ArrayList<UserDetails>();
     try {
@@ -95,10 +99,6 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
     return userAction(user, "", Action.DEL);
   }
 
-  public boolean modifyUsers(List<UserDetails> details) throws AppException {
-    return false;
-  }
-
   public RolesDetailsHolder getRolesDetails() throws AppException {
     String query = "SELECT granted_catalog, granted_schema, granted_element, "
       + "grantee, grantor, action, role_name, grant_type, table_type, with_grant_option "
@@ -157,6 +157,17 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
         }
 
       }
+
+      ResultSet rs_extra_roles = DBAccess.rawResultExec("SELECT name FROM sys_root.dba_roles WHERE name <> 'PUBLIC'");
+      while (rs_extra_roles.next()) {
+        final String role_name = rs_extra_roles.getString(1);
+        if (!details.containsKey(role_name)) {
+          RolesDetails rd = new RolesDetails();
+          rd.name = role_name;
+          details.put(role_name, rd);
+        }
+      }
+
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -167,8 +178,58 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
   }
 
   public String addNewRole(String role) throws AppException {
+    String retval = "";
+    String query = "CREATE ROLE " + role;
+    try {
+      ResultSet rs = DBAccess.rawResultExec(query);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      retval = e.getMessage();
+    }
+    return retval;
+  }
 
-    return "";
+  public String deleteRole(String role) throws AppException {
+    String retval = "";
+    String query = "DROP ROLE " + role;
+    try {
+      ResultSet rs = DBAccess.rawResultExec(query);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      retval = e.getMessage();
+    }
+    return retval;
+  }
+
+  public String userToRole(String user, String role, boolean added, boolean with_grant) throws AppException {
+    String retval = "";
+    String query = "";
+    if (added) {
+      query = "GRANT ROLE " + role + " TO \"" + user + "\"";
+      if (with_grant)
+        query += " WITH GRANT OPTION";
+    } else {
+      // oh yeah, I forgot. 
+      // TODO: get ability to remove users from roles.
+      // Note: apparently only one user can have grant option?
+      retval = "Not Implemented: REVOKE";
+      return retval;
+    }
+    try {
+      ResultSet rs = DBAccess.rawResultExec(query);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      retval = e.getMessage();
+    }
+    return retval;
+  }
+
+  public String grantPermissions(String elements) throws AppException {
+    return "Bad";
+  }
+
+  public String revokePermissions(String elements) throws AppException {
+    return "Bad";
   }
 
 }

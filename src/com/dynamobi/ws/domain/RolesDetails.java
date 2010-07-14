@@ -26,7 +26,7 @@ public class RolesDetails {
   @XmlAttribute public String name;
   @XmlElement @XmlList public List<String> users;
   @XmlElement @XmlList public List<String> users_with_grant_option;
-  @XmlElement   public List<PermissionsInfo> permissions;
+  @XmlElement(name="permission") public List<PermissionsInfo> permissions;
 
   public RolesDetails() {
     users = new ArrayList<String>();

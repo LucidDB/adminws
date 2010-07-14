@@ -24,7 +24,7 @@ public class PermissionsInfo {
   @XmlAttribute public String schema_name;
   @XmlAttribute public String item_name;
   @XmlAttribute public String item_type;
-  @XmlElement @XmlList public List<String> actions;
+  @XmlAttribute @XmlList public List<String> actions;
 
   public PermissionsInfo() {
     actions = new ArrayList<String>();

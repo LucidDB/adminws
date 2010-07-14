@@ -85,12 +85,35 @@ public interface UsersAndRolesService {
   @RolesAllowed( {"Admin", "Authenticated"} )
   public String addNewRole(@PathParam("role") String role) throws AppException;
 
-  /*@WebMethod
+  @WebMethod
   @POST
-  @Path("/roles")
+  @Path("/roles/delete/{role}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public String deleteRole(@PathParam("role") String role) throws AppException;
+
+  @WebMethod
+  @POST
+  @Path("/torole/{user}/{role}/{added}/{with_grant}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public String userToRole(@PathParam("user") String user,
+      @PathParam("role") String role,
+      @PathParam("added") boolean added,
+      @PathParam("with_grant") boolean with_grant) throws AppException;
+
+  @WebMethod
+  @POST
+  @Path("/roles/grant/{elements}")
   @RolesAllowed( {"Admin", "Authenticated"} )
   @Consumes ("application/xml")
-  public boolean modifyUsers(List<UserDetails> details) throws AppException;
-  */
+  public String grantPermissions(@PathParam("elements") String elements)
+    throws AppException;
+
+  @WebMethod
+  @POST
+  @Path("/roles/revoke/{elements}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  @Consumes ("application/xml")
+  public String revokePermissions(@PathParam("elements") String elements)
+    throws AppException;
 
 }
