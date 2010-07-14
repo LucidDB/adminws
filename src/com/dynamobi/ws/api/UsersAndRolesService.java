@@ -100,20 +100,56 @@ public interface UsersAndRolesService {
       @PathParam("added") boolean added,
       @PathParam("with_grant") boolean with_grant) throws AppException;
 
+  /** 
+   * Grant permissions for everything in the given schema;
+   * This and all others expect permissions as a comma-separated string
+   * of all the permissions.
+   */
   @WebMethod
   @POST
-  @Path("/roles/grant/{elements}")
+  @Path("/roles/grant/{catalog}/{schema}/{permissions}/{grantee}")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  @Consumes ("application/xml")
-  public String grantPermissions(@PathParam("elements") String elements)
+  public String grantPermissionsOnSchema(@PathParam("catalog") String catalog,
+                @PathParam("schema") String schema,
+                @PathParam("permissions") String permissions,
+                @PathParam("grantee") String grantee)
     throws AppException;
 
+  /** Grant permissions for a specific element like a table or view */
   @WebMethod
   @POST
-  @Path("/roles/revoke/{elements}")
+  @Path("/roles/grant/{catalog}/{schema}/{type}/{element}/{permissions}/{grantee}")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  @Consumes ("application/xml")
-  public String revokePermissions(@PathParam("elements") String elements)
+  public String grantPermissions(@PathParam("catalog") String catalog,
+                @PathParam("schema") String schema,
+                @PathParam("type") String type,
+                @PathParam("element") String element,
+                @PathParam("permissions") String permissions,
+                @PathParam("grantee") String grantee)
+    throws AppException;
+
+  /** Revoke permissions for everything in the given schema */
+  @WebMethod
+  @POST
+  @Path("/roles/revoke/{catalog}/{schema}/{permissions}/{grantee}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public String revokePermissionsOnSchema(@PathParam("catalog") String catalog,
+                @PathParam("schema") String schema,
+                @PathParam("permissions") String permissions,
+                @PathParam("grantee") String grantee)
+    throws AppException;
+
+  /** Revoke permissions for a specific element like a table or view */
+  @WebMethod
+  @POST
+  @Path("/roles/revoke/{catalog}/{schema}/{type}/{element}/{permissions}/{grantee}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public String revokePermissions(@PathParam("catalog") String catalog,
+                @PathParam("schema") String schema,
+                @PathParam("type") String type,
+                @PathParam("element") String element,
+                @PathParam("permissions") String permissions,
+                @PathParam("grantee") String grantee)
     throws AppException;
 
 }

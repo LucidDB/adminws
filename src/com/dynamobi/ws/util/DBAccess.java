@@ -45,6 +45,7 @@ public class DBAccess
 {
     public static String REGEX1 = "(\\w+)[\\(|:]";
     public static String REGEX2 = ":\\srowcount\\s=\\s(.+),\\scumulative\\scost\\s=\\s(.+)";
+    public static String connection_catalog = "";
 
     private DBAccess()
     {
@@ -1768,6 +1769,10 @@ public class DBAccess
 
       try {
         conn = getConnection();
+        if (!connection_catalog.equals("")) {
+          ps = conn.prepareStatement("SET CATALOG '" + connection_catalog + "'");
+          ps.execute();
+        }
         ps = conn.prepareStatement(query);
         if (ps.execute()) {
           rs = ps.getResultSet();

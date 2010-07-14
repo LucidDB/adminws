@@ -224,12 +224,86 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
     return retval;
   }
 
-  public String grantPermissions(String elements) throws AppException {
-    return "Bad";
+  public String grantPermissionsOnSchema(String catalog, String schema,
+                String permissions, String grantee) throws AppException {
+    String retval = "";
+    /*String query = "CALL APPLIB.DO_FOR_ENTIRE_SCHEMA('GRANT " +
+      permissions + " ON %TABLE_NAME% TO \"" + grantee + "\"', " +
+      "'" + schema + "', 'TABLES_AND_VIEWS')";
+      * cannot do above because do_for_entire_schema does not respect
+      * catalogs.
+      */
+    try {
+      ResultSet rs = DBAccess.rawResultExec("SELECT TABLE_NAME "
+          + "FROM SYS_ROOT.DBA_TABLES "
+          + "WHERE CATALOG_NAME = '" + catalog + "' AND "
+          + "SCHEMA_NAME = '" + schema + "'");
+      while (rs.next()) {
+        String query = "GRANT " + permissions + " ON " +
+          "\"" + catalog + "\".\"" + schema + "\".\"" + rs.getString(1) + "\" "
+          + "TO \"" + grantee + "\"";
+        DBAccess.rawResultExec(query);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+      retval = e.getMessage();
+    }
+    return retval;
   }
 
-  public String revokePermissions(String elements) throws AppException {
-    return "Bad";
+  public String grantPermissions(String catalog, String schema, String type,
+                String element, String permissions, String grantee)
+                throws AppException {
+    String retval = "";
+    String query = "GRANT " + permissions + " ON \"" + catalog +
+     "\".\"" + schema + "\".\"" + element + "\" TO \"" + grantee + "\"";
+    try {
+      ResultSet rs = DBAccess.rawResultExec(query);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      retval = e.getMessage();
+    }
+    return retval;
+  }
+
+  public String revokePermissionsOnSchema(String catalog, String schema,
+                String permissions, String grantee) throws AppException {
+    return "Not Implemented";
+    /*String retval = "";
+    try {
+      ResultSet rs = DBAccess.rawResultExec("SELECT TABLE_NAME "
+          + "FROM SYS_ROOT.DBA_TABLES "
+          + "WHERE CATALOG_NAME = '" + catalog + "' AND "
+          + "SCHEMA_NAME = '" + schema + "'");
+      while (rs.next()) {
+        String query = "REVOKE " + permissions + " ON " +
+          "\"" + catalog + "\".\"" + schema + "\".\"" + rs.getString(1) + "\" "
+          + "FROM \"" + grantee + "\"";
+        DBAccess.rawResultExec(query);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+      retval = e.getMessage();
+    }
+    return retval;
+    */
+  }
+
+  public String revokePermissions(String catalog, String schema, String type,
+                String element, String permissions, String grantee)
+                throws AppException {
+    return "Not Implemented";
+    /*String retval = "";
+    String query = "REVOKE " + permissions + " ON \"" + catalog +
+     "\".\"" + schema + "\".\"" + element + "\" FROM \"" + grantee + "\"";
+    try {
+      ResultSet rs = DBAccess.rawResultExec(query);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      retval = e.getMessage();
+    }
+    return retval;
+    */
   }
 
 }
