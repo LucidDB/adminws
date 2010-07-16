@@ -1798,7 +1798,7 @@ public class DBAccess
       } finally {
         try {
           if (rs != null) {
-            rs.close();
+            //rs.close();
           }
           if (ps != null) {
             ps.close();
