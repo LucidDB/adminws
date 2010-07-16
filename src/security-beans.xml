@@ -39,11 +39,13 @@
 <!--		<property name="cache" ref="userCacheBackend" />-->
 <!--	</bean>-->
 	
-	<bean id="userDetailsService"
-		class="org.springframework.security.userdetails.jdbc.JdbcDaoImpl">
-		<property name="dataSource">
+  <!--<bean id="userDetailsService"
+    class="org.springframework.security.userdetails.jdbc.JdbcDaoImpl">-->
+  <bean id="userDetailsService" class="com.dynamobi.ws.util.DBDao" destroy-method="cleanup">
+    <!--<property name="dataSource">
 			<ref local="dataSource" />
 		</property>
+    -->
 		<property name="authoritiesByUsernameQuery">
 			<value>
 				<![CDATA[select username, authority from 
@@ -62,12 +64,21 @@ where username = ?]]>
 	</bean>
 	
     
-  <!--<bean id="dataSource"
+  <!--<bean id="dataSource" singleton="true" 
     class="com.dynamobi.ws.util.ConnDriverManagerDataSource" />
-  <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" />
     -->
+
+  <!--<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClassName"
+			value="org.luciddb.jdbc.LucidDbClientDriver" />
+		<property name="url"
+			value="jdbc:luciddb:http://localhost" />
+		<property name="username" value="sa" />
+		<property name="password" value="sa" />
+  </bean>
+  -->
     
-   <bean id="dataSource" class="com.mchange.v2.c3p0.mbean.C3P0PooledDataSource"
+   <!--<bean id="dataSource" class="com.mchange.v2.c3p0.mbean.C3P0PooledDataSource"
           >
      
       <attribute name="JndiName">java:PooledDS</attribute>
@@ -76,6 +87,7 @@ where username = ?]]>
       <attribute name="User">sa</attribute>
       <attribute name="Password">sa</attribute>
     </bean>
+    -->
 
   <!--
   <bean id="dataSource"

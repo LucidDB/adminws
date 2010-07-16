@@ -15,7 +15,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//import com.dynamo.ws.util.ConnDriverManagerDataSource;
+import javax.sql.DataSource;
 
 import com.dynamobi.ws.domain.Catalog;
 import com.dynamobi.ws.domain.Column;
@@ -49,6 +49,8 @@ public class DBAccess
     public static String REGEX2 = ":\\srowcount\\s=\\s(.+),\\scumulative\\scost\\s=\\s(.+)";
     public static String connection_catalog = "";
 
+    public static DataSource connDataSource = null;
+
     private DBAccess()
     {
 
@@ -59,10 +61,14 @@ public class DBAccess
         IOException
     {
 
+        if (connDataSource == null) {
+          throw new SQLException("No Data Source Detected");
+        }
+
         Properties pro = new Properties();
         pro.load(DBAccess.class.getResourceAsStream("/jdbc.properties"));
         // Registers driver with the manager
-        Class.forName(pro.getProperty("jdbc.driver"));
+        //Class.forName(pro.getProperty("jdbc.driver"));
 
         // Need to check for a null auth for unit testing.
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -76,13 +82,15 @@ public class DBAccess
           password = pro.getProperty("jdbc.password");
         }
 
-        Connection conn = DriverManager.getConnection(
+        /*Connection conn = DriverManager.getConnection(
             pro.getProperty("jdbc.url"),
             username,
-            password);
+            password);*/
             
-        //Connection conn = ConnDriverManagerDataSource.getConnection();
+        //Connection conn = getInstance().getConnection(username, password);
         //Connection conn = DriverManager.getConnection();
+
+        Connection conn = connDataSource.getConnection(username, password);
 
         return conn;
     }
