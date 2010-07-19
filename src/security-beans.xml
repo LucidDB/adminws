@@ -64,43 +64,6 @@ where username = ?]]>
 	</bean>
 	
     
-  <!--<bean id="dataSource" singleton="true" 
-    class="com.dynamobi.ws.util.ConnDriverManagerDataSource" />
-    -->
-
-  <!--<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-		<property name="driverClassName"
-			value="org.luciddb.jdbc.LucidDbClientDriver" />
-		<property name="url"
-			value="jdbc:luciddb:http://localhost" />
-		<property name="username" value="sa" />
-		<property name="password" value="sa" />
-  </bean>
-  -->
-    
-   <!--<bean id="dataSource" class="com.mchange.v2.c3p0.mbean.C3P0PooledDataSource"
-          >
-     
-      <attribute name="JndiName">java:PooledDS</attribute>
-      <attribute name="JdbcUrl">jdbc:luciddb:http://localhost</attribute>
-      <attribute name="DriverClass">org.luciddb.jdbc.LucidDbClientDriver</attribute>
-      <attribute name="User">sa</attribute>
-      <attribute name="Password">sa</attribute>
-    </bean>
-    -->
-
-  <!--
-  <bean id="dataSource"
-		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName"
-			value="org.luciddb.jdbc.LucidDbClientDriver" />
-		<property name="url"
-			value="jdbc:luciddb:http://localhost" />
-		<property name="username" value="sa" />
-		<property name="password" value="sa" />
-	</bean>
-  -->
-
 	<bean id="passwordEncoder"
 		class="com.dynamobi.ws.util.LucidDBEncoder">
 		<property name="encodeHashAsBase64" value="true" />

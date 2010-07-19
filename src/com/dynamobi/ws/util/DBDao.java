@@ -1,12 +1,14 @@
 package com.dynamobi.ws.util;
 
-import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import java.lang.ClassNotFoundException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.io.InputStream;
+import java.io.IOException;
 
 // Base class
 import org.springframework.security.userdetails.jdbc.JdbcDaoImpl;
@@ -20,16 +22,31 @@ public class DBDao extends JdbcDaoImpl {
 
   private DataSource ds_pooled = null;
 
-  public DBDao() throws ClassNotFoundException, SQLException {
+  public DBDao() throws ClassNotFoundException, SQLException, IOException {
     super();
-    Class.forName("org.luciddb.jdbc.LucidDbClientDriver");
+
+    Properties pro = new Properties();
+
+    InputStream user_props = this.getClass().getResourceAsStream("/luciddb-jdbc.properties");
+    if (user_props != null) {
+      pro.load(user_props);
+    } else {
+      pro.load(this.getClass().getResourceAsStream("/luciddb-jdbc-default.properties"));
+    }
+
+    Class.forName(pro.getProperty("jdbc.driver"));
+
+    String username = pro.getProperty("jdbc.username");
+    String password = pro.getProperty("jdbc.password");
+    String url      = pro.getProperty("jdbc.url");
+
     DataSource ds_unpooled = DataSources.unpooledDataSource(
-        "jdbc:luciddb:http://localhost",
-        "sa",
-        "sa");
-    
+        url,
+        username,
+        password);
+
     Map<String,String> overrides = new HashMap<String,String>();
-    overrides.put("minPoolSize", "5");
+    overrides.put("minPoolSize", "3");
     ds_pooled = DataSources.pooledDataSource(ds_unpooled, overrides);
 
     setDataSource(ds_pooled);

@@ -1,7 +1,6 @@
 package com.dynamobi.ws.util;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,40 +55,23 @@ public class DBAccess
     }
 
     public static Connection getConnection()
-        throws ClassNotFoundException, SQLException, FileNotFoundException,
-        IOException
+        throws ClassNotFoundException, SQLException, FileNotFoundException
     {
 
         if (connDataSource == null) {
           throw new SQLException("No Data Source Detected");
         }
 
-        Properties pro = new Properties();
-        pro.load(DBAccess.class.getResourceAsStream("/jdbc.properties"));
-        // Registers driver with the manager
-        //Class.forName(pro.getProperty("jdbc.driver"));
-
-        // Need to check for a null auth for unit testing.
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        final String username;
-        final String password;
+        Connection conn;
+
         if (auth != null) {
-          username = auth.getName();
-          password = auth.getCredentials().toString();
+          conn = connDataSource.getConnection(auth.getName(),
+                                              auth.getCredentials().toString());
         } else {
-          username = pro.getProperty("jdbc.username");
-          password = pro.getProperty("jdbc.password");
+          // default connection
+          conn = connDataSource.getConnection();
         }
-
-        /*Connection conn = DriverManager.getConnection(
-            pro.getProperty("jdbc.url"),
-            username,
-            password);*/
-            
-        //Connection conn = getInstance().getConnection(username, password);
-        //Connection conn = DriverManager.getConnection();
-
-        Connection conn = connDataSource.getConnection(username, password);
 
         return conn;
     }
@@ -171,11 +152,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -255,11 +231,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -329,11 +300,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -400,11 +366,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -471,11 +432,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -537,11 +493,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -607,11 +558,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -679,11 +625,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -756,11 +697,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -870,11 +806,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -1000,11 +931,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -1104,11 +1030,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -1167,11 +1088,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
@@ -2007,11 +1923,6 @@ public class DBAccess
 
             e.printStackTrace();
             throw new AppException("Error Info: Not found jdbc.properties!");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new AppException(
-                "Error Info: failed to parse jdbc.properties!");
         } finally {
 
             try {
