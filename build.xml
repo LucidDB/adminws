@@ -3,13 +3,13 @@
 <!--Ant build file for building the sample API.-->
 <project default="enunciate">
 	
-	<property name="webapp.dir" value="/Users/ngoodman/dev/jetty/current/webapps"/>
+  <property name="webapp.dir" value="/var/lib/jetty/webapps/"/>
 	<!-- <property name="webapp.dir" value="D:\\dev\\jetty-6.1.7\\webapps"/> -->
 
   <!--The ${enunciate.home} property should point to the Enunciate home distribution directory. -->
   <property name="enunciate.home" value="${basedir}"/>
   <target name="clean">
-  	<delete dir="${basedir}/target"></delete>
+    <delete dir="${basedir}/target"></delete>
   </target>
   <target name="enunciate" depends="clean">
     <path id="enunciate.classpath">
@@ -42,6 +42,7 @@
 	
  <target name="deploy" depends="enunciate">
 	<copy file="target/adminws.war" tofile="${webapp.dir}/adminws.war"/>
+  <copy file="target/adminws.war" tofile="../dynamodb-services/wars/adminws.war"/>
 </target>
 </project>
 
