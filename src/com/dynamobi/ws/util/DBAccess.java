@@ -1541,8 +1541,8 @@ public class DBAccess
                 datamap = "Error";
                 executiontime = "";
                 recordcount = "";
-                datatables = "<NewDataSet><Table><Error>Error Executing Query: "
-                    + errormsg + "</Error></Table></NewDataSet>";
+                datatables = "<NewDataSet><Table><Error><![CDATA[Error Executing Query: "
+                    + errormsg + "]]></Error></Table></NewDataSet>";
 
             }
         }
@@ -1641,14 +1641,14 @@ public class DBAccess
 
             if (!"1".equals(recordcount)) {
                 throw new Exception(
-                    "Command effected more than one row, operation cancelled.");
+                    "Command affected more than one row, operation cancelled.");
             } else {
                 result = execSQL(connection, "normal", sql, toomany);
             }
         } catch (Exception ex) {
             String errormsg = ex.getMessage();
-            String datatables = "<NewDataSet><Table><Error>Error Executing Query: "
-                + errormsg + "</Error></Table></NewDataSet>";
+            String datatables = "<NewDataSet><Table><Error><![CDATA[Error Executing Query: "
+                + errormsg + "]]></Error></Table></NewDataSet>";
             result = formatResult("Error", "", "", "0", "", datatables);
         } finally {
 
@@ -1667,8 +1667,8 @@ public class DBAccess
             } catch (SQLException ex) {
 
                 String errormsg = ex.getMessage();
-                String datatables = "<NewDataSet><Table><Error>Error Executing Query: "
-                    + errormsg + "</Error></Table></NewDataSet>";
+                String datatables = "<NewDataSet><Table><Error><![CDATA[Error Executing Query: "
+                    + errormsg + "]]></Error></Table></NewDataSet>";
                 result = formatResult("Error", "", "", "0", "", datatables);
 
             }
@@ -2023,6 +2023,26 @@ public class DBAccess
       }
 
       return false;
+    }
+
+    private static String htmlEntities(String str) {
+      String escaped = "";
+      for (int i = 0; i < str.length(); i++) {
+        String c = Character.toString(str.charAt(i));
+        if (c.equals("<"))
+          escaped += "&lt;";
+        else if (c.equals(">"))
+          escaped += "&gt;";
+        else if (c.equals("\""))
+          escaped += "&quot;";
+        else if (c.equals("'"))
+          escaped += "&apos;";
+        else if (c.equals("&"))
+          escaped += "&amp;";
+        else
+          escaped += c;
+      }
+      return escaped;
     }
 
     public static void main(String[] args)

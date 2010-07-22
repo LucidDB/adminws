@@ -10,6 +10,7 @@ import com.dynamobi.ws.domain.Column;
 import com.dynamobi.ws.domain.Schema;
 import com.dynamobi.ws.domain.Table;
 import com.dynamobi.ws.domain.TableDetails;
+import com.dynamobi.ws.domain.TableDetailsHolder;
 import com.dynamobi.ws.domain.TablesInfo;
 import com.dynamobi.ws.util.AppException;
 import com.dynamobi.ws.util.DBAccess;
@@ -65,13 +66,14 @@ public class TableDetailsServiceImpl implements TableDetailsService {
   }
 
   public boolean postTableDetails(String catalog, String schema,
-      String table, TableDetails details)
+      String table, TableDetailsHolder detailsHolder)
   {
-    if (details == null) {
+    if (detailsHolder.value == null) {
       return false;
     }
     try {
-      boolean retval = DBAccess.postTableDetails(catalog, schema, table, details);
+      boolean retval = DBAccess.postTableDetails(catalog, schema,
+          table, detailsHolder.value);
     } catch (AppException e) {
       e.printStackTrace();
       return false;
