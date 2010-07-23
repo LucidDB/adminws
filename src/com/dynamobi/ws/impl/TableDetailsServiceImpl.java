@@ -58,10 +58,15 @@ public class TableDetailsServiceImpl implements TableDetailsService {
     return DBAccess.getSchemaByName(catalogName, schemaName);
   }
 
-  public Schema putSchema(String catalogName, Schema schema)
+  public String createSchema(String catalog, String schema)
     throws AppException
   {
-    return DBAccess.putSchema(catalogName, schema);
+    try {
+      DBAccess.createSchema(catalog, schema);
+    } catch (AppException ex) {
+      return ex.getMessage();
+    }
+    return "";
   }
 
   public boolean postTableDetails(String catalog, String schema,

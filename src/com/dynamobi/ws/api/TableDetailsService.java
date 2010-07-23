@@ -52,10 +52,10 @@ public interface TableDetailsService {
 
   @WebMethod
   @POST
-  @Path("/{catalog}")
+  @Path("/{catalog}/{schema}")
   @Consumes ("application/xml")
-  public Schema putSchema(@PathParam("catalog") String catalogName,
-      Schema schema) throws AppException;
+  public String createSchema(@PathParam("catalog") String catalog,
+      String schema) throws AppException;
 
 
   @WebMethod

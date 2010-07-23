@@ -74,7 +74,7 @@ public interface UsersAndRolesService {
                  throws AppException;
 
   @WebMethod
-  @POST
+  @GET
   @Path("/roles")
   @RolesAllowed( {"Admin", "Authenticated"} )
   public RolesDetailsHolder getRolesDetails() throws AppException;

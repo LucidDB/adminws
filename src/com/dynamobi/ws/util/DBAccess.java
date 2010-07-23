@@ -1056,11 +1056,9 @@ public class DBAccess
 
     }
 
-    public static Schema putSchema(String catalogName, Schema schema)
+    public static void createSchema(String catalogName, String schema)
         throws AppException
     {
-        Schema ret = schema;
-
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -1070,7 +1068,7 @@ public class DBAccess
             conn = getConnection();
 
             ps = conn.prepareStatement("create or replace schema "
-                + catalogName.trim() + "." + ret.name.trim());
+                + catalogName.trim() + "." + schema.trim());
             ps.execute();
 
         } catch (ClassNotFoundException e) {
@@ -1109,8 +1107,6 @@ public class DBAccess
             }
 
         }
-
-        return ret;
 
     }
 
