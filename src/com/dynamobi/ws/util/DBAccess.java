@@ -1205,7 +1205,7 @@ public class DBAccess
             result.append("<node label=\"Schemas\">\n"); // root node for our metadata
 
             for (Map.Entry<String, Map<String, Map<String, Map<String, String>>> > schema : meta_data.entrySet()) {
-              result.append("<node label=\"" + schema.getKey() + "\">\n");
+              result.append("<schema label=\"" + schema.getKey() + "\">\n");
               for (Map.Entry<String, Map<String, Map<String, String>>> type : schema.getValue().entrySet()) {
                 result.append("  <node label=\"" + type.getKey() + "s\">\n");
                 for (Map.Entry<String, Map<String, String>> table : type.getValue().entrySet()) {
@@ -1225,7 +1225,7 @@ public class DBAccess
                 }
                 result.append("  </node>\n"); // type
               }
-              result.append("</node>\n"); // schema
+              result.append("</schema>\n"); // schema
             }
 
             result.append("</node>\n"); // root node
