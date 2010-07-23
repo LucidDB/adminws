@@ -15,7 +15,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 
 import com.dynamobi.ws.domain.Schema;
 import com.dynamobi.ws.domain.Table;
-import com.dynamobi.ws.domain.TableDetailsHolder;
 import com.dynamobi.ws.domain.TableDetails;
 import com.dynamobi.ws.domain.TablesInfo;
 import com.dynamobi.ws.util.AppException;
@@ -74,6 +73,6 @@ public interface TableDetailsService {
   @Consumes ("application/xml")
     public boolean postTableDetails(@PathParam("catalog") String catalog,
         @PathParam("schema") String schema,
-        @PathParam("table") String table, TableDetailsHolder detailsHolder);
+        @PathParam("table") String table, TableDetails details);
 
 }
