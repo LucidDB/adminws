@@ -773,7 +773,6 @@ public class DBAccess
                         sql.append(myConditions.get(i));
                 }
             }
-            // System.out.println(sql.toString());
             ps = conn.prepareStatement(sql.toString());
             rs = ps.executeQuery();
 
@@ -1128,16 +1127,19 @@ public class DBAccess
                 + "when 'LOCAL TABLE' then 'Table' "
                 + "when 'FOREIGN TABLE' then 'View' "
                 + "when 'LOCAL VIEW' then 'View' "
+                + "else null "
                 + "end as ObjectType, "
-                + "c.schema_name, "
+                + "s.schema_name, "
                 + "c.table_name AS Object, "
                 + "c.column_name AS ColumnName, "
                 + "c.ordinal_position AS ColumnOrder, "
                 + "c.\"PRECISION\" AS Length, "
                 + "c.is_nullable AS Nullable, "
                 + "c.datatype AS DataType "
-                + "from SYS_ROOT.DBA_COLUMNS c LEFT OUTER JOIN SYS_ROOT.DBA_TABLES t ON t.table_name = c.table_name "
-                + "where t.table_type IN ('LOCAL TABLE', 'LOCAL VIEW', 'FOREIGN TABLE') and t.catalog_name=? "
+                + "from sys_root.dba_schemas s "
+                + "LEFT OUTER JOIN sys_root.dba_columns c ON c.schema_name = s.schema_name AND c.catalog_name = s.catalog_name "
+                + "LEFT OUTER JOIN sys_root.dba_tables t ON t.table_name = c.table_name "
+                + "where s.catalog_name = ? "
                 + "order by schema_name,ObjectType,Object,ColumnOrder");
             ps.setString(1, catalog);
             rs = ps.executeQuery();
@@ -1185,15 +1187,15 @@ public class DBAccess
                   Map<String, Map<String, Map<String, String>> > new_schema = new LinkedHashMap<String, Map<String, Map<String, String>> >();
                   meta_data.put(schemaName, new_schema);
                 }
-                if (!meta_data.get(schemaName).containsKey(type)) {
+                if (type != null && !meta_data.get(schemaName).containsKey(type)) {
                   Map<String, Map<String, String> > new_type = new LinkedHashMap<String, Map<String, String>>();
                   meta_data.get(schemaName).put(type, new_type);
                 }
-                if (!meta_data.get(schemaName).get(type).containsKey(name)) {
+                if (name != null && !meta_data.get(schemaName).get(type).containsKey(name)) {
                   Map<String, String> new_table = new LinkedHashMap<String, String>();
                   meta_data.get(schemaName).get(type).put(name, new_table);
                 }
-                if (!meta_data.get(schemaName).get(type).get(name).containsKey(col_name)) {
+                if (col_name != null && !meta_data.get(schemaName).get(type).get(name).containsKey(col_name)) {
                   String null_str = (is_null) ? "NULL" : "NOT NULL";
                   String col_info = "(" + data_type + ", " + null_str + ")";
                   meta_data.get(schemaName).get(type).get(name).put(col_name, col_info);
@@ -1217,7 +1219,10 @@ public class DBAccess
                     table_data += "&quot;" + column.getKey() + "&quot;, ";
                   }
                   // chop off the last comma-space and finish the node
-                  table_data = table_data.substring(0, table_data.lastIndexOf(", ")) + " FROM " + schema.getKey()
+                  int last_ind = table_data.lastIndexOf(", ");
+                  //if (last_ind != -1)
+                    //table_data = table_data.substring(0, last_ind);
+                  table_data += " FROM " + schema.getKey()
                     + "." + table.getKey() + "\">\n";
                   result.append(table_data);
                   result.append(column_data);
