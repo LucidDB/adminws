@@ -1267,13 +1267,19 @@ public class DBAccess
     public static String execSQL(
         String connection,
         String sqlquerytype,
-        String sql,
+        String raw_sql,
         int toomany)
     {
 
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
+
+        // Supports multiple queries by splitting at semicolons.
+        List<String> all_results = new ArrayList<String>();
+
+        for (String sql : raw_sql.split(";")) {
+          sql = sql.trim();
 
         // Result Vars
         String datamap = "";
@@ -1320,7 +1326,7 @@ public class DBAccess
                 datamap = "Parse";
                 tablename = "";
                 edittable = "false";
-                executiontime = "";
+                executiontime = "0";
                 recordcount = "1";
                 datatables = "<NewDataSet><Table><Parse>The command(s) completed successfully.</Parse></Table></NewDataSet>";
                 // TODO:Close parseonly option. I don't know how to do in
@@ -1331,6 +1337,7 @@ public class DBAccess
                 ps = conn.prepareStatement("explain plan including all attributes with implementation for "
                     + sql);
                 rs = ps.executeQuery();
+                tablename = rs.getMetaData().getTableName(1);
 
                 String tmp = "";
                 List<RelNode> nodes = new ArrayList<RelNode>();
@@ -1436,6 +1443,7 @@ public class DBAccess
                 ps.setMaxRows(toomany);
 
                 rs = ps.executeQuery();
+                tablename = rs.getMetaData().getTableName(1);
                 long end = System.currentTimeMillis() - start;
 
                 result.append("<NewDataSet>");
@@ -1517,8 +1525,8 @@ public class DBAccess
             ex.printStackTrace();
             errormsg = ex.getMessage();
             datamap = "Error";
-            executiontime = "";
-            recordcount = "";
+            executiontime = "0";
+            recordcount = "0";
             datatables = "<NewDataSet><Table><Error> <![CDATA[ Error Executing Query: "
                 + errormsg + "  ]]></Error></Table></NewDataSet>";
 
@@ -1548,14 +1556,16 @@ public class DBAccess
             }
         }
 
-        return formatResult(
-            datamap,
-            tablename,
-            edittable,
-            executiontime,
-            recordcount,
-            datatables);
+        all_results.add(formatResult(datamap, tablename, edittable,
+              executiontime, recordcount, datatables));
+        }
 
+        StringBuilder retval = new StringBuilder();
+        for (String result : all_results) {
+          retval.append(result);
+          retval.append("\n");
+        }
+        return retval.toString();
     }
 
     private static List<RelNode> buildRelationship(List<RelNode> input)

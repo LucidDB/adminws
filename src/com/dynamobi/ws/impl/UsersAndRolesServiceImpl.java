@@ -100,9 +100,13 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
   }
 
   public RolesDetailsHolder getRolesDetails() throws AppException {
-    String query = "SELECT granted_catalog, granted_schema, granted_element, "
-      + "grantee, grantor, action, role_name, grant_type, table_type, with_grant_option "
-      + "FROM sys_root.dba_element_grants "
+    String query = "SELECT DISTINCT granted_catalog, granted_schema, granted_element, "
+      + "grantee, grantor, action, "
+      + "CASE WHEN r.role IS NOT NULL THEN r.role "
+      + "WHEN grant_type = 'Role' THEN grantee END AS role_name, "
+      + "grant_type, table_type, g.with_grant_option "
+      + "FROM sys_root.dba_element_grants g left outer join sys_root.dba_user_roles r "
+      + "ON action = 'INHERIT_ROLE' AND r.role_mof_id = element_mof_id "
       + "WHERE (grant_type = 'Role' AND grantee <> 'PUBLIC' "
       + "AND grantee <> '_SYSTEM') OR action = 'INHERIT_ROLE'";
     Map<String, RolesDetails> details = new LinkedHashMap<String, RolesDetails>();
