@@ -104,7 +104,7 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
       + "grantee, grantor, action, "
       + "CASE WHEN r.role IS NOT NULL THEN r.role "
       + "WHEN grant_type = 'Role' THEN grantee END AS role_name, "
-      + "grant_type, table_type, g.with_grant_option "
+      + "grant_type, class_name, g.with_grant_option "
       + "FROM sys_root.dba_element_grants g left outer join sys_root.dba_user_roles r "
       + "ON action = 'INHERIT_ROLE' AND r.role_mof_id = element_mof_id "
       + "WHERE (grant_type = 'Role' AND grantee <> 'PUBLIC' "
@@ -123,7 +123,7 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
         final String action = rs.getString(col++);
         final String role_name = rs.getString(col++);
         final String grant_type = rs.getString(col++);
-        final String table_type = rs.getString(col++);
+        final String class_name = rs.getString(col++);
         final boolean with_grant = rs.getBoolean(col++);
 
         RolesDetails rd;
@@ -142,14 +142,14 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
             rd.users_with_grant_option.add(grantee);
           }
         } else if (grant_type.equals("Role")) {
-          final String key = role_name + catalog + schema + element + table_type;
+          final String key = role_name + catalog + schema + element + class_name;
           PermissionsInfo p;
           if (!perms.containsKey(key)) {
             p = new PermissionsInfo();
             p.catalog_name = catalog;
             p.schema_name = schema;
             p.item_name = element;
-            p.item_type = table_type;
+            p.item_type = class_name;
             perms.put(key, p);
             rd.permissions.add(p);
           } else {
