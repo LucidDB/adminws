@@ -1240,8 +1240,8 @@ public class DBAccess
                   int last_ind = table_data.lastIndexOf(", ");
                   //if (last_ind != -1)
                     //table_data = table_data.substring(0, last_ind);
-                  table_data += " FROM " + schema.getKey()
-                    + "." + table.getKey() + "\">\n";
+                  table_data += " FROM &quot;" + schema.getKey()
+                    + "&quot;.&quot;" + table.getKey() + "&quot;\">\n";
                   result.append(table_data);
                   result.append(column_data);
                   result.append("    </" + type.getKey().toLowerCase() + ">\n"); // table
@@ -1838,10 +1838,8 @@ public class DBAccess
 
             if (isExisting == 0) {
 
-                if (schema.toLowerCase().equals(schema))
-                  schema = "\"" + schema + "\"";
-                if (table.toLowerCase().equals(table))
-                  table = "\"" + table + "\"";
+                schema = "\"" + schema + "\"";
+                table = "\"" + table + "\"";
 
                 sb = new StringBuffer();
                 sb.append("create table " + catalogName + "." + schema + "."
