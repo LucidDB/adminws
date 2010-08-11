@@ -1227,12 +1227,12 @@ public class DBAccess
             for (Map.Entry<String, Map<String, Map<String, Map<String, String>>> > schema : meta_data.entrySet()) {
               result.append("<schema label=\"" + schema.getKey() + "\">\n");
               for (Map.Entry<String, Map<String, Map<String, String>>> type : schema.getValue().entrySet()) {
-                result.append("  <node label=\"" + type.getKey() + "s\">\n");
+                result.append("  <" + type.getKey().toLowerCase() + "s label=\"" + type.getKey() + "s\">\n");
                 for (Map.Entry<String, Map<String, String>> table : type.getValue().entrySet()) {
-                  String table_data = "    <node label=\"" + table.getKey() + "\" sqlquery=\"SELECT ";
+                  String table_data = "    <" + type.getKey().toLowerCase() + " label=\"" + table.getKey() + "\" sqlquery=\"SELECT ";
                   String column_data = "";
                   for (Map.Entry<String, String> column : table.getValue().entrySet()) {
-                    column_data += "      <node column=\"" + column.getKey() + "\" label=\"" + column.getKey()
+                    column_data += "      <column column=\"" + column.getKey() + "\" label=\"" + column.getKey()
                       + " " + column.getValue() + "\" />\n";
                     table_data += "&quot;" + column.getKey() + "&quot;, ";
                   }
@@ -1244,9 +1244,9 @@ public class DBAccess
                     + "." + table.getKey() + "\">\n";
                   result.append(table_data);
                   result.append(column_data);
-                  result.append("    </node>\n"); // table
+                  result.append("    </" + type.getKey().toLowerCase() + ">\n"); // table
                 }
-                result.append("  </node>\n"); // type
+                result.append("  </" + type.getKey().toLowerCase() + "s>\n"); // type
               }
               result.append("</schema>\n"); // schema
             }
