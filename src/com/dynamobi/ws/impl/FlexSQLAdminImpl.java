@@ -26,6 +26,8 @@ import javax.jws.WebService;
 import com.dynamobi.ws.api.FlexSQLAdmin;
 import com.dynamobi.ws.util.DBAccess;
 
+import java.sql.ResultSet;
+
 /**
  * Implementation of the interface FlexSQLAdmin
  * 
@@ -95,4 +97,32 @@ public class FlexSQLAdminImpl
         return ret;
     }
 
+    private String getAuthIDs(String class_name) {
+      StringBuffer ids = new StringBuffer();
+      String lower = class_name.toLowerCase();
+      try {
+        final String query = "SELECT name FROM sys_root.dba_auth_ids " +
+          "WHERE class_name = '" + class_name + "' AND " +
+          "name <> '_SYSTEM' ORDER BY name";
+        ResultSet rs = DBAccess.rawResultExec(query);
+        ids.append("<" + lower + "s label=\"" + class_name + "s\">\n");
+        while (rs.next()) {
+          ids.append("  <" + lower + " label=\"" +
+              rs.getString(1) + "\" />\n");
+        }
+        ids.append("</" + lower + "s>\n");
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      return ids.toString();
+    }
+
+    public String getUsers() {
+        return getAuthIDs("User");
+    }
+
+    public String getRoles() {
+      return getAuthIDs("Role");
+    }
 }

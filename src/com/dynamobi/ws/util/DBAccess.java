@@ -1222,12 +1222,26 @@ public class DBAccess
             }
 
             // Now build the XML to be returned to the client.
-            result.append("<node label=\"Schemas\">\n"); // root node for our metadata
+            result.append("<schemas label=\"Schemas\">\n"); // root node for our metadata
 
             for (Map.Entry<String, Map<String, Map<String, Map<String, String>>> > schema : meta_data.entrySet()) {
               result.append("<schema label=\"" + schema.getKey() + "\">\n");
+              // Force some children to be added even if we didn't get them
+              // in the query. (They should have a loadInfo defined..)
+              Map<String, Map<String, String> > forced_type = new LinkedHashMap<String, Map<String, String>>();
+              if (!meta_data.get(schema.getKey()).containsKey("Table"))
+                  meta_data.get(schema.getKey()).put("Table", forced_type);
+              if (!meta_data.get(schema.getKey()).containsKey("View"))
+                  meta_data.get(schema.getKey()).put("View", forced_type);
+              if (!meta_data.get(schema.getKey()).containsKey("Foreign_Table"))
+                  meta_data.get(schema.getKey()).put("Foreign_Table", forced_type);
+              if (!meta_data.get(schema.getKey()).containsKey("Function"))
+                  meta_data.get(schema.getKey()).put("Function", forced_type);
+              if (!meta_data.get(schema.getKey()).containsKey("Procedure"))
+                  meta_data.get(schema.getKey()).put("Procedure", forced_type);
+
               for (Map.Entry<String, Map<String, Map<String, String>>> type : schema.getValue().entrySet()) {
-                result.append("  <" + type.getKey().toLowerCase() + "s label=\"" + type.getKey() + "s\">\n");
+                result.append("  <" + type.getKey().toLowerCase() + "s label=\"" + type.getKey().replace("_", " ") + "s\">\n");
                 for (Map.Entry<String, Map<String, String>> table : type.getValue().entrySet()) {
                   String table_data = "    <" + type.getKey().toLowerCase() + " label=\"" + table.getKey() + "\" sqlquery=\"SELECT ";
                   String column_data = "";
@@ -1251,7 +1265,7 @@ public class DBAccess
               result.append("</schema>\n"); // schema
             }
 
-            result.append("</node>\n"); // root node
+            result.append("</schemas>\n"); // root node
 
         } catch (Exception e) {
             // TODO Auto-generated catch block

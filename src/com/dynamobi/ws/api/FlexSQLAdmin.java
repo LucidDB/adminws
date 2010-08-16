@@ -23,7 +23,9 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
 /**
- * WebService interface for FlexSQLAdmin
+ * The implementor is responsible for executing generic queries
+ * along with returning XML for the ObjectTree.
+ *
  * @author Ray Zhang
  * @since Feb 04,2010
  *
@@ -63,4 +65,10 @@ public interface FlexSQLAdmin
      */
     @RolesAllowed( {"Admin","Authenticated"} )
     public String handleUpdate(String connection, String testsql, String sql, int toomany);
+
+
+    @RolesAllowed( {"Admin","Authenticated"} )
+    public String getUsers();
+    @RolesAllowed( {"Admin","Authenticated"} )
+    public String getRoles();
 }
