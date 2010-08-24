@@ -32,18 +32,23 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
 import com.dynamobi.ws.domain.RolesDetails;
+import com.dynamobi.ws.domain.UserPermsDetails;
 
 /**
- * Holder for the list of roles details.
+ * Holder for the list of roles details. (Not a strict holder.)
+ * TODO: Rename this and supporting classes to show that what is meant
+ * is users and roles permissions holder.
  * @author Kevin Secretan
  */
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 @XmlRootElement(name="roles")
-public final class RolesDetailsHolder { // implements Holder {
+public final class RolesDetailsHolder {
   @XmlElement(name="role") public List<RolesDetails> value;
+  @XmlElement(name="user") public List<UserPermsDetails> value2;
 
   public RolesDetailsHolder() {
     value = new ArrayList<RolesDetails>();
+    value2 = new ArrayList<UserPermsDetails>();
   }
 
   public RolesDetailsHolder(List<RolesDetails> value) {

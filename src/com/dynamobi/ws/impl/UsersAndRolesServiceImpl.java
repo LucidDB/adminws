@@ -32,6 +32,7 @@ import com.dynamobi.ws.api.UsersAndRolesService;
 import com.dynamobi.ws.domain.UserDetails;
 import com.dynamobi.ws.domain.SessionInfo;
 import com.dynamobi.ws.domain.RolesDetails;
+import com.dynamobi.ws.domain.UserPermsDetails;
 import com.dynamobi.ws.domain.RolesDetailsHolder;
 import com.dynamobi.ws.domain.PermissionsInfo;
 import com.dynamobi.ws.util.AppException;
@@ -123,11 +124,18 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
       + "CASE WHEN r.role IS NOT NULL THEN r.role "
       + "WHEN grant_type = 'Role' THEN grantee END AS role_name, "
       + "grant_type, class_name, g.with_grant_option "
-      + "FROM sys_root.dba_element_grants g left outer join sys_root.dba_user_roles r "
+      + "FROM sys_root.dba_element_grants g LEFT OUTER JOIN sys_root.dba_user_roles r "
       + "ON action = 'INHERIT_ROLE' AND r.role_mof_id = element_mof_id "
+      + "WHERE grantee NOT IN ('PUBLIC', '_SYSTEM') AND "
+      + "grantor <> '_SYSTEM'";
+
+      /* old where for roles only
       + "WHERE (grant_type = 'Role' AND grantee <> 'PUBLIC' "
       + "AND grantee <> '_SYSTEM') OR action = 'INHERIT_ROLE'";
+      */
     Map<String, RolesDetails> details = new LinkedHashMap<String, RolesDetails>();
+    Map<String, UserPermsDetails> user_details = new LinkedHashMap<String, UserPermsDetails>();
+
     Map<String, PermissionsInfo> perms = new LinkedHashMap<String, PermissionsInfo>();
     try {
       ResultSet rs = DBAccess.rawResultExec(query);
@@ -144,41 +152,60 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
         final String class_name = rs.getString(col++);
         final boolean with_grant = rs.getBoolean(col++);
 
-        RolesDetails rd;
-        if (!details.containsKey(role_name)) {
-          rd = new RolesDetails();
-          rd.name = role_name;
-          details.put(role_name, rd);
+
+        final String key = grantee + catalog + schema + element + class_name;
+        PermissionsInfo p;
+        if (!perms.containsKey(key)) {
+          p = new PermissionsInfo();
+          p.catalog_name = catalog;
+          p.schema_name = schema;
+          p.item_name = element;
+          p.item_type = class_name;
+          perms.put(key, p);
         } else {
-          rd = details.get(role_name);
+          p = perms.get(key);
         }
 
-        // Dealing with a users or permissions entry?
-        if (grant_type.equals("User")) {
-          rd.users.add(grantee);
-          if (with_grant) {
-            rd.users_with_grant_option.add(grantee);
+        if (!action.equals("INHERIT_ROLE"))
+          p.actions.add(action);
+
+        if (role_name != null) {
+          // Role permission
+          RolesDetails rd;
+          if (!details.containsKey(role_name)) {
+            rd = new RolesDetails();
+            rd.name = role_name;
+            details.put(role_name, rd);
+          } else {
+            rd = details.get(role_name);
           }
-        } else if (grant_type.equals("Role")) {
-          final String key = role_name + catalog + schema + element + class_name;
-          PermissionsInfo p;
-          if (!perms.containsKey(key)) {
-            p = new PermissionsInfo();
-            p.catalog_name = catalog;
-            p.schema_name = schema;
-            p.item_name = element;
-            p.item_type = class_name;
-            perms.put(key, p);
+
+          // Dealing with a users or permissions entry?
+          if (grant_type.equals("User")) {
+            rd.users.add(grantee);
+            if (with_grant) {
+              rd.users_with_grant_option.add(grantee);
+            }
+          } else if (grant_type.equals("Role")) {
             rd.permissions.add(p);
           } else {
-            p = perms.get(key);
+            throw new AppException("Unknown grant type");
           }
-          p.actions.add(action);
+
         } else {
-          throw new AppException("Unknown grant type");
+          // User permission
+          UserPermsDetails upd;
+          if (!user_details.containsKey(grantee)) {
+            upd = new UserPermsDetails();
+            upd.name = grantee;
+            user_details.put(grantee, upd);
+          } else {
+            upd = user_details.get(grantee);
+          }
+          upd.permissions.add(p);
         }
 
-      }
+      } // End of user/roles/perms result set.
 
       ResultSet rs_extra_roles = DBAccess.rawResultExec("SELECT name FROM sys_root.dba_roles WHERE name <> 'PUBLIC'");
       while (rs_extra_roles.next()) {
@@ -196,6 +223,7 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
 
     RolesDetailsHolder rh = new RolesDetailsHolder();
     rh.value.addAll(details.values());
+    rh.value2.addAll(user_details.values());
     return rh;
   }
 
