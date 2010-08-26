@@ -1084,7 +1084,7 @@ public class DBAccess
 
             conn = getConnection();
 
-            ps = conn.prepareStatement("create or replace schema "
+            ps = conn.prepareStatement("create schema "
                 + catalogName.trim() + "." + schema.trim());
             ps.execute();
 
