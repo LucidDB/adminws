@@ -548,16 +548,22 @@ public class DBAccess
 
             conn = getConnection();
 
-            ps = conn.prepareStatement("select source_name, counter_name, counter_units, counter_value  from SYS_ROOT.DBA_PERFORMANCE_COUNTERS");
+            //ps = conn.prepareStatement("select source_name, counter_name, counter_units, counter_value  from SYS_ROOT.DBA_PERFORMANCE_COUNTERS");
+            ps = conn.prepareStatement("SELECT counter_category, " +
+                "counter_subcategory, source_name, counter_name, " +
+                "counter_units, counter_value " +
+                "FROM perf_test.counters");
             rs = ps.executeQuery();
 
             while (rs.next()) {
 
                 Counter en = new Counter();
-                en.setSourceName(rs.getString(1));
-                en.setCounterName(rs.getString(2));
-                en.setCounterUnits(rs.getString(3));
-                en.setCounterValue(rs.getString(4));
+                en.setCounterCategory(rs.getString(1));
+                en.setCounterSubcategory(rs.getString(2));
+                en.setSourceName(rs.getString(3));
+                en.setCounterName(rs.getString(4));
+                en.setCounterUnits(rs.getString(5));
+                en.setCounterValue(rs.getString(6));
                 retVal.add(en);
 
             }

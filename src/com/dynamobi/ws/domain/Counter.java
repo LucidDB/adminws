@@ -23,6 +23,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Counter
 {
+    private String counterCategory;
+
+    private String counterSubcategory;
+
     private String sourceName;
     
     private String counterName;
@@ -30,6 +34,22 @@ public class Counter
     private String counterUnits;
     
     private String counterValue;
+
+    public String getCounterCategory() {
+      return counterCategory;
+    }
+
+    public void setCounterCategory(String counterCategory) {
+      this.counterCategory = counterCategory;
+    }
+
+    public String getCounterSubcategory() {
+      return counterSubcategory;
+    }
+
+    public void setCounterSubcategory(String counterSubcategory) {
+      this.counterSubcategory = counterSubcategory;
+    }
 
     public String getCounterName()
     {
