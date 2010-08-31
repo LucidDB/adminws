@@ -47,7 +47,18 @@ public interface PerformanceCountersService
     List<Counter> getAllPerformanceCounters() throws AppException;
 
     /**
-     * Read special performance counter thru counter name.
+     * Return demanded counters.
+     * @names - Comma-separated list of names.
+     */
+    @WebMethod
+    @GET
+    @Path("/list/{names}")
+    @RolesAllowed( {"Admin", "Authenticated"} )
+    List<Counter> getCountersByNames(@PathParam("names") String names)
+    throws AppException;
+
+    /**
+     * Read special performance counter through counter name.
      * @param counterName
      * @return Counter
      * @throws AppException

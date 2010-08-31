@@ -59,4 +59,11 @@ public class PerformanceCountersService
         return list;
     }
 
+    public List<Counter> getCountersByNames(String names)
+      throws AppException {
+      
+      List<Counter> list = DBAccess.getCountersByNames(names);
+      return list;
+    }
+
 }

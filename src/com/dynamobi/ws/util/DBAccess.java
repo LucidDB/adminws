@@ -548,11 +548,10 @@ public class DBAccess
 
             conn = getConnection();
 
-            //ps = conn.prepareStatement("select source_name, counter_name, counter_units, counter_value  from SYS_ROOT.DBA_PERFORMANCE_COUNTERS");
             ps = conn.prepareStatement("SELECT counter_category, " +
                 "counter_subcategory, source_name, counter_name, " +
                 "counter_units, counter_value " +
-                "FROM perf_test.counters");
+                "FROM sys_root.dba_performance_counters");
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -605,6 +604,84 @@ public class DBAccess
         }
 
         return retVal;
+
+    }
+
+    public static List<Counter> getCountersByNames(String names)
+      throws AppException {
+        List<Counter> retVal = new ArrayList<Counter>();
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        String list_names = "'";
+        for (String n : names.split(",")) {
+          list_names += n + "', '";
+        }
+        list_names += "'";
+
+        try {
+            conn = getConnection();
+
+            ps = conn.prepareStatement("SELECT counter_category, " +
+                "counter_subcategory, source_name, counter_name, " +
+                "counter_units, counter_value " +
+                "FROM sys_root.dba_performance_counters " +
+                "WHERE counter_name IN (" + list_names + ")");
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Counter en = new Counter();
+                en.setCounterCategory(rs.getString(1));
+                en.setCounterSubcategory(rs.getString(2));
+                en.setSourceName(rs.getString(3));
+                en.setCounterName(rs.getString(4));
+                en.setCounterUnits(rs.getString(5));
+                en.setCounterValue(rs.getString(6));
+                retVal.add(en);
+
+            }
+
+        } catch (ClassNotFoundException e) {
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found JDBC driver!");
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+            throw new AppException(
+                "Error Info: The connection was bad or Execute sql statment failed!");
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+
+            e.printStackTrace();
+            throw new AppException("Error Info: Not found jdbc.properties!");
+        } finally {
+
+            try {
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+
+            } catch (SQLException ex) {
+
+                throw new AppException("Error Info: Release db resouce failed");
+
+            }
+
+        }
+
+        return retVal;
+
 
     }
 

@@ -36,7 +36,7 @@ public class Counter
     private String counterValue;
 
     public String getCounterCategory() {
-      return counterCategory;
+      return (counterCategory == null) ? "" : counterCategory;
     }
 
     public void setCounterCategory(String counterCategory) {
@@ -44,7 +44,7 @@ public class Counter
     }
 
     public String getCounterSubcategory() {
-      return counterSubcategory;
+      return (counterSubcategory == null) ? "" : counterSubcategory;
     }
 
     public void setCounterSubcategory(String counterSubcategory) {
@@ -63,7 +63,7 @@ public class Counter
 
     public String getCounterUnits()
     {
-        return counterUnits;
+      return (counterUnits == null) ? "" : counterUnits;
     }
 
     public void setCounterUnits(String counterUnits)
