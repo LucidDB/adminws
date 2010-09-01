@@ -138,7 +138,6 @@ public class FlexSQLAdminImpl
           + "FROM sys_root.dba_routines "
           + "WHERE schema_name = '" + schema + "' AND "
           + "routine_type = '" + type + "'";
-        System.out.println(query);
         ResultSet rs = DBAccess.rawResultExec(query);
         while (rs.next()) {
           String inv_name = rs.getString(1).replace("\"", "&quot;");
