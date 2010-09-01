@@ -71,4 +71,13 @@ public interface FlexSQLAdmin
     public String getUsers();
     @RolesAllowed( {"Admin","Authenticated"} )
     public String getRoles();
+
+    @RolesAllowed( {"Admin","Authenticated"} )
+    public String getForeignTables(String schema);
+
+    @RolesAllowed( {"Admin","Authenticated"} )
+    public String getFunctions(String schema);
+
+    @RolesAllowed( {"Admin","Authenticated"} )
+    public String getProcedures(String schema);
 }

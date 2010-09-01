@@ -26,7 +26,7 @@ import javax.jws.WebService;
 import com.dynamobi.ws.api.FlexSQLAdmin;
 import com.dynamobi.ws.util.DBAccess;
 
-import java.sql.ResultSet;
+import java.sql.*;
 
 /**
  * Implementation of the interface FlexSQLAdmin
@@ -124,5 +124,46 @@ public class FlexSQLAdminImpl
 
     public String getRoles() {
       return getAuthIDs("Role");
+    }
+
+    public String getForeignTables(String schema) {
+      return "";
+    }
+
+    private String getRoutine(String schema, String type) {
+      StringBuffer result = new StringBuffer("<" + type.toLowerCase() + "s>\n");
+      try {
+        final String query = "SELECT DISTINCT invocation_name, external_name, "
+          + "is_table_function, is_deterministic "
+          + "FROM sys_root.dba_routines "
+          + "WHERE schema_name = '" + schema + "' AND "
+          + "routine_type = '" + type + "'";
+        System.out.println(query);
+        ResultSet rs = DBAccess.rawResultExec(query);
+        while (rs.next()) {
+          String inv_name = rs.getString(1).replace("\"", "&quot;");
+          if (inv_name != null) inv_name = inv_name.replace("\"", "&quot;");
+          String ext_name = rs.getString(2);
+          if (ext_name != null) ext_name = ext_name.replace("\"", "&quot;");
+          final boolean is_tab_fun = rs.getBoolean(3);
+          final boolean is_determ = rs.getBoolean(4);
+          result.append("  <" + type.toLowerCase() + " label=\"" + inv_name +
+             "\" externalName=\"" + ext_name + "\" isTableFunction=\"" + 
+            is_tab_fun + "\" isDeterministic=\"" + is_determ + "\" />\n");
+        }
+        result.append("</" + type.toLowerCase() + "s>");
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+
+      return result.toString();
+    }
+
+    public String getFunctions(String schema) {
+      return getRoutine(schema, "FUNCTION");
+    }
+
+    public String getProcedures(String schema) {
+      return getRoutine(schema, "PROCEDURE");
     }
 }
