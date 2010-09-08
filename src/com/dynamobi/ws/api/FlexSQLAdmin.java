@@ -80,4 +80,7 @@ public interface FlexSQLAdmin
 
     @RolesAllowed( {"Admin","Authenticated"} )
     public String getProcedures(String schema);
+
+    @RolesAllowed( {"Admin", "Authenticated"} )
+    public String getRemoteData();
 }

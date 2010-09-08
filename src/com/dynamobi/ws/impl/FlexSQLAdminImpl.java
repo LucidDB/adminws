@@ -16,9 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
-/**
- * 
- */
 package com.dynamobi.ws.impl;
 
 import javax.jws.WebService;
@@ -164,5 +161,39 @@ public class FlexSQLAdminImpl
 
     public String getProcedures(String schema) {
       return getRoutine(schema, "PROCEDURE");
+    }
+
+    public String getRemoteData() {
+      StringBuffer result = new StringBuffer("<wrappers>\n");
+      try {
+        final String query = "SELECT w.foreign_wrapper_name, w.library, "
+          + "s.foreign_server_name FROM sys_root.dba_foreign_wrappers w "
+          + "left outer join sys_root.dba_foreign_servers s ON "
+          + "s.foreign_wrapper_name = w.foreign_wrapper_name "
+          + "ORDER BY w.foreign_wrapper_name";
+        ResultSet rs = DBAccess.rawResultExec(query);
+        String last_wrapper = "";
+        while (rs.next()) {
+          String wrapper_name = rs.getString(1);
+          String wrapper_lib = rs.getString(2);
+          String server_name = rs.getString(3);
+
+          if (! wrapper_name.equals(last_wrapper)) {
+            if (! last_wrapper.equals("") )
+              result.append("    </servers>\n  </wrapper>\n");
+            result.append("  <wrapper label=\"" + wrapper_name + "\" library=\"" + wrapper_lib + "\">\n");
+            result.append("    <servers label=\"Servers\">\n");
+          }
+          
+          if (server_name != null)
+            result.append("      <server label=\"" + server_name + "\" />\n");
+
+          last_wrapper = wrapper_name;
+        }
+        result.append("    </servers>\n  </wrapper>\n</wrappers>");
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return result.toString();
     }
 }
