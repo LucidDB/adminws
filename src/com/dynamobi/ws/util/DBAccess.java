@@ -1226,7 +1226,7 @@ public class DBAccess
             ps = conn.prepareStatement("select "
                 + "case t.table_type "
                 + "when 'LOCAL TABLE' then 'Table' "
-                + "when 'FOREIGN TABLE' then 'Foreign Table' "
+                + "when 'FOREIGN TABLE' then 'Foreign_Table' "
                 + "when 'LOCAL VIEW' then 'View' "
                 + "else null "
                 + "end as ObjectType, "
