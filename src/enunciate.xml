@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 <enunciate label="dynamobi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.17.xsd">
-	<deployment host="localhost:8080" context="adminws" />
+  <deployment host="localhost:8080" protocol="http" context="adminws" />
 	<namespaces>
 		<namespace id="dynamo" uri="http://domain.ws.dynamobi.com" />
 	</namespaces>
