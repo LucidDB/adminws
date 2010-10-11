@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package com.dynamobi.ws.impl;
 
 import javax.jws.WebService;
+import javax.ws.rs.Path;
 
 import com.dynamobi.ws.api.FlexSQLAdmin;
 import com.dynamobi.ws.util.DBAccess;
@@ -34,6 +35,8 @@ import java.sql.*;
  * @author Kevin Secretan
  * @since June 15, 2010
  */
+
+@Path("/sqlcommands")
 @WebService(
 
 endpointInterface = "com.dynamobi.ws.api.FlexSQLAdmin"
@@ -100,7 +103,7 @@ public class FlexSQLAdminImpl
       try {
         final String query = "SELECT name FROM sys_root.dba_auth_ids " +
           "WHERE class_name = '" + class_name + "' AND " +
-          "name <> '_SYSTEM' ORDER BY name";
+          "name <> '_SYSTEM' AND name <> 'PUBLIC' ORDER BY name";
         ResultSet rs = DBAccess.rawResultExec(query);
         ids.append("<" + lower + "s label=\"" + class_name + "s\">\n");
         while (rs.next()) {
@@ -196,4 +199,27 @@ public class FlexSQLAdminImpl
       }
       return result.toString();
     }
+
+    public String getJars(String schema) {
+      StringBuffer result = new StringBuffer("<jars>\n");
+      try {
+        final String query = "SELECT \"name\" FROM " +
+          "sys_fem.\"SQL2003\".\"Jar\" j INNER JOIN " +
+          "sys_boot.jdbc_metadata.schemas_view_internal svi " +
+          "ON svi.\"mofId\" = j.\"namespace\" " +
+          "WHERE object_schema = '" + schema + "'";
+        ResultSet rs = DBAccess.rawResultExec(query);
+        while (rs.next()) {
+          String name = rs.getString(1);
+          result.append("  <jar label=\"" + name + "\" schema=\"" + schema +
+              "\" />\n");
+        }
+        result.append("</jars>\n");
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return result.toString();
+
+    }
+
 }

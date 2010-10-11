@@ -34,11 +34,12 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
 import com.dynamobi.ws.domain.WrapperOptions;
+import com.dynamobi.ws.domain.RemoteData;
 
 import com.dynamobi.ws.util.AppException;
 
 /**
- * Interface: Service for handling all the foreign data wrappers/services
+ * Service for handling all the foreign data wrappers/services
  * transactions.
  *
  * @ WebMethod is for soap
@@ -54,6 +55,11 @@ import com.dynamobi.ws.util.AppException;
 
 public interface ForeignDataService {
 
+  /**
+   * @param wrapper - Name of the foreign data wrapper.
+   * @return Returns a list of all wrapper options (including extended)
+   * for a given wrapper name.
+   */
   @WebMethod
   @GET
   @Path("/wrappers/options/{wrapper}")
@@ -61,6 +67,25 @@ public interface ForeignDataService {
   public List<WrapperOptions> getWrapperOptions(
       @PathParam("wrapper") String wrapper) throws AppException;
 
+  /**
+   * @param server - Name of the server.
+   * @return Returns a list of all wrapper options defined for an
+   * existing server.
+   */
+  @WebMethod
+  @GET
+  @Path("/serverss/options/{server}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public List<WrapperOptions> getWrapperOptionsForServer(
+      @PathParam("server") String server) throws AppException;
+
+  /**
+   * Allows for creation of a new foreign server with certain options.
+   * @param server_name - Name of the new server.
+   * @param wrapper_name - Wrapper this server is based on.
+   * @param options - XML List of wrapper options to load into the server.
+   * @return Returns an empty string on success, otherwise an SQL error message.
+   */
   @WebMethod
   @POST
   @Path("servers/create/{name}/{wrapper}")
@@ -69,6 +94,37 @@ public interface ForeignDataService {
   public String createServer(@PathParam("name") String server_name,
       @PathParam("wrapper") String wrapper_name,
       List<WrapperOptions> options) throws AppException;
+
+  /**
+   * Tests to see if a foreign server can be connected to.
+   * @param server_name - Name of foreign server.
+   * @return Returns an empty string on success, otherwise an SQL error message.
+   */
+  @WebMethod
+  @GET
+  @Path("/servers/test/{name}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public String testServer(@PathParam("name") String server_name)
+    throws AppException;
+
+  /**
+   * (NOT FULLY IMPLEMENTED) Used for retrieving a list of
+   * foreign data from a foreign server for the user to import
+   * locally. Currently this is a very expensive and not-quite-correct
+   * call because it imports everything into a temporary schema since
+   * we are missing a certain UDX.
+   *
+   * @param server_name - Name of the foreign data server.
+   * @return Returns a RemoteData object which contains a list of schemas,
+   * foreign objects, as well as which items are changed or deleted
+   * compared to local imports (if any).
+   */
+  @WebMethod
+  @GET
+  @Path("/servers/get_data/{name}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public RemoteData getForeignData(@PathParam("name") String server_name)
+    throws AppException;
 
 }
 

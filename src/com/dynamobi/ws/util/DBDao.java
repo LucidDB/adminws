@@ -65,6 +65,7 @@ public class DBDao extends JdbcDaoImpl {
 
     Map<String,String> overrides = new HashMap<String,String>();
     overrides.put("minPoolSize", "3");
+    overrides.put("maxIdleTimeExcessConnections", "600");
     ds_pooled = DataSources.pooledDataSource(ds_unpooled, overrides);
 
     setDataSource(ds_pooled);

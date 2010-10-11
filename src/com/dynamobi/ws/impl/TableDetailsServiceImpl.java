@@ -42,38 +42,11 @@ import com.dynamobi.ws.util.DBAccess;
 @Path("/metadata")
 public class TableDetailsServiceImpl implements TableDetailsService {
 
-  public TablesInfo readTablesInfo() throws AppException {
-    return DBAccess.getTablesInfo();
-    // List<Table> ret = DBAccess.getTableInfo();
-    // return ret;
-  }
-
-  public List<Table> readTablesInfoBySchema(String schemaName)
-    throws AppException
-  {
-    List<Table> ret = DBAccess.getTableInfo(schemaName);
-    return ret;
-  }
-
-  public List<Column> readColumnNamesFromTable(String tableName,
-      String schemaName) throws AppException
-  {
-    List<Column> ret = DBAccess.getColumnNamesFromTable(tableName,
-                                                        schemaName);
-    return ret;
-  }
-
   public TableDetails getTableDetails(String catalog, String schema, String table)
     throws AppException
   {
     TableDetails ret = DBAccess.getTableDetails(catalog, schema, table);
     return ret;
-  }
-
-  public Schema getSchema(String catalogName, String schemaName)
-    throws AppException
-  {
-    return DBAccess.getSchemaByName(catalogName, schemaName);
   }
 
   public String createSchema(String catalog, String schema)

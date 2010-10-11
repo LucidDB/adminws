@@ -31,6 +31,10 @@ import javax.annotation.security.RolesAllowed;
 import com.dynamobi.ws.domain.Counter;
 import com.dynamobi.ws.util.AppException;
 
+/**
+ * Service for retrieving some performance information about
+ * LucidDB.
+ */
 @WebService(serviceName="PerformanceCountersService", name="PerformanceCountersService")
 public interface PerformanceCountersService
 {   
@@ -48,7 +52,8 @@ public interface PerformanceCountersService
 
     /**
      * Return demanded counters.
-     * @names - Comma-separated list of names.
+     * @param names - Comma-separated list of names.
+     * @return List of Counter structures.
      */
     @WebMethod
     @GET
@@ -59,8 +64,8 @@ public interface PerformanceCountersService
 
     /**
      * Read special performance counter through counter name.
-     * @param counterName
-     * @return Counter
+     * @param counterName - Name of the counter you want info on.
+     * @return Returns a single Counter structure.
      * @throws AppException
      */
     @WebMethod

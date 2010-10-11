@@ -41,7 +41,7 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
 /**
- * Interface: Service for creating/editing and retrieving table data.
+ * Service for creating/editing and retrieving table data.
  *
  * @ WebMethod is for soap
  * @ GET is for REST
@@ -57,17 +57,11 @@ import javax.annotation.security.RolesAllowed;
 
 public interface TableDetailsService {
 
-  @WebMethod
-  @GET
-  @Path("/")
-  public TablesInfo readTablesInfo() throws AppException;
-
-  @WebMethod
-  @GET
-  @Path("/{catalog}/{schema}")
-  public Schema getSchema(@PathParam("catalog") String catalogName,
-      @PathParam("schema") String schemaName) throws AppException;
-
+  /**
+   * @param catalog - Catalog to place schema.
+   * @param schema - Schema name to create.
+   * @return Returns an empty string on success, otherwise an SQL error message.
+   */ 
   @WebMethod
   @POST
   @Path("/{catalog}/{schema}")
@@ -76,6 +70,12 @@ public interface TableDetailsService {
       String schema) throws AppException;
 
 
+  /**
+   * @param catalog - Table's catalog.
+   * @param schema - Table's schema.
+   * @param table - Table's name.
+   * @return Returns table and column information on a specified table.
+   */
   @WebMethod
   @GET
   @Path("/{catalog}/{schema}/{table}")
@@ -84,6 +84,14 @@ public interface TableDetailsService {
       @PathParam("schema") String schema,
       @PathParam("table") String table) throws AppException;
 
+  /**
+   * @param catalog - Table's catalog.
+   * @param schema - Table's schema.
+   * @param table - Table's name.
+   * @param details - Data structure of necessary details such as column names
+   *        and types.
+   * @return Returns true on success.
+   */
   @WebMethod
   @POST
   @Path("/{catalog}/{schema}/{table}")

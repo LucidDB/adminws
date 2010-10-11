@@ -19,8 +19,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package com.dynamobi.ws.api;
 
 import javax.jws.WebService;
+import javax.jws.WebMethod;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 
 /**
  * The implementor is responsible for executing generic queries
@@ -38,49 +44,142 @@ import javax.annotation.security.RolesAllowed;
 public interface FlexSQLAdmin
 {
     /**
-     * @param connection
-     * @param catalog
-     * @return
+     * This will return all schemas, tables, views, and columns
+     * for a given catalog.
+     *
+     * @param connection - Unused
+     * @param catalog - Catalog for fetching data.
+     * @return Returns an XML string of the metadata.
      */
+    @WebMethod
+    @GET
+    @Path("/getmetadata/{connection}/{catalog}")
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String getDBMetaData(String connection, String catalog);
+    public String getDBMetaData(@PathParam("connection") String connection,
+        @PathParam("catalog") String catalog);
+
     /**
-     * exec SQL
-     * @param connection
+     * This allows support for calling generic queries, including multiple
+     * ones separated by semicolons (for example for multiple inserts).
+     * Some queries like SELECT return specificly formatted XML, others
+     * like DROP do not.
+     * @param connection - Unused
      * @param sqlquerytype
+     *        This defines whether we just want to perform a raw query
+     *        (pass "normal") or if we want to get the execution plan
+     *        of a query (pass "showplan"). We currently do not support
+     *        getting both at once. 
      * @param sql
-     * @param toomany
-     * @return 
+     *        The sql query string must be formatted properly for LucidDB
+     *        (ANSI-standard SQL).
+     * @param toomany - Limit the number of rows returned.
+     * @return Returns the result of the query, in String-XML.
      */
+    @WebMethod
+    @GET
+    @Path("/query/{connection}/{sqlquerytype}/{sql}/{toomany}")
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String execSQL(String connection, String sqlquerytype, String sql, int toomany);
+    public String execSQL(@PathParam("connection") String connection,
+        @PathParam("sqlquerytype") String sqlquerytype,
+        @PathParam("sql") String sql,
+        @PathParam("toomany") int toomany);
     
     /**
-     * update data
-     * @param connection
-     * @param testsql
-     * @param sql
-     * @param toomany
-     * @return
+     * Attempts to safely update data by checking for affected rows.
+     * @param connection - Unused
+     * @param testsql - Query to check that only one row will be affected.
+     *                (e.g. a select...where cond)
+     * @param sql - The actual query to be performed if only one row would
+     *              be affected. (e.g. a delete...where cond)
+     * @param toomany - Limit returned rows.
+     * @return Returns similar to execSQL.
      */
+    @WebMethod
+    @GET
+    @Path("/query/{connection}/{testsql}/{sql}/{toomany}")
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String handleUpdate(String connection, String testsql, String sql, int toomany);
+    public String handleUpdate(@PathParam("connection") String connection,
+        @PathParam("testsql") String testsql,
+        @PathParam("sql") String sql,
+        @PathParam("toomany") int toomany);
 
 
+    /**
+     * Gets a list of users for the object tree.
+     * @return XML-string of users.
+     * &lt;users&gt;&lt;user label="name" /&gt;&lt;users /&gt;
+     */
+    @WebMethod
+    @GET
+    @Path("/getusers")
     @RolesAllowed( {"Admin","Authenticated"} )
     public String getUsers();
+
+    /**
+     * Gets a list of roles for the object tree.
+     * @return XML-string of roles.
+     * &lt;roles&gt;&lt;role label="name" /&gt;&lt;roles /&gt;
+     */
+    @WebMethod
+    @GET
+    @Path("/getroles")
     @RolesAllowed( {"Admin","Authenticated"} )
     public String getRoles();
 
+    /**
+     * Gets a list of foreign tables for the object tree.
+     * @param schema - Schema to get foreign tables in.
+     * @return XML-string of foreign tables.
+     * &lt;foreign_tables&gt;&lt;foreign_table label="name" /&gt;&lt;foreign_tables /&gt;
+     */
+    @WebMethod
+    @GET
+    @Path("/getforeigntables/{schema}")
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String getForeignTables(String schema);
+    public String getForeignTables(@PathParam("schema") String schema);
 
+    /**
+     * Gets a list of functions for the object tree.
+     * @param schema - Schema to get functions in.
+     * @return XML-string of functions.
+     * &lt;functions&gt;&lt;function label="name" /&gt;&lt;functions /&gt;
+     */
+    @WebMethod
+    @GET
+    @Path("/getfunctions/{schema}")
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String getFunctions(String schema);
+    public String getFunctions(@PathParam("schema") String schema);
 
+    /**
+     * Gets a list of procedures for the object tree.
+     * @param schema - Schema to get procedures in.
+     * @return XML-string of procedures.
+     * &lt;procedures&gt;&lt;procedure label="name" /&gt;&lt;procedures /&gt;
+     */
+    @WebMethod
+    @GET
+    @Path("/getprocedures/{schema}")
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String getProcedures(String schema);
+    public String getProcedures(@PathParam("schema") String schema);
 
+    /**
+     * Gets a list of foreign data wrappers and servers for the object tree.
+     * @return XML-string of foreign data wrappers and servers.
+     */
+    @WebMethod
+    @GET
+    @Path("/getremotedata")
     @RolesAllowed( {"Admin", "Authenticated"} )
     public String getRemoteData();
+
+    /**
+     * Gets a list of jars for a schema's tree.
+     * @param schema - Schema to get jars for.
+     * @return XML-string of jars.
+     */
+    @WebMethod
+    @GET
+    @Path("/getjars/{schema}")
+    @RolesAllowed( {"Admin", "Authenticated"} )
+    public String getJars(@PathParam("schema") String schema);
 }
