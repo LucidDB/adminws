@@ -39,7 +39,7 @@ import javax.ws.rs.POST;
  * @since June 15, 2010
  * 
  */
-@WebService
+@WebService(serviceName="FlexSQLAdminService", name="FlexSQLAdminService")
 @PermitAll
 public interface FlexSQLAdmin
 {
@@ -96,7 +96,7 @@ public interface FlexSQLAdmin
      */
     @WebMethod
     @GET
-    @Path("/query/{connection}/{testsql}/{sql}/{toomany}")
+    @Path("/update/{connection}/{testsql}/{sql}/{toomany}")
     @RolesAllowed( {"Admin","Authenticated"} )
     public String handleUpdate(@PathParam("connection") String connection,
         @PathParam("testsql") String testsql,
