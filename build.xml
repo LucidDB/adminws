@@ -56,9 +56,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
       <export artifactId="war.file" destination="target/adminws.war"/>
       <export artifactId="jaxws.client.library.binaries" destination="target/dynamobi-client.jar"/>
     </enunciate>
-  </target>
-	
- <target name="deploy" depends="enunciate">
    <!-- re-war the webapp -->
    <replace file="target/build/basic-app/ns0.wsdl" token="http://localhost:8080" value="" />
    <jar destfile="target/adminws.war">
@@ -67,6 +64,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
      </fileset>
   </jar>
 
+  </target>
+	
+ <target name="deploy" depends="enunciate">
 	<copy file="target/adminws.war" tofile="${webapp.dir}/adminws.war"/>
   <copy file="target/adminws.war" tofile="../dynamodb-services/wars/adminws.war"/>
 </target>
