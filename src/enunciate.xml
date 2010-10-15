@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 -->
 <enunciate label="dynamobi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.17.xsd">
+	xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.20.xsd">
   <deployment host="localhost:8080" protocol="http" context="adminws" />
 	<namespaces>
 		<namespace id="dynamo" uri="http://domain.ws.dynamobi.com" />
@@ -55,8 +55,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 			<attribute name="Webapp-Context" value="wsadmin" />
 			<attribute name="Bundle-ClassPath"
 				value="WEB-INF/classes, . , WEB-INF/" />
-			<!--  <attribute name="Bundle-ClassPath" value=".,/WEB-INF/,/WEB-INF/classes/,/WEB-INF/lib/activation-1.1.jar,/WEB-INF/lib/asm-3.1.jar,/WEB-INF/lib/commons-beanutils-1.7.0.jar,/WEB-INF/lib/commons-digester-1.7.jar,/WEB-INF/lib/commons-logging-1.0.4.jar,/WEB-INF/lib/dynamobi-client.jar,/WEB-INF/lib/easymock-2.2.jar,/WEB-INF/lib/enunciate-core-annotations-1.17.jar,/WEB-INF/lib/enunciate-core-rt-1.17.jar,/WEB-INF/lib/enunciate-jaxws-ri-rt-1.17.jar,/WEB-INF/lib/enunciate-jersey-rt-1.17.jar,/WEB-INF/lib/enunciate-rt-1.17.jar,/WEB-INF/lib/jackson-core-asl-1.2.0.jar,/WEB-INF/lib/jackson-jaxrs-1.2.0.jar,/WEB-INF/lib/jackson-mapper-asl-1.2.0.jar,/WEB-INF/lib/jackson-xc-1.2.0.jar,/WEB-INF/lib/jaxb-api-2.1.jar,/WEB-INF/lib/jaxb-impl-2.1.11.jar,/WEB-INF/lib/jaxws-api-2.1-1.jar,/WEB-INF/lib/jaxws-api-2.1.jar,/WEB-INF/lib/jaxws-rt-2.1.7.jar,/WEB-INF/lib/jdom-1.1.jar,/WEB-INF/lib/jersey-core-1.1.4.1.jar,/WEB-INF/lib/jersey-server-1.1.4.1.jar,/WEB-INF/lib/jsr250-api-1.0.jar,/WEB-INF/lib/jsr311-api-1.0.jar,/WEB-INF/lib/junit-3.8.1.jar,/WEB-INF/lib/LucidDbClient.jar,/WEB-INF/lib/mail-1.4.jar,/WEB-INF/lib/mimepull-1.3.jar,/WEB-INF/lib/resolver-20050927.jar,/WEB-INF/lib/saaj-api-1.3.jar,/WEB-INF/lib/saaj-impl-1.3.3.jar,/WEB-INF/lib/stax-api-1.0-2.jar,/WEB-INF/lib/stax-api-1.0.1.jar,/WEB-INF/lib/stax-ex-1.2.jar,/WEB-INF/lib/streambuffer-0.9.jar,/WEB-INF/lib/wstx-asl-3.2.3.jar,/WEB-INF/lib/wstx-asl-3.2.7.jar,/WEB-INF/lib/xfire-jsr181-api-1.0-M1.jar"/>
-			-->
 		</manifest>
 	</webapp>
 </enunciate>
