@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 <enunciate label="dynamobi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.20.xsd">
-  <deployment host="localhost:8080" protocol="http" context="adminws" />
+  <deployment context="adminws" />
 	<namespaces>
 		<namespace id="dynamo" uri="http://domain.ws.dynamobi.com" />
 	</namespaces>
@@ -28,11 +28,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 		<xfire-client disabled="true" />
 		<amf disabled="true" />
 		<c disabled="true" />
+    <cxf disabled="false" enableJaxws="false" enableJaxrs="false"
+      useWsdlRedirectFilter="true" />
 		<gwt disabled="true" />
 		<jaxws-client disabled="true" />
 		<obj-c disabled="true" />
-		<!--    <jaxws-ri disabled="true"/>-->
-		<!--  <jersey disabled="true"/>   -->
 		<docs splashPackage="com.dynamobi.ws.api" title="DynamoBI's API"
 			copyright="DynamoBI Inc.">
 			<download name="License" file="LICENSE.txt"

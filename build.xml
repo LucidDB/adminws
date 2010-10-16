@@ -57,12 +57,13 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
       <export artifactId="jaxws.client.library.binaries" destination="target/dynamobi-client.jar"/>
     </enunciate>
    <!-- re-war the webapp -->
-   <replace file="target/build/basic-app/ns0.wsdl" token="http://localhost:8080" value="" />
+   <!-- (No longer necessary) -->
+   <!--<replace file="target/build/basic-app/ns0.wsdl" token="http://localhost:8080" value="" />
    <jar destfile="target/adminws.war">
      <fileset dir="target/build/basic-app/">
        <include name="**/*" />
      </fileset>
-  </jar>
+  </jar>-->
 
   </target>
 	
