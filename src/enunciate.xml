@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 		<xfire-client disabled="true" />
     <!-- If you get a flex error about a Fonts.ser file, change your
          flex-config.xml file and uncomment the local-fonts-snapshot item.-->
-		<amf disabled="true" flexHome="/home/kevin/Desktop/flex_sdk_4" swcDownloadable="true" asSourcesDownloadable="true" />
+    <amf disabled="false" flexHome="${flex_home}" swcDownloadable="true" asSourcesDownloadable="true" />
 		<c disabled="true" />
     <cxf disabled="false" enableJaxws="false" enableJaxrs="false"
       useWsdlRedirectFilter="true" />
