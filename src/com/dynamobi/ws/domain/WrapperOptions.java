@@ -24,16 +24,16 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="wrapperoptions")
 public class WrapperOptions {
 
-  @XmlAttribute public int ordinal;
-  @XmlAttribute public String name;
-  @XmlAttribute public String desc;
-  @XmlAttribute public boolean required;
-  @XmlAttribute public String value;
-  @XmlAttribute public String type;
+  public int ordinal;
+  public String name;
+  public String desc;
+  public boolean required;
+  public String value;
+  public String type;
 
   public String toString() {
     return "\nordinal: " + ordinal +
@@ -43,4 +43,31 @@ public class WrapperOptions {
      "\nvalue: " + value +
      "\ntype: " + type;
   }
+
+  // Auto-generated for AMF
+  @XmlAttribute
+  public int getOrdinal() { return ordinal; }
+  public void setOrdinal(int ordinal) { this.ordinal = ordinal; }
+
+  @XmlAttribute
+  public String getName() { return name; }
+  public void setName(String name) { this.name = name; }
+
+  @XmlAttribute
+  public String getDesc() { return desc; }
+  public void setDesc(String desc) { this.desc = desc; }
+
+  @XmlAttribute
+  public boolean getRequired() { return required; }
+  public void setRequired(boolean required) { this.required = required; }
+
+  @XmlAttribute
+  public String getValue() { return value; }
+  public void setValue(String value) { this.value = value; }
+
+  @XmlAttribute
+  public String getType() { return type; }
+  public void setType(String type) { this.type = type; }
+
 }
+

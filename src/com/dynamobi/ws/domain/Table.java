@@ -32,20 +32,35 @@ import javax.xml.bind.annotation.XmlAccessorType;
  * @author Ray Zhang
  * @since Jan-11-2010
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement
 public class Table
 {
-	@XmlAttribute
 	public String uuid;
 	
-	@XmlAttribute
-    public String name;
+	public String name;
 
-	@XmlAttribute
-    public String schema;
+	public String schema;
 
-	@XmlAttribute
-    public String catalog;
+	public String catalog;
+
+
+  // Auto-generated for AMF
+  @XmlAttribute
+  public String getUuid() { return uuid; }
+  public void setUuid(String uuid) { this.uuid = uuid; }
+
+  @XmlAttribute
+  public String getName() { return name; }
+  public void setName(String name) { this.name = name; }
+
+  @XmlAttribute
+  public String getSchema() { return schema; }
+  public void setSchema(String schema) { this.schema = schema; }
+
+  @XmlAttribute
+  public String getCatalog() { return catalog; }
+  public void setCatalog(String catalog) { this.catalog = catalog; }
 
 }
+

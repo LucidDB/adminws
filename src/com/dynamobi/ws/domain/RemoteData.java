@@ -35,19 +35,19 @@ import java.util.HashSet;
  * Used for storing various metadata on foreign objects.
  * @author Kevin Secretan
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="remotedata")
 public class RemoteData {
 
-  @XmlElement public List<String> foreign_schemas;
-  @XmlElement public List<String> foreign_descriptions;
-  @XmlElement public String foreign_tables;
-  @XmlElement public List<String> local_imported_tables;
+  public List<String> foreign_schemas;
+  public List<String> foreign_descriptions;
+  public String foreign_tables;
+  public List<String> local_imported_tables;
 
   // List of remote tables that are different from local imported ones.
-  @XmlElement public List<String> foreign_changed;
+  public List<String> foreign_changed;
   // List of remote tables that are gone but we imported locally.
-  @XmlElement public List<String> foreign_deleted;
+  public List<String> foreign_deleted;
 
   // Helper maps. Structure: {'SchemaName~TableName': 'Col1,Col2'}
   private Map<String, String> local_data;
@@ -142,6 +142,32 @@ public class RemoteData {
       "\nforeign_tables: " + foreign_tables +
       "\nlocal_imported_tables: " + local_imported_tables;
   }
+
+
+  // Auto-generated for AMF
+  @XmlElement
+  public List<String> getForeign_schemas() { return foreign_schemas; }
+  public void setForeign_schemas(List<String> foreign_schemas) { this.foreign_schemas = foreign_schemas; }
+
+  @XmlElement
+  public List<String> getForeign_descriptions() { return foreign_descriptions; }
+  public void setForeign_descriptions(List<String> foreign_descriptions) { this.foreign_descriptions = foreign_descriptions; }
+
+  @XmlElement
+  public String getForeign_tables() { return foreign_tables; }
+  public void setForeign_tables(String foreign_tables) { this.foreign_tables = foreign_tables; }
+
+  @XmlElement
+  public List<String> getLocal_imported_tables() { return local_imported_tables; }
+  public void setLocal_imported_tables(List<String> local_imported_tables) { this.local_imported_tables = local_imported_tables; }
+
+  @XmlElement
+  public List<String> getForeign_changed() { return foreign_changed; }
+  public void setForeign_changed(List<String> foreign_changed) { this.foreign_changed = foreign_changed; }
+
+  @XmlElement
+  public List<String> getForeign_deleted() { return foreign_deleted; }
+  public void setForeign_deleted(List<String> foreign_deleted) { this.foreign_deleted = foreign_deleted; }
 
 }
 

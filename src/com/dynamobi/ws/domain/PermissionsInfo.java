@@ -34,15 +34,15 @@ import java.util.ArrayList;
 /**
  * @author Kevin Secretan
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="info")
 public class PermissionsInfo {
 
-  @XmlAttribute public String catalog_name;
-  @XmlAttribute public String schema_name;
-  @XmlAttribute public String item_name;
-  @XmlAttribute public String item_type;
-  @XmlAttribute @XmlList public List<String> actions;
+  public String catalog_name;
+  public String schema_name;
+  public String item_name;
+  public String item_type;
+  public List<String> actions;
 
   public PermissionsInfo() {
     actions = new ArrayList<String>();
@@ -56,4 +56,27 @@ public class PermissionsInfo {
      "\nitem_type: " + item_type +
      "\nactions: " + actions;
   }
+
+  // Auto-generated for AMF
+  @XmlAttribute
+  public String getCatalog_name() { return catalog_name; }
+  public void setCatalog_name(String catalog_name) { this.catalog_name = catalog_name; }
+
+  @XmlAttribute
+  public String getSchema_name() { return schema_name; }
+  public void setSchema_name(String schema_name) { this.schema_name = schema_name; }
+
+  @XmlAttribute
+  public String getItem_name() { return item_name; }
+  public void setItem_name(String item_name) { this.item_name = item_name; }
+
+  @XmlAttribute
+  public String getItem_type() { return item_type; }
+  public void setItem_type(String item_type) { this.item_type = item_type; }
+
+  @XmlAttribute
+  @XmlList public List<String> getActions() { return actions; }
+  public void setActions(List<String> actions) { this.actions = actions; }
+
 }
+

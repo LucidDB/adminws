@@ -32,15 +32,30 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Ray Zhang
  * @since Jan-11-2010
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement
 public class Schema
 {
-	@XmlAttribute public String uuid;
-	@XmlAttribute public String name;
+	public String uuid;
+	public String name;
     
-	@XmlElement(name="table")
-    public List<Table> tables;
+	public List<Table> tables;
 
+
+  // Auto-generated for AMF
+  @XmlAttribute
+  public String getUuid() { return uuid; }
+  public void setUuid(String uuid) { this.uuid = uuid; }
+
+  @XmlAttribute
+  public String getName() { return name; }
+  public void setName(String name) { this.name = name; }
+
+
+  // Auto-generated for AMF
+  @XmlElement(name="table")
+  public List<Table> getTables() { return tables; }
+  public void setTables(List<Table> tables) { this.tables = tables; }
 
 }
+

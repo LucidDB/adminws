@@ -34,14 +34,14 @@ import com.dynamobi.ws.domain.PermissionsInfo;
  * Holder for the roles xml tree.
  * @author Kevin Secretan
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="role")
 public class RolesDetails {
 
-  @XmlAttribute public String name;
-  @XmlElement @XmlList public List<String> users;
-  @XmlElement @XmlList public List<String> users_with_grant_option;
-  @XmlElement(name="permission") public List<PermissionsInfo> permissions;
+  public String name;
+  public List<String> users;
+  public List<String> users_with_grant_option;
+  public List<PermissionsInfo> permissions;
 
   public RolesDetails() {
     users = new ArrayList<String>();
@@ -56,4 +56,23 @@ public class RolesDetails {
      "\nusers with grant: " + users_with_grant_option + 
      "\npermissions: " + permissions;
   }
+
+  // Auto-generated for AMF
+  @XmlAttribute
+  public String getName() { return name; }
+  public void setName(String name) { this.name = name; }
+
+  @XmlElement
+  @XmlList public List<String> getUsers() { return users; }
+  public void setUsers(List<String> users) { this.users = users; }
+
+  @XmlElement
+  @XmlList public List<String> getUsers_with_grant_option() { return users_with_grant_option; }
+  public void setUsers_with_grant_option(List<String> users_with_grant_option) { this.users_with_grant_option = users_with_grant_option; }
+
+  @XmlElement(name="permission")
+  public List<PermissionsInfo> getPermissions() { return permissions; }
+  public void setPermissions(List<PermissionsInfo> permissions) { this.permissions = permissions; }
+
 }
+

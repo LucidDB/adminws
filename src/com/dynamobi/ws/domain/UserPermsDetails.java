@@ -34,12 +34,12 @@ import com.dynamobi.ws.domain.PermissionsInfo;
  * Holder for the per-user permissions xml tree.
  * @author Kevin Secretan
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="user")
 public class UserPermsDetails {
 
-  @XmlAttribute public String name;
-  @XmlElement(name="permission") public List<PermissionsInfo> permissions;
+  public String name;
+  public List<PermissionsInfo> permissions;
 
   public UserPermsDetails() {
     permissions = new ArrayList<PermissionsInfo>();
@@ -50,5 +50,15 @@ public class UserPermsDetails {
      "\nname: " + name +
      "\npermissions: " + permissions;
   }
+
+  // Auto-generated for AMF
+  @XmlAttribute
+  public String getName() { return name; }
+  public void setName(String name) { this.name = name; }
+
+  @XmlElement(name="permission")
+  public List<PermissionsInfo> getPermissions() { return permissions; }
+  public void setPermissions(List<PermissionsInfo> permissions) { this.permissions = permissions; }
+
 }
 

@@ -34,10 +34,13 @@ import javax.xml.bind.annotation.XmlAccessorType;
  * @author Ray Zhang
  * @since Jan-11-2010
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="tableinfo")
 public class TablesInfo
 {
 	public List<Catalog> catalog;
 
+
+  // Auto-generated for AMF
 }
+

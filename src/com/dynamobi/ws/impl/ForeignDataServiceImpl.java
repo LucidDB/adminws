@@ -176,6 +176,12 @@ public class ForeignDataServiceImpl implements ForeignDataService {
     RemoteData remote_data = new RemoteData();
 
     // FIXME: Generate a guid name
+    /*
+     *  see FarragoExportSchemaUDR.java, 850
+        String tmpLocalSchema =
+            "_TMP_LOCAL_SCHEMA"
+            + UUID.randomUUID().toString();
+            */
     String temp_schema = "slkfJIOix32p89wml";
     
     String query;

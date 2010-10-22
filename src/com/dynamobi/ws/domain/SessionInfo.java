@@ -28,14 +28,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
  * Holds SessionInfo
  * @author Kevin Secretan
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="sessioninfo")
 public class SessionInfo {
 
-  @XmlAttribute public int id;
-  @XmlAttribute public String connect_url;
-  @XmlAttribute public String user;
-  @XmlAttribute public String query;
+  public int id;
+  public String connect_url;
+  public String user;
+  public String query;
 
   public String toString() {
     return
@@ -44,4 +44,23 @@ public class SessionInfo {
      "\nuser: " + user +
      "\nquery: " + query;
   }
+
+  // Auto-generated for AMF
+  @XmlAttribute
+  public int getId() { return id; }
+  public void setId(int id) { this.id = id; }
+
+  @XmlAttribute
+  public String getConnect_url() { return connect_url; }
+  public void setConnect_url(String connect_url) { this.connect_url = connect_url; }
+
+  @XmlAttribute
+  public String getUser() { return user; }
+  public void setUser(String user) { this.user = user; }
+
+  @XmlAttribute
+  public String getQuery() { return query; }
+  public void setQuery(String query) { this.query = query; }
+
 }
+

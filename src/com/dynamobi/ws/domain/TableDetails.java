@@ -35,21 +35,21 @@ import javax.xml.bind.annotation.XmlAccessorType;
  * 
  * @author Nicholas Goodman
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="tabledetails")
 public class TableDetails
 {
-	@XmlAttribute public String uuid;
-	@XmlAttribute public String name;
-	@XmlAttribute public String schema;
-	@XmlAttribute public String catalog;
-	@XmlAttribute public Date create_time;
-	@XmlAttribute public Integer last_analyze_row_count;
-	@XmlAttribute public Date last_analyze_timestamp;
-	@XmlAttribute public Integer current_row_count;
-	@XmlAttribute public Integer deleted_row_count;
-	@XmlAttribute public String table_type;
-	@XmlElement public List<Column> column;
+	public String uuid;
+	public String name;
+	public String schema;
+	public String catalog;
+	public Date create_time;
+	public Integer last_analyze_row_count;
+	public Date last_analyze_timestamp;
+	public Integer current_row_count;
+	public Integer deleted_row_count;
+	public String table_type;
+	public List<Column> column;
 	
 	
   public String toString() {
@@ -66,4 +66,51 @@ public class TableDetails
 	
 	
 
+
+  // Auto-generated for AMF
+  @XmlAttribute
+  public String getUuid() { return uuid; }
+  public void setUuid(String uuid) { this.uuid = uuid; }
+
+  @XmlAttribute
+  public String getName() { return name; }
+  public void setName(String name) { this.name = name; }
+
+  @XmlAttribute
+  public String getSchema() { return schema; }
+  public void setSchema(String schema) { this.schema = schema; }
+
+  @XmlAttribute
+  public String getCatalog() { return catalog; }
+  public void setCatalog(String catalog) { this.catalog = catalog; }
+
+  @XmlAttribute
+  public Date getCreate_time() { return create_time; }
+  public void setCreate_time(Date create_time) { this.create_time = create_time; }
+
+  @XmlAttribute
+  public Integer getLast_analyze_row_count() { return last_analyze_row_count; }
+  public void setLast_analyze_row_count(Integer last_analyze_row_count) { this.last_analyze_row_count = last_analyze_row_count; }
+
+  @XmlAttribute
+  public Date getLast_analyze_timestamp() { return last_analyze_timestamp; }
+  public void setLast_analyze_timestamp(Date last_analyze_timestamp) { this.last_analyze_timestamp = last_analyze_timestamp; }
+
+  @XmlAttribute
+  public Integer getCurrent_row_count() { return current_row_count; }
+  public void setCurrent_row_count(Integer current_row_count) { this.current_row_count = current_row_count; }
+
+  @XmlAttribute
+  public Integer getDeleted_row_count() { return deleted_row_count; }
+  public void setDeleted_row_count(Integer deleted_row_count) { this.deleted_row_count = deleted_row_count; }
+
+  @XmlAttribute
+  public String getTable_type() { return table_type; }
+  public void setTable_type(String table_type) { this.table_type = table_type; }
+
+  @XmlElement
+  public List<Column> getColumn() { return column; }
+  public void setColumn(List<Column> column) { this.column = column; }
+
 }
+

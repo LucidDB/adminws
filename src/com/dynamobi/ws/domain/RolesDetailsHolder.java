@@ -40,11 +40,11 @@ import com.dynamobi.ws.domain.UserPermsDetails;
  * is users and roles permissions holder.
  * @author Kevin Secretan
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="roles")
 public final class RolesDetailsHolder {
-  @XmlElement(name="role") public List<RolesDetails> value;
-  @XmlElement(name="user") public List<UserPermsDetails> value2;
+  public List<RolesDetails> value;
+  public List<UserPermsDetails> value2;
 
   public RolesDetailsHolder() {
     value = new ArrayList<RolesDetails>();
@@ -54,4 +54,15 @@ public final class RolesDetailsHolder {
   public RolesDetailsHolder(List<RolesDetails> value) {
     this.value = value;
   }
+
+  // Auto-generated for AMF
+  @XmlElement(name="role")
+  public List<RolesDetails> getValue() { return value; }
+  public void setValue(List<RolesDetails> value) { this.value = value; }
+
+  @XmlElement(name="user")
+  public List<UserPermsDetails> getValue2() { return value2; }
+  public void setValue2(List<UserPermsDetails> value2) { this.value2 = value2; }
+
 }
+

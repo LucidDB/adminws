@@ -34,6 +34,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
       <fileset dir="${enunciate.home}/lib">
         <include name="*.jar"/>
       </fileset>
+      <fileset dir="${enunciate.home}/lib/modules/amf">
+        <include name="*.jar"/>
+      </fileset>
       <fileset dir="${enunciate.home}/lib/modules/spring">
         <include name="*.jar"/>
       </fileset>

@@ -30,21 +30,21 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author rzhang, ngoodman
  * @since Jan-15-2010
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 public class Column
 {
-	@XmlAttribute public String name;
-	@XmlAttribute public String uuid;
-	@XmlAttribute public Integer ordinal_position;
-	@XmlAttribute public String datatype;
-	@XmlAttribute public Integer precision;
-	@XmlAttribute public Integer dec_digits;
-	@XmlAttribute public Boolean is_nullable;
-  @XmlAttribute public String default_value;
-	@XmlAttribute public String remarks;
-	@XmlAttribute public Integer distinct_value_count;
-	@XmlAttribute public Boolean distinct_value_count_estimated;
-	@XmlAttribute public Date last_analyze_time;
+	public String name;
+	public String uuid;
+	public Integer ordinal_position;
+	public String datatype;
+	public Integer precision;
+	public Integer dec_digits;
+	public Boolean is_nullable;
+  public String default_value;
+	public String remarks;
+	public Integer distinct_value_count;
+	public Boolean distinct_value_count_estimated;
+	public Date last_analyze_time;
 
   public String toString() {
     return "uuid: " + uuid + "\nname: " + name + "\nordinal_position: "
@@ -57,4 +57,55 @@ public class Column
       + "\nlast_analyze_time: " + last_analyze_time;
   }
 
+
+  // Auto-generated for AMF
+  @XmlAttribute
+  public String getName() { return name; }
+  public void setName(String name) { this.name = name; }
+
+  @XmlAttribute
+  public String getUuid() { return uuid; }
+  public void setUuid(String uuid) { this.uuid = uuid; }
+
+  @XmlAttribute
+  public Integer getOrdinal_position() { return ordinal_position; }
+  public void setOrdinal_position(Integer ordinal_position) { this.ordinal_position = ordinal_position; }
+
+  @XmlAttribute
+  public String getDatatype() { return datatype; }
+  public void setDatatype(String datatype) { this.datatype = datatype; }
+
+  @XmlAttribute
+  public Integer getPrecision() { return precision; }
+  public void setPrecision(Integer precision) { this.precision = precision; }
+
+  @XmlAttribute
+  public Integer getDec_digits() { return dec_digits; }
+  public void setDec_digits(Integer dec_digits) { this.dec_digits = dec_digits; }
+
+  @XmlAttribute
+  public Boolean getIs_nullable() { return is_nullable; }
+  public void setIs_nullable(Boolean is_nullable) { this.is_nullable = is_nullable; }
+
+  @XmlAttribute
+  public String getDefault_value() { return default_value; }
+  public void setDefault_value(String default_value) { this.default_value = default_value; }
+
+  @XmlAttribute
+  public String getRemarks() { return remarks; }
+  public void setRemarks(String remarks) { this.remarks = remarks; }
+
+  @XmlAttribute
+  public Integer getDistinct_value_count() { return distinct_value_count; }
+  public void setDistinct_value_count(Integer distinct_value_count) { this.distinct_value_count = distinct_value_count; }
+
+  @XmlAttribute
+  public Boolean getDistinct_value_count_estimated() { return distinct_value_count_estimated; }
+  public void setDistinct_value_count_estimated(Boolean distinct_value_count_estimated) { this.distinct_value_count_estimated = distinct_value_count_estimated; }
+
+  @XmlAttribute
+  public Date getLast_analyze_time() { return last_analyze_time; }
+  public void setLast_analyze_time(Date last_analyze_time) { this.last_analyze_time = last_analyze_time; }
+
 }
+

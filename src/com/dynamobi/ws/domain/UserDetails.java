@@ -29,14 +29,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
  * Holds UserDetails info
  * @author Kevin Secretan
  */
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="userdetails")
 public class UserDetails {
 
-  @XmlAttribute public String name;
-  @XmlAttribute public String password;
-  @XmlAttribute public String creation_timestamp;
-  @XmlAttribute public String modification_timestamp;
+  public String name;
+  public String password;
+  public String creation_timestamp;
+  public String modification_timestamp;
 
   public String toString() {
     return
@@ -45,4 +45,23 @@ public class UserDetails {
      "\ncreation_timestamp: " + creation_timestamp +
      "\nmodification_timestamp: " + modification_timestamp;
   }
+
+  // Auto-generated for AMF
+  @XmlAttribute
+  public String getName() { return name; }
+  public void setName(String name) { this.name = name; }
+
+  @XmlAttribute
+  public String getPassword() { return password; }
+  public void setPassword(String password) { this.password = password; }
+
+  @XmlAttribute
+  public String getCreation_timestamp() { return creation_timestamp; }
+  public void setCreation_timestamp(String creation_timestamp) { this.creation_timestamp = creation_timestamp; }
+
+  @XmlAttribute
+  public String getModification_timestamp() { return modification_timestamp; }
+  public void setModification_timestamp(String modification_timestamp) { this.modification_timestamp = modification_timestamp; }
+
 }
+
