@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
          flex-config.xml file and uncomment the local-fonts-snapshot item.-->
     <amf disabled="false" flexHome="${FLEX_HOME}" swcDownloadable="true" asSourcesDownloadable="true" >
 	<compiler>
-		<arg>-fonts.local-fonts-snapshot</arg>
+		<arg>-compiler.fonts.local-fonts-snapshot</arg>
 		<arg>${FLEX_HOME}/frameworks/localFonts.ser</arg>
 	</compiler>
     </amf>
