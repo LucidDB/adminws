@@ -159,30 +159,13 @@ public class ForeignDataServiceImpl implements ForeignDataService {
       return retval;
   }
 
-  /*
-   * Do not use this yet!
-   */
   public RemoteData getForeignData(String server_name) throws AppException {
-    // NOTE: foreign tables are just that. Their data isn't actually
-    // stored locally unless told to, therefore we can import the server to
-    // temporary schema to get a list of tables and columns to check
-    // for new tables/deleted tables/modified (columns) tables by just
-    // looking at the structure. No need to go out with a select yet.
-
     String valid_server = testServer(server_name);
     if (!valid_server.equals(""))
       return null;  // invalid
 
     RemoteData remote_data = new RemoteData();
-
-    // FIXME: Generate a guid name
-    /*
-     *  see FarragoExportSchemaUDR.java, 850
-        String tmpLocalSchema =
-            "_TMP_LOCAL_SCHEMA"
-            + UUID.randomUUID().toString();
-            */
-    String temp_schema = "slkfJIOix32p89wml";
+    // tmpLocalSchema = "_TMP_LOCAL_SCHEMA" + UUID.randomUUID().toString();
     
     String query;
     try {
@@ -213,52 +196,45 @@ public class ForeignDataServiceImpl implements ForeignDataService {
         remote_data.foreign_schemas.add(schema_name);
         remote_data.foreign_descriptions.add(desc);
       }
+      // If this server has no schemas, maybe there's a default one, so
+      // let's check.
+      if (remote_data.foreign_schemas.size() == 0) {
+        remote_data.foreign_schemas.add("");
+        remote_data.foreign_descriptions.add("");
+      }
 
-      // create a temporary schema for extraction:
-      // (note: while it would be ideal to do this for each ind.
-      // import to resolve possible table name conflicts,
-      // this just runs way too slow.)
-      query = "CREATE SCHEMA \"" + temp_schema + "\"";
-      DBAccess.rawResultExec(query);
-      // Import them to our temp schema:
+      // Get a list of tables and columns for each schema.
       for (String schema_name : remote_data.foreign_schemas) {
         try {
-          query = "IMPORT FOREIGN SCHEMA \"" + schema_name + "\" FROM SERVER \""
-            + server_name + "\" INTO \"" + temp_schema + "\"";
+          query = "select distinct table_name, column_name, ordinal, " +
+            "column_type, description, default_value " +
+            "FROM table(sys_boot.mgmt.browse_foreign_columns('" + server_name +
+            "', '" + schema_name + "')) ORDER BY table_name, ordinal";
+          // Sometimes need to run this twice...
           rs = DBAccess.rawResultExec(query);
+          rs = DBAccess.rawResultExec(query);
+          while (rs.next()) {
+            int c = 0;
+            String table = rs.getString(++c);
+            String col = rs.getString(++c);
+            int ordinal = rs.getInt(++c);
+            String type = rs.getString(++c);
+            String desc = rs.getString(++c);
+            String default_val = rs.getString(++c);
+            remote_data.addForeignTableColumn(schema_name, table, col + type);
+          }
         } catch (SQLException ex) {
           // Bad foreign schema?
           continue;
         }
-        // Now get a list of the newly imported ones and their column details.
-        query = "SELECT DISTINCT table_name, column_name, datatype FROM " +
-          "sys_root.dba_columns c WHERE schema_name = '" + temp_schema + "' " +
-          "ORDER BY table_name, column_name";
-        rs = DBAccess.rawResultExec(query);
-        while (rs.next()) {
-          int c = 0;
-          String table = rs.getString(++c);
-          String col = rs.getString(++c);
-          String type = rs.getString(++c);
-          remote_data.addForeignTableColumn(schema_name, table, col + type);
-        }
 
       }
-      // Clean up our schema
-      query = "DROP SCHEMA \"" + temp_schema + "\" CASCADE";
-      rs = DBAccess.rawResultExec(query);
 
       remote_data.findChanges();
       remote_data.readyResults();
 
     } catch (SQLException e) {
       e.printStackTrace();
-      // May need to still clean up
-      try {
-        query = "DROP SCHEMA \"" + temp_schema + "\" CASCADE";
-        DBAccess.rawResultExec(query);
-      } catch (SQLException e2) { }
-      return null;
     }
     return remote_data;
   }

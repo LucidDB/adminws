@@ -57,6 +57,7 @@ public class RemoteData {
   private Map<String, Set<String>> foreign_schema_tables;
 
   public RemoteData() {
+    foreign_tables = "";
     foreign_schemas = new ArrayList<String>();
     foreign_descriptions = new ArrayList<String>();
     local_imported_tables = new ArrayList<String>();
@@ -94,12 +95,6 @@ public class RemoteData {
   }
 
   public void addForeignTableColumn(String schema, String table, String identifier) {
-    if (table.equals("foreign_data_wrapper_options")) {
-      //System.out.println(schema);
-      // Argh. This table exists in multiple schemas, but it's the same,
-      // this problem can be solved by keeping track of the schema,
-      // but our local imported tables need to know about it too.
-    }
     String put_key = table;
     String put_val = identifier;
     if (foreign_data.containsKey(put_key)) {

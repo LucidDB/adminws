@@ -1491,8 +1491,18 @@ public class DBAccess
       } catch (Exception ex) {
         ex.printStackTrace();
       } finally {
-        // We don't need to explicitly close anymore
+        // We don't need to explicitly close RS's
         // because c3p0 will handle it for us.
+        try {
+          if (ps != null) {
+            ps.close();
+          }
+          if (conn != null) {
+            conn.close();
+          }
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
       }
       return rs;
     }
