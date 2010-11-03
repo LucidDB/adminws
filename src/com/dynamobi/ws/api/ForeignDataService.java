@@ -57,7 +57,7 @@ public interface ForeignDataService {
 
   /**
    * @param wrapper - Name of the foreign data wrapper.
-   * @return Returns a list of all wrapper options (including extended)
+   * @return Returns a list of all wrapper options (excluding extended)
    * for a given wrapper name.
    */
   @WebMethod
@@ -66,6 +66,19 @@ public interface ForeignDataService {
   @RolesAllowed( {"Admin", "Authenticated"} )
   public List<WrapperOptions> getWrapperOptions(
       @PathParam("wrapper") String wrapper) throws AppException;
+
+  /**
+   * @param wrapper - Name of the foreign data wrapper.
+   * @return Returns a list of all wrapper options (including extended)
+   * for a given wrapper name and driver class.
+   */
+  @WebMethod
+  @GET
+  @Path("/wrappers/options/extended/{wrapper}/{driver}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public List<WrapperOptions> getExtendedWrapperOptions(
+      @PathParam("wrapper") String wrapper,
+      @PathParam("driver") String driver) throws AppException;
 
   /**
    * @param server - Name of the server.
@@ -108,11 +121,9 @@ public interface ForeignDataService {
     throws AppException;
 
   /**
-   * (NOT FULLY IMPLEMENTED) Used for retrieving a list of
+   * Used for retrieving a list of
    * foreign data from a foreign server for the user to import
-   * locally. Currently this is a very expensive and not-quite-correct
-   * call because it imports everything into a temporary schema since
-   * we are missing a certain UDX.
+   * locally.
    *
    * @param server_name - Name of the foreign data server.
    * @return Returns a RemoteData object which contains a list of schemas,
@@ -125,6 +136,30 @@ public interface ForeignDataService {
   @RolesAllowed( {"Admin", "Authenticated"} )
   public RemoteData getForeignData(@PathParam("name") String server_name)
     throws AppException;
+
+
+  /**
+   * Called to import a foreign schema into a local schema,
+   * along with a list of table names from the foreign schema to
+   * import. (An empty list implies all tables.)
+   *
+   * @param server - Name of the foreign server to import from.
+   * @param from_schema - Name of the foreign schema to import from.
+   * @param to_schema - Name of the local schema to import into.
+   * @param tables - List of foreign table names to import.
+   * @return Returns an empty string on success, otherwise an SQL error message.
+   */
+  @WebMethod
+  @POST
+  @Path("/servers/import/{server}/{from_schema}/{to_schema}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  @Consumes ("application/xml")
+  public String importForeignSchema(@PathParam("server") String server,
+      @PathParam("from_schema") String from_schema,
+      @PathParam("to_schema") String to_schema,
+      List<String> tables) throws AppException;
+
+
 
 }
 

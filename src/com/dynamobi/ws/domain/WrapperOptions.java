@@ -34,6 +34,7 @@ public class WrapperOptions {
   public boolean required;
   public String value;
   public String type;
+  public boolean is_extended;
 
   public String toString() {
     return "\nordinal: " + ordinal +
@@ -68,6 +69,10 @@ public class WrapperOptions {
   @XmlAttribute
   public String getType() { return type; }
   public void setType(String type) { this.type = type; }
+
+  @XmlAttribute
+  public boolean getIsExtended() { return is_extended; }
+  public void setIsExtended(boolean ex) { is_extended = ex; }
 
 }
 

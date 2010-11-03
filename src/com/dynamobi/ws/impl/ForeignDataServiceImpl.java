@@ -87,6 +87,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
           if (options.value == null)
             options.value = "";
           options.type = type;
+          options.is_extended = false;
 
           options_list.add(options);
         }
@@ -94,6 +95,58 @@ public class ForeignDataServiceImpl implements ForeignDataService {
         e.printStackTrace();
       }
       return options_list;
+  }
+
+  public List<WrapperOptions> getExtendedWrapperOptions(String wrapper,
+      String driver) throws AppException {
+    List<WrapperOptions> options_list = new ArrayList<WrapperOptions>();
+
+    try {
+      final String query = "select distinct " +
+        "option_ordinal,  " +
+        "option_name, " +
+        "option_description, " +
+        "is_option_required, " +
+        "option_choice_value as option_default_value, " +
+        "case  " +
+        "  when option_choice_value = 'TRUE' OR option_choice_value = 'FALSE' then 'BOOLEAN' " +
+        "  else 'TEXT' " +
+        "end as option_type, " +
+        "option_choice_ordinal " +
+        "from " +
+        "  table(sys_boot.mgmt.browse_connect_foreign_server('" + wrapper + "', " +
+        "    cursor(values ('DRIVER_CLASS', '" + driver + "'), ('URL', ''), " +
+        "      ('EXTENDED_OPTIONS', 'TRUE')))) " +
+        "where option_choice_ordinal = -1 " +
+        "order by option_ordinal ";
+
+      ResultSet rs = DBAccess.rawResultExec(query);
+      while (rs.next()) {
+        int c = 0;
+        int ordinal = rs.getInt(++c);
+        String name = rs.getString(++c);
+        String desc = rs.getString(++c);
+        boolean req = rs.getBoolean(++c);
+        String default_val = rs.getString(++c);
+        String type = rs.getString(++c);
+
+        WrapperOptions options = new WrapperOptions();
+        options.ordinal = ordinal;
+        options.name = name;
+        options.desc = desc;
+        options.required = req;
+        options.value = default_val;
+        if (options.value == null)
+          options.value = "";
+        options.type = type;
+        options.is_extended = true;
+
+        options_list.add(options);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return options_list;
   }
 
   public List<WrapperOptions> getWrapperOptionsForServer(String server)
@@ -160,9 +213,13 @@ public class ForeignDataServiceImpl implements ForeignDataService {
   }
 
   public RemoteData getForeignData(String server_name) throws AppException {
+    long start, end;
+    start = System.currentTimeMillis();
     String valid_server = testServer(server_name);
     if (!valid_server.equals(""))
       return null;  // invalid
+    end = System.currentTimeMillis();
+    System.out.println("validate: " + (end - start)/1000.0);
 
     RemoteData remote_data = new RemoteData();
     // tmpLocalSchema = "_TMP_LOCAL_SCHEMA" + UUID.randomUUID().toString();
@@ -172,6 +229,8 @@ public class ForeignDataServiceImpl implements ForeignDataService {
 
       // get a list of already imported tables for this server and
       // unique column identifiers.
+      start = System.currentTimeMillis();
+
       query = "SELECT schema_name, table_name, column_name, datatype " +
         "FROM sys_root.dba_columns c INNER JOIN sys_root.dba_foreign_tables f "
         + "ON foreign_server_name = '" + server_name + "' AND " +
@@ -186,7 +245,10 @@ public class ForeignDataServiceImpl implements ForeignDataService {
         String type = rs.getString(++c);
         remote_data.addLocalTableColumn(schema, table, col + type);
       }
+      end = System.currentTimeMillis();
+      System.out.println("already imported: " + (end - start) / 1000.0);
 
+      start = System.currentTimeMillis();
       // get a list of foreign schemas:
       query = "SELECT DISTINCT schema_name, description FROM table(sys_boot.mgmt.browse_foreign_schemas('" + server_name + "')) order by schema_name";
       rs = DBAccess.rawResultExec(query);
@@ -202,8 +264,11 @@ public class ForeignDataServiceImpl implements ForeignDataService {
         remote_data.foreign_schemas.add("");
         remote_data.foreign_descriptions.add("");
       }
+      end = System.currentTimeMillis();
+      System.out.println("schemas: " + (end - start) / 1000.0);
 
       // Get a list of tables and columns for each schema.
+      start = System.currentTimeMillis();
       for (String schema_name : remote_data.foreign_schemas) {
         try {
           query = "select distinct table_name, column_name, ordinal, " +
@@ -227,16 +292,47 @@ public class ForeignDataServiceImpl implements ForeignDataService {
           // Bad foreign schema?
           continue;
         }
+        end = System.currentTimeMillis();
+        System.out.println("tables and stuff: " + (end - start) / 1000.0);
 
       }
 
+      start = System.currentTimeMillis();
       remote_data.findChanges();
       remote_data.readyResults();
+      end = System.currentTimeMillis();
+      System.out.println("ready results: " + (end - start) / 1000.0);
 
     } catch (SQLException e) {
       e.printStackTrace();
     }
     return remote_data;
+  }
+
+  public String importForeignSchema(String server, String from_schema,
+      String to_schema,
+      List<String> tables) throws AppException {
+    String retval = "";
+    try {
+      if (from_schema == null || from_schema.equals("")) from_schema = "";
+      String query = "IMPORT FOREIGN SCHEMA \"" + from_schema + "\"";
+      if (tables.size() > 0) {
+        query += " LIMIT TO (";
+        for (String table : tables) {
+          query += "\"" + table + "\",";
+        }
+        int last_ind = query.lastIndexOf(",");
+        if (last_ind != -1)
+          query = query.substring(0, last_ind) + ")";
+      }
+      query += " FROM SERVER " + server + " INTO \"" + to_schema + "\"";
+      System.out.println(query);
+      ResultSet rs = DBAccess.rawResultExec(query);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      retval = e.getMessage();
+    }
+    return retval;
   }
 
 }
