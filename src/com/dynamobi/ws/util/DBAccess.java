@@ -1629,28 +1629,15 @@ public class DBAccess
 
                     int matchCode = -1;
                     for (int i = 0; i < retVal.column.size(); i++) {
-
-                        if (index.size() > 0) {
-                            for (int j = 0; j < index.size(); j++) {
-
-                                if (index.indexOf(j) == i) {
-                                    break;
-                                }
-                            }
-                        }
-
                         if (retVal.column.get(i).name.equals(colName)) {
-
                             matchCode = i;
                             break;
                         }
                     }
 
                     if (matchCode == -1) {
-
                         colNameFromDb.add(colName);
                     } else {
-
                         index.add(matchCode);
                     }
 
@@ -1775,7 +1762,7 @@ public class DBAccess
             ret.append(col.name + " " + col.datatype);
         }
 
-        if (!col.default_value.equals("")) {
+        if (col.default_value != null && !col.default_value.equals("")) {
           if (!isNumericType(col.datatype))
             ret.append(" DEFAULT '" + col.default_value + "'");
           else
