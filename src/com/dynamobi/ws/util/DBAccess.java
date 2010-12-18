@@ -1064,7 +1064,7 @@ public class DBAccess
 
             String mySql = sql.toLowerCase();
             String sqlcmd = "";
-            if (mySql.startsWith("select")) {
+            if (mySql.startsWith("select") || mySql.startsWith("explain")) {
                 sqlcmd = "SELECT";
             } else if (mySql.startsWith("insert")) {
                 sqlcmd = "INSERT";
@@ -1483,6 +1483,7 @@ public class DBAccess
           ps.execute();
         }
         ps = conn.prepareStatement(query);
+        ps.setMaxRows(0);
         if (ps.execute()) {
           rs = ps.getResultSet();
         }
@@ -1493,16 +1494,16 @@ public class DBAccess
       } finally {
         // We don't need to explicitly close RS's
         // because c3p0 will handle it for us.
-        try {
+        /*try {
           if (ps != null) {
-            ps.close();
+            //ps.close();
           }
           if (conn != null) {
-            conn.close();
+            //conn.close();
           }
         } catch (SQLException ex) {
           ex.printStackTrace();
-        }
+        }*/
       }
       return rs;
     }

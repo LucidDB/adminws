@@ -222,4 +222,22 @@ public class FlexSQLAdminImpl
 
     }
 
+    public String getSchemaDdl(String catalog, String schema) {
+      StringBuffer result = new StringBuffer("<statement>\n<![CDATA[\n");
+      try {
+        final String query = "SELECT statement FROM table(" +
+          "sys_root.generate_ddl_for_schema('" + catalog +
+          "', '" + schema + "'))";
+        ResultSet rs = DBAccess.rawResultExec(query);
+        while (rs.next()) {
+          String stmt = rs.getString(1);
+          result.append(stmt + "\n");
+        }
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      result.append("]]>\n</statement>\n");
+      return result.toString();
+    }
+
 }

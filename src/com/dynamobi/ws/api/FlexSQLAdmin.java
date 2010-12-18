@@ -182,4 +182,18 @@ public interface FlexSQLAdmin
     @Path("/getjars/{schema}")
     @RolesAllowed( {"Admin", "Authenticated"} )
     public String getJars(@PathParam("schema") String schema);
+
+    /**
+     * Gets the DDL for the given schema.
+     * @param catalog - Catalog of schema
+     * @param schema - Schema to get ddl for.
+     * @return Returns a simple &lt;statement&gt; with the string of
+     * the ddl as its value.
+     */
+    @WebMethod
+    @GET
+    @Path("/ddl/schema/{catalog}/{schema}")
+    @RolesAllowed( {"Admin", "Authenticated"} )
+    public String getSchemaDdl(@PathParam("catalog") String catalog,
+        @PathParam("schema") String schema);
 }
