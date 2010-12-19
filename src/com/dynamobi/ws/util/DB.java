@@ -123,6 +123,14 @@ public class DB {
   }
 
   public static <T extends DBLoader> void execute(String query, T obj) {
+    execute(query, obj, null);
+  }
+
+  @SuppressWarnings(value={"unchecked"})
+  public static <T extends DBLoader> void execute(
+      String query,
+      T obj,
+      List<T> list) {
     Connection conn = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -144,9 +152,11 @@ public class DB {
 
       while (rs.next()) {
         obj.loadRow(rs);
+        if (list != null) {
+          list.add((T)obj.copy());
+        }
       }
       obj.finalize();
-
     } catch (SQLException ex) {
       obj.exception(ex);
     } catch (Exception ex) {

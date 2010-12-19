@@ -24,9 +24,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 
+import com.dynamobi.ws.domain.DBLoader;
+import java.sql.*;
+
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="wrapperoptions")
-public class WrapperOptions {
+public class WrapperOptions extends DBLoader<WrapperOptions> {
 
   public int ordinal;
   public String name;
@@ -44,6 +47,37 @@ public class WrapperOptions {
      "\nvalue: " + value +
      "\ntype: " + type;
   }
+
+  private WrapperOptions copy;
+
+  public void loadRow(ResultSet rs) throws SQLException {
+    int c = 0;
+    int ordinal = rs.getInt(++c);
+    String name = rs.getString(++c);
+    String desc = rs.getString(++c);
+    boolean req = rs.getBoolean(++c);
+    String default_val = rs.getString(++c);
+    String type = rs.getString(++c);
+
+    WrapperOptions options = new WrapperOptions();
+    options.ordinal = ordinal;
+    options.name = name;
+    options.desc = desc;
+    options.required = req;
+    options.value = default_val;
+    if (options.value == null)
+      options.value = "";
+    options.type = type;
+    options.is_extended = false;
+
+    copy = options;
+  }
+
+  public void finalize() {
+
+  }
+
+  public WrapperOptions copy() { return copy; }
 
   // Auto-generated for AMF
   @XmlAttribute

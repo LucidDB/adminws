@@ -24,13 +24,15 @@ import javax.xml.bind.annotation.*;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="result")
-public abstract class DBLoader {
+public abstract class DBLoader <T extends DBLoader> {
   public boolean error = false;
   public String error_msg = "";
 
   abstract public void loadRow(ResultSet rs) throws SQLException;
 
   abstract public void finalize();
+
+  abstract public T copy();
 
   public void exception(Exception e) {
     error = true;

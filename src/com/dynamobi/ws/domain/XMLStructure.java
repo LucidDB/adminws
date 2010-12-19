@@ -22,9 +22,17 @@ import com.dynamobi.ws.domain.DBLoader;
 import java.sql.*;
 import javax.xml.bind.annotation.*;
 
+/**
+ * Currently only wraps a ddl statement generation,
+ * I'm still determining if this is a useful generalization class
+ * or not.
+ *
+ * @author Kevin Secretan
+ */
+
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="result")
-public class XMLStructure extends DBLoader {
+public class XMLStructure extends DBLoader<XMLStructure> {
 
   public String result;
 
@@ -59,6 +67,8 @@ public class XMLStructure extends DBLoader {
     result_builder.append("]]></" + root + ">");
     result = result_builder.toString();
   }
+
+  public XMLStructure copy() { return this; }
 
   @XmlAttribute
   public String getResult() { return result; }

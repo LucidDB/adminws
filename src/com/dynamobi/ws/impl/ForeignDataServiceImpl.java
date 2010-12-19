@@ -34,6 +34,7 @@ import com.dynamobi.ws.domain.RemoteData;
 
 import com.dynamobi.ws.util.AppException;
 import com.dynamobi.ws.util.DBAccess;
+import com.dynamobi.ws.util.DB;
 
 /**
  * ForeignDataService implementation
@@ -48,52 +49,19 @@ public class ForeignDataServiceImpl implements ForeignDataService {
   public List<WrapperOptions> getWrapperOptions(String wrapper)
     throws AppException {
       List<WrapperOptions> options_list = new ArrayList<WrapperOptions>();
-
-      try {
-        final String query = "select distinct " +
-          "option_ordinal,  " +
-          "option_name, " +
-          "option_description, " +
-          "is_option_required, " +
-          "option_choice_value as option_default_value, " +
+      WrapperOptions first = new WrapperOptions();
+      final String query = DB.select("distinct option_ordinal, option_name, " +
+          "option_description, is_option_required, option_choice_value as option_default_value, " +
           "case  " +
           "  when option_choice_value = 'TRUE' OR option_choice_value = 'FALSE' then 'BOOLEAN' " +
           "  else 'TEXT' " +
           "end as option_type, " +
-          "option_choice_ordinal " +
-          "from " +
-          "  table(sys_boot.mgmt.browse_connect_foreign_server('" + wrapper + "', " +
-          "    cursor(select '' as option_name, '' as option_value " +
-          "      from sys_boot.jdbc_metadata.empty_view))) " +
-          "where option_choice_ordinal = -1 " +
-          "order by option_ordinal ";
-
-        ResultSet rs = DBAccess.rawResultExec(query);
-        while (rs.next()) {
-          int c = 0;
-          int ordinal = rs.getInt(++c);
-          String name = rs.getString(++c);
-          String desc = rs.getString(++c);
-          boolean req = rs.getBoolean(++c);
-          String default_val = rs.getString(++c);
-          String type = rs.getString(++c);
-
-          WrapperOptions options = new WrapperOptions();
-          options.ordinal = ordinal;
-          options.name = name;
-          options.desc = desc;
-          options.required = req;
-          options.value = default_val;
-          if (options.value == null)
-            options.value = "";
-          options.type = type;
-          options.is_extended = false;
-
-          options_list.add(options);
-        }
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
+          "option_choice_ordinal", DB.populate(
+            "table(sys_boot.mgmt.browse_connect_foreign_server({0,lit}, cursor(select '' as option_name, '' as option_value " +
+            "      from sys_boot.jdbc_metadata.empty_view))) ", wrapper),
+          "option_choice_ordinal = -1 ") +
+          " order by option_ordinal ";
+      DB.execute(query, first, options_list);
       return options_list;
   }
 
