@@ -28,6 +28,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 
+import com.dynamobi.ws.domain.*;
+
 /**
  * The implementor is responsible for executing generic queries
  * along with returning XML for the ObjectTree.
@@ -194,6 +196,6 @@ public interface FlexSQLAdmin
     @GET
     @Path("/ddl/schema/{catalog}/{schema}")
     @RolesAllowed( {"Admin", "Authenticated"} )
-    public String getSchemaDdl(@PathParam("catalog") String catalog,
+    public XMLStructure getSchemaDdl(@PathParam("catalog") String catalog,
         @PathParam("schema") String schema);
 }

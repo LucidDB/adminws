@@ -23,6 +23,8 @@ import javax.ws.rs.Path;
 
 import com.dynamobi.ws.api.FlexSQLAdmin;
 import com.dynamobi.ws.util.DBAccess;
+import com.dynamobi.ws.util.DB;
+import com.dynamobi.ws.domain.*;
 
 import java.sql.*;
 
@@ -202,6 +204,7 @@ public class FlexSQLAdminImpl
 
     public String getJars(String schema) {
       StringBuffer result = new StringBuffer("<jars>\n");
+      XMLStructure ds = new XMLStructure("jars", "jar label schema");
       try {
         final String query = "SELECT \"name\" FROM " +
           "sys_fem.\"SQL2003\".\"Jar\" j INNER JOIN " +
@@ -222,22 +225,12 @@ public class FlexSQLAdminImpl
 
     }
 
-    public String getSchemaDdl(String catalog, String schema) {
-      StringBuffer result = new StringBuffer("<statement>\n<![CDATA[\n");
-      try {
-        final String query = "SELECT statement FROM table(" +
-          "sys_root.generate_ddl_for_schema('" + catalog +
-          "', '" + schema + "'))";
-        ResultSet rs = DBAccess.rawResultExec(query);
-        while (rs.next()) {
-          String stmt = rs.getString(1);
-          result.append(stmt + "\n");
-        }
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      result.append("]]>\n</statement>\n");
-      return result.toString();
+    public XMLStructure getSchemaDdl(String catalog, String schema) {
+      XMLStructure ds = new XMLStructure("statement");
+      final String query = DB.select("statement", DB.populate(
+            "table(sys_root.generate_ddl_for_schema({0,lit}, {1,lit}))",
+            catalog, schema));
+      DB.execute(query, ds);
+      return ds;
     }
-
 }

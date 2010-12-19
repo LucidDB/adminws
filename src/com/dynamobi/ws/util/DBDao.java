@@ -35,6 +35,7 @@ import org.springframework.security.userdetails.jdbc.JdbcDaoImpl;
 import com.mchange.v2.c3p0.DataSources;
 
 import com.dynamobi.ws.util.DBAccess;
+import com.dynamobi.ws.util.DB;
 
 public class DBDao extends JdbcDaoImpl {
 
@@ -72,6 +73,7 @@ public class DBDao extends JdbcDaoImpl {
 
     setDataSource(ds_pooled);
     DBAccess.connDataSource = ds_pooled;
+    DB.connDataSource = ds_pooled;
   }
 
   public void cleanup() throws SQLException {
