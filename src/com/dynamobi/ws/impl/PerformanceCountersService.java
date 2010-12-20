@@ -19,6 +19,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package com.dynamobi.ws.impl;
 
 import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
 
 import javax.jws.WebService;
 import javax.ws.rs.Path;
@@ -26,9 +28,10 @@ import javax.ws.rs.Path;
 import com.dynamobi.ws.domain.Counter;
 import com.dynamobi.ws.util.AppException;
 import com.dynamobi.ws.util.DBAccess;
+import com.dynamobi.ws.util.DB;
 
 /**
- * @author zhangrui
+ * @author zhangrui, Kevin
  *
  */
 @Path("/counter")
@@ -45,8 +48,14 @@ public class PerformanceCountersService
     public Counter findPerformanceCounterByName(String counterName)
         throws AppException
     {
-        Counter co = DBAccess.findPerformanceCounterByName(counterName);
-        return co;
+      Counter retVal = new Counter();
+
+      final String query = DB.select(
+          "source_name, counter_name, counter_units, counter_value",
+          "SYS_ROOT.DBA_PERFORMANCE_COUNTERS",
+          DB.populate("counter_name = {0,lit}", counterName));
+      DB.execute(query, retVal);
+      return retVal;
     }
 
     /* (non-Javadoc)
@@ -55,15 +64,28 @@ public class PerformanceCountersService
     public List<Counter> getAllPerformanceCounters()
         throws AppException
     {
-       List<Counter> list = DBAccess.getAllPerformanceCounters();
-        return list;
+      List<Counter> retVal = new ArrayList<Counter>();
+
+      final String query = DB.select(
+          "counter_category, counter_subcategory, source_name, counter_name, " +
+          "counter_units, counter_value ", "sys_root.dba_performance_counters");
+      Counter commander = new Counter();
+      commander.list_mode = true;
+      DB.execute(query, commander, retVal);
+      return retVal;
     }
 
     public List<Counter> getCountersByNames(String names)
       throws AppException {
-      
-      List<Counter> list = DBAccess.getCountersByNames(names);
-      return list;
+      List<Counter> retVal = new ArrayList<Counter>();
+      String query = DB.select(
+          "counter_category, counter_subcategory, source_name, counter_name, " +
+          "counter_units, counter_value", "sys_root.dba_performance_counters",
+          DB.populate("counter_name IN ({0,lit_list})",
+            Arrays.asList(names.split(","))));
+      Counter commander = new Counter();
+      commander.list_mode = true;
+      DB.execute(query, commander, retVal);
+      return retVal;
     }
-
 }

@@ -37,7 +37,8 @@ public class WrapperOptions extends DBLoader<WrapperOptions> {
   public boolean required;
   public String value;
   public String type;
-  public boolean is_extended;
+  public boolean is_extended = false;
+  private boolean server_only = false;
 
   public String toString() {
     return "\nordinal: " + ordinal +
@@ -48,27 +49,43 @@ public class WrapperOptions extends DBLoader<WrapperOptions> {
      "\ntype: " + type;
   }
 
+  public WrapperOptions(boolean is_extended) {
+    this.is_extended = is_extended;
+  }
+
+  public WrapperOptions(String for_server) {
+    server_only = true;
+  }
+
+  public WrapperOptions() { }
+
   private WrapperOptions copy;
 
   public void loadRow(ResultSet rs) throws SQLException {
     int c = 0;
-    int ordinal = rs.getInt(++c);
-    String name = rs.getString(++c);
-    String desc = rs.getString(++c);
-    boolean req = rs.getBoolean(++c);
-    String default_val = rs.getString(++c);
-    String type = rs.getString(++c);
-
     WrapperOptions options = new WrapperOptions();
-    options.ordinal = ordinal;
-    options.name = name;
-    options.desc = desc;
-    options.required = req;
-    options.value = default_val;
-    if (options.value == null)
-      options.value = "";
-    options.type = type;
-    options.is_extended = false;
+    if (!server_only) {
+      int ordinal = rs.getInt(++c);
+      String name = rs.getString(++c);
+      String desc = rs.getString(++c);
+      boolean req = rs.getBoolean(++c);
+      String default_val = rs.getString(++c);
+      String type = rs.getString(++c);
+      options.ordinal = ordinal;
+      options.name = name;
+      options.desc = desc;
+      options.required = req;
+      options.value = default_val;
+      if (options.value == null)
+        options.value = "";
+      options.type = type;
+      options.is_extended = this.is_extended;
+    } else {
+      String op_name = rs.getString(++c);
+      String op_val = rs.getString(++c);
+      options.name = op_name;
+      options.value = op_val;
+    }
 
     copy = options;
   }

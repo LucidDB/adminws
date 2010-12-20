@@ -19,9 +19,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package com.dynamobi.ws.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import com.dynamobi.ws.domain.DBLoader;
+import java.sql.*;
 
 @XmlRootElement
-public class Counter
+public class Counter extends DBLoader<Counter>
 {
     private String counterCategory;
 
@@ -34,6 +36,9 @@ public class Counter
     private String counterUnits;
     
     private String counterValue;
+
+    public boolean list_mode = false;
+    private Counter copy;
 
     public String getCounterCategory() {
       return (counterCategory == null) ? "" : counterCategory;
@@ -92,6 +97,24 @@ public class Counter
     }
     
     
-    
-    
+    public void loadRow(ResultSet rs) throws SQLException {
+      if (!list_mode) {
+        setSourceName(rs.getString(1));
+        setCounterName(rs.getString(2));
+        setCounterUnits(rs.getString(3));
+        setCounterValue(rs.getString(4));
+      } else {
+        Counter en = new Counter();
+        en.setCounterCategory(rs.getString(1));
+        en.setCounterSubcategory(rs.getString(2));
+        en.setSourceName(rs.getString(3));
+        en.setCounterName(rs.getString(4));
+        en.setCounterUnits(rs.getString(5));
+        en.setCounterValue(rs.getString(6));
+        copy = en;
+      }
+    }
+
+    public void finalize() { }
+    public Counter copy() { return copy; }
 }

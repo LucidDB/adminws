@@ -30,6 +30,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 
+import java.sql.*;
+import com.dynamobi.ws.domain.DBLoader;
+
 /**
  * Holds the detailed information on a table.
  * 
@@ -37,7 +40,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="tabledetails")
-public class TableDetails
+public class TableDetails extends DBLoader<TableDetails>
 {
 	public String uuid;
 	public String name;
@@ -63,9 +66,22 @@ public class TableDetails
       + "\ncolumns: " + column.toString();
   }
 	
-	
-	
+  public void loadRow(ResultSet rs) throws SQLException {
+    int c = 1;
+    name = rs.getString(c++);
+    schema = rs.getString(c++);
+    catalog = rs.getString(c++);
+    uuid = rs.getString(c++);
+    create_time = rs.getDate(c++);
+    last_analyze_row_count = rs.getInt(c++);
+    last_analyze_timestamp = rs.getDate(c++);
+    current_row_count = rs.getInt(c++);
+    deleted_row_count = rs.getInt(c++);
+    table_type = rs.getString(c++);
+  }
 
+  public void finalize() { }
+  public TableDetails copy() { return this; }
 
   // Auto-generated for AMF
   @XmlAttribute

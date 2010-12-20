@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -31,13 +32,16 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 
+import java.sql.*;
+import com.dynamobi.ws.domain.DBLoader;
+
 /**
  * Used for storing various metadata on foreign objects.
  * @author Kevin Secretan
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="remotedata")
-public class RemoteData {
+public class RemoteData extends DBLoader<RemoteData> {
 
   public List<String> foreign_schemas;
   public List<String> foreign_descriptions;
@@ -48,6 +52,11 @@ public class RemoteData {
   public List<String> foreign_changed;
   // List of remote tables that are gone but we imported locally.
   public List<String> foreign_deleted;
+
+  @XmlTransient
+  public String data_mode = "";
+  @XmlTransient
+  public String fschema_name = "";
 
   // Helper maps. Structure: {'SchemaName~TableName': 'Col1,Col2'}
   private Map<String, String> local_data;
@@ -137,6 +146,35 @@ public class RemoteData {
       "\nforeign_tables: " + foreign_tables +
       "\nlocal_imported_tables: " + local_imported_tables;
   }
+
+
+  // dbloader methods
+  public void loadRow(ResultSet rs) throws SQLException {
+    int c = 0;
+    if (data_mode.equals("")) {
+      String schema = rs.getString(++c);
+      String table = rs.getString(++c);
+      String col = rs.getString(++c);
+      String type = rs.getString(++c);
+      addLocalTableColumn(schema, table, col + type);
+    } else if (data_mode.equals("foreign_schemas")) {
+      String schema_name = rs.getString(1);
+      String desc = rs.getString(2);
+      foreign_schemas.add(schema_name);
+      foreign_descriptions.add(desc);
+    } else if (data_mode.equals("foreign_tables")) {
+      String table = rs.getString(++c);
+      String col = rs.getString(++c);
+      int ordinal = rs.getInt(++c);
+      String type = rs.getString(++c);
+      String desc = rs.getString(++c);
+      String default_val = rs.getString(++c);
+      addForeignTableColumn(fschema_name, table, col + type);
+    }
+  }
+
+  public void finalize() { }
+  public RemoteData copy() { return this; }
 
 
   // Auto-generated for AMF

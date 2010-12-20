@@ -24,6 +24,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
+import java.sql.*;
+import com.dynamobi.ws.domain.DBLoader;
+
 /**
  * VO: It holds the column information.
  * 
@@ -31,7 +34,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @since Jan-15-2010
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class Column
+public class Column extends DBLoader<Column>
 {
 	public String name;
 	public String uuid;
@@ -46,6 +49,8 @@ public class Column
 	public Boolean distinct_value_count_estimated;
 	public Date last_analyze_time;
 
+  private Column copy;
+
   public String toString() {
     return "uuid: " + uuid + "\nname: " + name + "\nordinal_position: "
       + ordinal_position + "\ndatatype: " + datatype
@@ -57,6 +62,27 @@ public class Column
       + "\nlast_analyze_time: " + last_analyze_time;
   }
 
+  public void loadRow(ResultSet rs) throws SQLException {
+    Column c = new Column();
+    c.uuid = rs.getString(1);
+    c.name = rs.getString(2);
+    if (c.name != null)
+      c.name = c.name.replaceAll("\"", "&quot;");
+    c.ordinal_position = rs.getInt(3);
+    c.datatype = rs.getString(4);
+    c.precision = rs.getInt(5);
+    c.dec_digits = rs.getInt(6);
+    c.is_nullable = rs.getBoolean(7);
+    c.remarks = rs.getString(8);
+    c.distinct_value_count = rs.getInt(9);
+    c.distinct_value_count_estimated = rs.getBoolean(10);
+    c.last_analyze_time = rs.getDate(11);
+    c.default_value = rs.getString(12);
+    copy = c;
+  }
+
+  public void finalize() { }
+  public Column copy() { return copy; }
 
   // Auto-generated for AMF
   @XmlAttribute

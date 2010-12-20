@@ -65,10 +65,15 @@ public class DB {
    *        will be populated by items in data, tokens specified by
    *        {data_index,type}. The caller is responsible for escaping the
    *        opening brace with '/', closing braces do not have to be escaped.
+   *        Literals and identifiers will be escaped by doubling up the quote.
    *
    *        Valid types:
    *          literal (will wrap argument in single quotes) AKA lit
    *          identifier (will wrap argument in double quotes) AKA id
+   *          string (will simply call toString() and insert it) AKA str
+   *          lit_list (expects List of strings and will quote them with lit)
+   *          id_list (expects List of strings and will quote them with id)
+   *          str_list (expects List of strings and will not quote them)
    *
    *        Example:
    *
@@ -80,6 +85,7 @@ public class DB {
    *    @param data - Multiple arguments whose length matches the highest
    *                  number in the query pattern.
    */
+  @SuppressWarnings(value={"unchecked"})
   public static String populate(String query, Object ...data) {
     List<String> tokens = new ArrayList<String>();
     StringBuffer pop = new StringBuffer();
@@ -109,9 +115,25 @@ public class DB {
       Object obj = data[Integer.parseInt(pattern[0])];
       String value = "";
       if (pattern[1].equals("literal") || pattern[1].equals("lit")) {
-        value = "'" + obj.toString() + "'";
+        value = surround(obj.toString(), "'");
       } else if (pattern[1].equals("identifier") || pattern[1].equals("id")) {
-        value = "\"" + obj.toString() + "\"";
+        value = surround(obj.toString(), "\"");
+      } else if (pattern[1].equals("string") || pattern[1].equals("str")) {
+        value = obj.toString();
+      } else if (pattern[1].equals("lit_list") ||
+          pattern[1].equals("id_list") || pattern[1].equals("str_list")) {
+        List<String> list = (List<String>)obj;
+        boolean is_first = true;
+        for (String item : list) {
+          if (!is_first) value += ", ";
+          else is_first = false;
+          if (pattern[1].equals("lit_list"))
+            value += surround(item, "'");
+          else if (pattern[1].equals("id_list"))
+            value += surround(item, "\"");
+          else
+            value += item;
+        }
       }
       value = value.replaceAll("/\\{", "\\{");
       token = token.replaceAll("/\\{", "\\{");
@@ -150,7 +172,7 @@ public class DB {
         rs = ps.getResultSet();
       }
 
-      while (rs.next()) {
+      while (rs != null && rs.next()) {
         obj.loadRow(rs);
         if (list != null) {
           list.add((T)obj.copy());
@@ -190,5 +212,10 @@ public class DB {
     return select(what, table, "");
   }
 
+  public static String surround(String item, String sur) {
+    if (sur == "\"" || sur == "'")
+      item = item.replaceAll(sur, sur + sur);
+    return sur + item + sur;
+  }
 
 }
