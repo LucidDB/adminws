@@ -31,10 +31,8 @@ import java.sql.SQLException;
 import com.dynamobi.ws.api.ForeignDataService;
 import com.dynamobi.ws.domain.WrapperOptions;
 import com.dynamobi.ws.domain.RemoteData;
-import com.dynamobi.ws.domain.SuccessQuery;
 
 import com.dynamobi.ws.util.AppException;
-import com.dynamobi.ws.util.DBAccess;
 import com.dynamobi.ws.util.DB;
 
 /**
@@ -101,7 +99,6 @@ public class ForeignDataServiceImpl implements ForeignDataService {
   public String createServer(String server_name, String wrapper_name,
       List<WrapperOptions> options)
       throws AppException {
-    String retval = "";
     String query = DB.populate("CREATE OR REPLACE SERVER {0,str} " +
         " FOREIGN DATA WRAPPER {1,id}" +
         " OPTIONS ( ", server_name, wrapper_name);
@@ -112,22 +109,13 @@ public class ForeignDataServiceImpl implements ForeignDataService {
       query += DB.populate("{0,str} {1,lit}", option.name, option.value);
     }
     query += ")";
-    SuccessQuery s = new SuccessQuery();
-    DB.execute(query, s);
-    if (s.error)
-      retval = s.error_msg;
-    return retval;
+    return DB.execute_success(query);
   }
 
   public String testServer(String server_name) throws AppException {
-    String retval = "";
     final String query = DB.populate(
         "CALL sys_boot.mgmt.test_data_server({0,lit})", server_name);
-    SuccessQuery s = new SuccessQuery();
-    DB.execute(query, s);
-    if (s.error)
-      retval = s.error_msg;
-    return retval;
+    return DB.execute_success(query);
   }
 
   public RemoteData getForeignData(String server_name) throws AppException {
@@ -196,7 +184,6 @@ public class ForeignDataServiceImpl implements ForeignDataService {
   public String importForeignSchema(String server, String from_schema,
       String to_schema,
       List<String> tables) throws AppException {
-    String retval = "";
     if (from_schema == null || from_schema.equals("")) from_schema = "";
     String query = DB.populate("IMPORT FOREIGN SCHEMA {0,id}", from_schema);
     if (tables.size() > 0) {
@@ -210,12 +197,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
       query += ")";
     }
     query += DB.populate(" FROM SERVER {0,str} INTO {1,id}", server, to_schema);
-    System.out.println(query);
-    SuccessQuery s = new SuccessQuery();
-    DB.execute(query, s);
-    if (s.error)
-      retval = s.error_msg;
-    return retval;
+    return DB.execute_success(query);
   }
 
 }

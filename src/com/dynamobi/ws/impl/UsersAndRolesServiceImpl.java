@@ -35,8 +35,9 @@ import com.dynamobi.ws.domain.RolesDetails;
 import com.dynamobi.ws.domain.UserPermsDetails;
 import com.dynamobi.ws.domain.RolesDetailsHolder;
 import com.dynamobi.ws.domain.PermissionsInfo;
+import com.dynamobi.ws.domain.SubQuery;
 import com.dynamobi.ws.util.AppException;
-import com.dynamobi.ws.util.DBAccess;
+import com.dynamobi.ws.util.DB;
 
 /**
  * UsersAndRolesService implementation
@@ -49,56 +50,39 @@ import com.dynamobi.ws.util.DBAccess;
 public class UsersAndRolesServiceImpl implements UsersAndRolesService {
 
 
-  /* TODO: use prepared statements / better db interface
-   */
-
   public List<UserDetails> getUsersDetails() throws AppException {
     List<UserDetails> details = new ArrayList<UserDetails>();
-    try {
-      final String query = "SELECT name, password, creation_timestamp, "
-        + "modification_timestamp FROM sys_root.dba_users u WHERE "
-        + "u.name <> '_SYSTEM'";
-      ResultSet rs = DBAccess.rawResultExec(query);
-      while (rs.next()) {
-        UserDetails ud = new UserDetails();
-        ud.name = rs.getString(1);
-        ud.password = rs.getString(2);
-        ud.creation_timestamp = rs.getString(3);
-        ud.modification_timestamp = rs.getString(4);
-        details.add(ud);
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
+    UserDetails seed = new UserDetails();
+    final String query = "SELECT name, password, creation_timestamp, "
+      + "modification_timestamp FROM sys_root.dba_users u WHERE "
+      + "u.name <> '_SYSTEM'";
+    DB.execute(query, seed, details);
     return details;
   }
 
   public List<SessionInfo> getCurrentSessions() throws AppException {
-    return DBAccess.getCurrentSessions();
+    List<SessionInfo> retVal = new ArrayList<SessionInfo>();
+    SessionInfo seed = new SessionInfo();
+    final String query = DB.select("s.session_id, s.connect_url, " +
+        "s.current_user_name, s2.sql_text", "sys_root.dba_sessions s " +
+        "LEFT JOIN sys_root.dba_sql_statements s2 ON " +
+        "s.session_id = s2.session_id");
+    DB.execute(query, seed, retVal);
+    return retVal;
   }
 
   private enum Action { NEW, MOD, DEL };
   private String userAction(String user, String password, Action act)
                  throws AppException {
-    // TODO: rewrite this to use prepared statements
     String query = "";
     if (act == Action.NEW) {
-      query = "CREATE USER " + user + " IDENTIFIED BY '" + password + "'";
+      query = DB.populate("CREATE USER {0,str} IDENTIFIED BY {1,lit}", user, password);
     } else if (act == Action.MOD) {
-      query = "CREATE OR REPLACE USER " + user + " IDENTIFIED BY '" + password + "'";
+      query = DB.populate("CREATE OR REPLACE USER {0,str} IDENTIFIED BY {1,lit}", user, password);
     } else if (act == Action.DEL) {
-      query = "DROP USER " + user;
+      query = DB.populate("DROP USER {0,str}", user);
     }
-
-    String retval = "";
-    try {
-      ResultSet rs = DBAccess.rawResultExec(query);
-    } catch (SQLException e) {
-      e.printStackTrace();
-      retval = e.getMessage();
-    }
-    return retval;
+    return DB.execute_success(query);
   }
 
   public String addNewUser(String user, String password) throws AppException {
@@ -106,10 +90,6 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
   }
 
   // TODO: also adjust the roles when modifying and deleting.
-  // Research: what happens if I just change the name/password in
-  // the table rather than doing CREATE or REPLACE? That would be a better
-  // solution and should preserve roles due to mofIds remaining the same.
-  // Just gotta find out if user/pass are in more than one place.
   public String modifyUser(String user, String password) throws AppException {
     return userAction(user, password, Action.MOD);
   }
@@ -133,145 +113,38 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
       + "WHERE (grant_type = 'Role' AND grantee <> 'PUBLIC' "
       + "AND grantee <> '_SYSTEM') OR action = 'INHERIT_ROLE'";
       */
-    Map<String, RolesDetails> details = new LinkedHashMap<String, RolesDetails>();
-    Map<String, UserPermsDetails> user_details = new LinkedHashMap<String, UserPermsDetails>();
-
-    Map<String, PermissionsInfo> perms = new LinkedHashMap<String, PermissionsInfo>();
-    try {
-      ResultSet rs = DBAccess.rawResultExec(query);
-      while (rs.next()) {
-        int col = 1;
-        final String catalog = rs.getString(col++);
-        final String schema = rs.getString(col++);
-        final String element = rs.getString(col++);
-        final String grantee = rs.getString(col++);
-        final String grantor = rs.getString(col++);
-        final String action = rs.getString(col++);
-        final String role_name = rs.getString(col++);
-        final String grant_type = rs.getString(col++);
-        final String class_name = rs.getString(col++);
-        final boolean with_grant = rs.getBoolean(col++);
-
-
-        final String key = grantee + catalog + schema + element + class_name;
-        PermissionsInfo p;
-        if (!perms.containsKey(key)) {
-          p = new PermissionsInfo();
-          p.catalog_name = catalog;
-          p.schema_name = schema;
-          p.item_name = element;
-          p.item_type = class_name;
-          perms.put(key, p);
-        } else {
-          p = perms.get(key);
-        }
-
-        if (!action.equals("INHERIT_ROLE"))
-          p.actions.add(action);
-
-        if (role_name != null) {
-          // Role permission
-          RolesDetails rd;
-          if (!details.containsKey(role_name)) {
-            rd = new RolesDetails();
-            rd.name = role_name;
-            details.put(role_name, rd);
-          } else {
-            rd = details.get(role_name);
-          }
-
-          // Dealing with a users or permissions entry?
-          if (grant_type.equals("User")) {
-            rd.users.add(grantee);
-            if (with_grant) {
-              rd.users_with_grant_option.add(grantee);
-            }
-          } else if (grant_type.equals("Role")) {
-            rd.permissions.add(p);
-          } else {
-            throw new AppException("Unknown grant type");
-          }
-
-        } else {
-          // User permission
-          UserPermsDetails upd;
-          if (!user_details.containsKey(grantee)) {
-            upd = new UserPermsDetails();
-            upd.name = grantee;
-            user_details.put(grantee, upd);
-          } else {
-            upd = user_details.get(grantee);
-          }
-          upd.permissions.add(p);
-        }
-
-      } // End of user/roles/perms result set.
-
-      ResultSet rs_extra_roles = DBAccess.rawResultExec("SELECT name FROM sys_root.dba_roles WHERE name <> 'PUBLIC'");
-      while (rs_extra_roles.next()) {
-        final String role_name = rs_extra_roles.getString(1);
-        if (!details.containsKey(role_name)) {
-          RolesDetails rd = new RolesDetails();
-          rd.name = role_name;
-          details.put(role_name, rd);
-        }
-      }
-
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
     RolesDetailsHolder rh = new RolesDetailsHolder();
-    rh.value.addAll(details.values());
-    rh.value2.addAll(user_details.values());
+    DB.execute(query, rh);
+
+    RolesDetails rd = new RolesDetails(rh);
+    query = DB.select("name", "sys_root.dba_roles", "name <> 'PUBLIC'");
+    DB.execute(query, rd);
+
     return rh;
   }
 
   public String addNewRole(String role) throws AppException {
-    String retval = "";
-    String query = "CREATE ROLE " + role;
-    try {
-      ResultSet rs = DBAccess.rawResultExec(query);
-    } catch (SQLException e) {
-      e.printStackTrace();
-      retval = e.getMessage();
-    }
-    return retval;
+    String query = DB.populate("CREATE ROLE {0,str}", role);
+    return DB.execute_success(query);
   }
 
   public String deleteRole(String role) throws AppException {
-    String retval = "";
-    String query = "DROP ROLE " + role;
-    try {
-      ResultSet rs = DBAccess.rawResultExec(query);
-    } catch (SQLException e) {
-      e.printStackTrace();
-      retval = e.getMessage();
-    }
-    return retval;
+    String query = DB.populate("DROP ROLE {0,str}", role);
+    return DB.execute_success(query);
   }
 
   public String userToRole(String user, String role, boolean added, boolean with_grant) throws AppException {
-    String retval = "";
     String query = "";
     if (added) {
-      query = "GRANT ROLE " + role + " TO \"" + user + "\"";
+      query = DB.populate("GRANT ROLE {0,str} TO {1,id}", role, user);
       if (with_grant)
         query += " WITH GRANT OPTION";
     } else {
-      // oh yeah, I forgot. 
       // TODO: get ability to remove users from roles.
       // Note: apparently only one user can have grant option?
-      retval = "Not Implemented: REVOKE";
-      return retval;
+      return "Not Implemented: REVOKE";
     }
-    try {
-      ResultSet rs = DBAccess.rawResultExec(query);
-    } catch (SQLException e) {
-      e.printStackTrace();
-      retval = e.getMessage();
-    }
-    return retval;
+    return DB.execute_success(query);
   }
 
   public String grantPermissionsOnSchema(String catalog, String schema,
@@ -283,77 +156,35 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
       * cannot do above because do_for_entire_schema does not respect
       * catalogs.
       */
-    try {
-      ResultSet rs = DBAccess.rawResultExec("SELECT TABLE_NAME "
-          + "FROM SYS_ROOT.DBA_TABLES "
-          + "WHERE CATALOG_NAME = '" + catalog + "' AND "
-          + "SCHEMA_NAME = '" + schema + "'");
-      while (rs.next()) {
-        String query = "GRANT " + permissions + " ON " +
-          "\"" + catalog + "\".\"" + schema + "\".\"" + rs.getString(1) + "\" "
-          + "TO \"" + grantee + "\"";
-        DBAccess.rawResultExec(query);
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-      retval = e.getMessage();
-    }
-    return retval;
+    String query = DB.select("table_name", "sys_root.dba_tables", DB.populate(
+          "catalog_name = {0,lit} AND schema_name = {1,lit}", catalog, schema));
+    SubQuery sq = new SubQuery(DB.populate(
+          "GRANT {0,str} ON {1,id}.{2,id}.{3,str} TO " +
+          "{4,id}", permissions, catalog, schema, "/{0,id}", grantee), 1);
+    DB.execute(query, sq);
+    if (sq.error)
+      return sq.error_msg;
+    return "";
   }
 
   public String grantPermissions(String catalog, String schema, String type,
                 String element, String permissions, String grantee)
                 throws AppException {
-    String retval = "";
-    String query = "GRANT " + permissions + " ON \"" + catalog +
-     "\".\"" + schema + "\".\"" + element + "\" TO \"" + grantee + "\"";
-    try {
-      ResultSet rs = DBAccess.rawResultExec(query);
-    } catch (SQLException e) {
-      e.printStackTrace();
-      retval = e.getMessage();
-    }
-    return retval;
+    String query = DB.populate(
+        "GRANT {0,str} ON {1,id}.{2,id}.{3,id} TO {4,id}",
+        permissions, catalog, schema, element, grantee);
+    return DB.execute_success(query);
   }
 
   public String revokePermissionsOnSchema(String catalog, String schema,
                 String permissions, String grantee) throws AppException {
     return "Not Implemented";
-    /*String retval = "";
-    try {
-      ResultSet rs = DBAccess.rawResultExec("SELECT TABLE_NAME "
-          + "FROM SYS_ROOT.DBA_TABLES "
-          + "WHERE CATALOG_NAME = '" + catalog + "' AND "
-          + "SCHEMA_NAME = '" + schema + "'");
-      while (rs.next()) {
-        String query = "REVOKE " + permissions + " ON " +
-          "\"" + catalog + "\".\"" + schema + "\".\"" + rs.getString(1) + "\" "
-          + "FROM \"" + grantee + "\"";
-        DBAccess.rawResultExec(query);
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-      retval = e.getMessage();
-    }
-    return retval;
-    */
   }
 
   public String revokePermissions(String catalog, String schema, String type,
                 String element, String permissions, String grantee)
                 throws AppException {
     return "Not Implemented";
-    /*String retval = "";
-    String query = "REVOKE " + permissions + " ON \"" + catalog +
-     "\".\"" + schema + "\".\"" + element + "\" FROM \"" + grantee + "\"";
-    try {
-      ResultSet rs = DBAccess.rawResultExec(query);
-    } catch (SQLException e) {
-      e.printStackTrace();
-      retval = e.getMessage();
-    }
-    return retval;
-    */
   }
 
 }

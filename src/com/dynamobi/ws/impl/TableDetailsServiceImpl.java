@@ -30,7 +30,6 @@ import com.dynamobi.ws.domain.Schema;
 import com.dynamobi.ws.domain.Table;
 import com.dynamobi.ws.domain.TableDetails;
 import com.dynamobi.ws.domain.TablesInfo;
-import com.dynamobi.ws.domain.SuccessQuery;
 import com.dynamobi.ws.util.AppException;
 import com.dynamobi.ws.util.DBAccess;
 import com.dynamobi.ws.util.DB;
@@ -86,11 +85,7 @@ public class TableDetailsServiceImpl implements TableDetailsService {
     String query = DB.populate(
         "create schema {0,id}.{1,id}", catalog.trim(),
         schema.trim());
-    SuccessQuery s = new SuccessQuery();
-    DB.execute(query, s);
-    if (s.error)
-      return s.error_msg;
-    return "";
+    return DB.execute_success(query);
   }
 
   public boolean postTableDetails(String catalog, String schema,
@@ -99,8 +94,6 @@ public class TableDetailsServiceImpl implements TableDetailsService {
     if (details == null) {
       return false;
     }
-    // leaving this one using DBAccess, it's a big method...
-    // perhaps rename DBAccess to DBActions?
     try {
       boolean retval = DBAccess.postTableDetails(catalog, schema, table, details);
     } catch (AppException e) {

@@ -24,18 +24,25 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 
+import java.sql.*;
+import com.dynamobi.ws.domain.DBLoader;
+
 /**
  * Holds SessionInfo
  * @author Kevin Secretan
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="sessioninfo")
-public class SessionInfo {
+public class SessionInfo extends DBLoader<SessionInfo> {
 
   public int id;
   public String connect_url;
   public String user;
   public String query;
+
+  private SessionInfo copy;
+
+  public SessionInfo() { }
 
   public String toString() {
     return
@@ -44,6 +51,20 @@ public class SessionInfo {
      "\nuser: " + user +
      "\nquery: " + query;
   }
+
+  public void loadRow(ResultSet rs) throws SQLException {
+    int c = 1;
+    SessionInfo si = new SessionInfo();
+    si.id = rs.getInt(c++);
+    si.connect_url = rs.getString(c++);
+    si.user = rs.getString(c++);
+    si.query = rs.getString(c++);
+    copy = si;
+  }
+
+  public void finalize() { }
+
+  public SessionInfo copy() { return copy; }
 
   // Auto-generated for AMF
   @XmlAttribute

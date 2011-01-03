@@ -103,7 +103,8 @@ public class DB {
     while (start != -1) {
       // next token:
       int start_next = query.indexOf("{", start+1);
-      while (query.charAt(start - 1) == '/' && start_next != -1) {
+      // handle escapes
+      while (start != 0 && query.charAt(start - 1) == '/' && start_next != -1) {
         start_next = query.indexOf("{", start_next + 1);
       }
       String token = (start_next != -1) ? query.substring(start+1, start_next)
@@ -198,6 +199,14 @@ public class DB {
         ex.printStackTrace();
       }
     }
+  }
+
+  public static String execute_success(String query) {
+    SuccessQuery s = new SuccessQuery();
+    execute(query, s);
+    if (s.error)
+      return s.error_msg;
+    return "";
   }
 
   public static String select(String what, String table, String where) {

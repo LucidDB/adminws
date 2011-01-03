@@ -115,7 +115,7 @@ public interface FlexSQLAdmin
     @GET
     @Path("/getusers")
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String getUsers();
+    public XMLStructure getUsers();
 
     /**
      * Gets a list of roles for the object tree.
@@ -126,10 +126,11 @@ public interface FlexSQLAdmin
     @GET
     @Path("/getroles")
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String getRoles();
+    public XMLStructure getRoles();
 
     /**
      * Gets a list of foreign tables for the object tree.
+     * (UNIMPLEMENTED, returned with normal metadata.)
      * @param schema - Schema to get foreign tables in.
      * @return XML-string of foreign tables.
      * &lt;foreign_tables&gt;&lt;foreign_table label="name" /&gt;&lt;foreign_tables /&gt;
@@ -150,7 +151,7 @@ public interface FlexSQLAdmin
     @GET
     @Path("/getfunctions/{schema}")
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String getFunctions(@PathParam("schema") String schema);
+    public XMLStructure getFunctions(@PathParam("schema") String schema);
 
     /**
      * Gets a list of procedures for the object tree.
@@ -162,7 +163,7 @@ public interface FlexSQLAdmin
     @GET
     @Path("/getprocedures/{schema}")
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String getProcedures(@PathParam("schema") String schema);
+    public XMLStructure getProcedures(@PathParam("schema") String schema);
 
     /**
      * Gets a list of foreign data wrappers and servers for the object tree.
@@ -183,7 +184,7 @@ public interface FlexSQLAdmin
     @GET
     @Path("/getjars/{schema}")
     @RolesAllowed( {"Admin", "Authenticated"} )
-    public String getJars(@PathParam("schema") String schema);
+    public XMLStructure getJars(@PathParam("schema") String schema);
 
     /**
      * Gets the DDL for the given schema.

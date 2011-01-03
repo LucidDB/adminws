@@ -99,32 +99,21 @@ public class FlexSQLAdminImpl
         return ret;
     }
 
-    private String getAuthIDs(String class_name) {
-      StringBuffer ids = new StringBuffer();
+    private XMLStructure getAuthIDs(String class_name) {
       String lower = class_name.toLowerCase();
-      try {
-        final String query = "SELECT name FROM sys_root.dba_auth_ids " +
-          "WHERE class_name = '" + class_name + "' AND " +
-          "name <> '_SYSTEM' AND name <> 'PUBLIC' ORDER BY name";
-        ResultSet rs = DBAccess.rawResultExec(query);
-        ids.append("<" + lower + "s label=\"" + class_name + "s\">\n");
-        while (rs.next()) {
-          ids.append("  <" + lower + " label=\"" +
-              rs.getString(1) + "\" />\n");
-        }
-        ids.append("</" + lower + "s>\n");
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-
-      return ids.toString();
+      XMLStructure ds = new XMLStructure(lower + "s", lower + " label");
+      final String query = DB.select("name", "sys_root.dba_auth_ids",
+          DB.populate("class_name = {0,lit} AND name <> '_SYSTEM' AND " +
+            "name <> 'PUBLIC' ORDER BY name", class_name));
+      DB.execute(query, ds);
+      return ds;
     }
 
-    public String getUsers() {
+    public XMLStructure getUsers() {
         return getAuthIDs("User");
     }
 
-    public String getRoles() {
+    public XMLStructure getRoles() {
       return getAuthIDs("Role");
     }
 
@@ -132,39 +121,23 @@ public class FlexSQLAdminImpl
       return "";
     }
 
-    private String getRoutine(String schema, String type) {
-      StringBuffer result = new StringBuffer("<" + type.toLowerCase() + "s>\n");
-      try {
-        final String query = "SELECT DISTINCT invocation_name, external_name, "
-          + "is_table_function, is_deterministic "
-          + "FROM sys_root.dba_routines "
-          + "WHERE schema_name = '" + schema + "' AND "
-          + "routine_type = '" + type + "'";
-        ResultSet rs = DBAccess.rawResultExec(query);
-        while (rs.next()) {
-          String inv_name = rs.getString(1).replace("\"", "&quot;");
-          if (inv_name != null) inv_name = inv_name.replace("\"", "&quot;");
-          String ext_name = rs.getString(2);
-          if (ext_name != null) ext_name = ext_name.replace("\"", "&quot;");
-          final boolean is_tab_fun = rs.getBoolean(3);
-          final boolean is_determ = rs.getBoolean(4);
-          result.append("  <" + type.toLowerCase() + " label=\"" + inv_name +
-             "\" externalName=\"" + ext_name + "\" isTableFunction=\"" + 
-            is_tab_fun + "\" isDeterministic=\"" + is_determ + "\" />\n");
-        }
-        result.append("</" + type.toLowerCase() + "s>");
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-
-      return result.toString();
+    private XMLStructure getRoutine(String schema, String type) {
+      String tag = type.toLowerCase();
+      XMLStructure ds = new XMLStructure(tag + "s",
+          tag + " label externalName isTableFunction isDeterministic");
+      final String query = DB.select("DISTINCT invocation_name, external_name, "
+          + "is_table_function, is_deterministic ", "sys_root.dba_routines",
+          DB.populate("schema_name = {0,lit} AND routine_type = {1,lit}",
+            schema, type));
+      DB.execute(query, ds);
+      return ds;
     }
 
-    public String getFunctions(String schema) {
+    public XMLStructure getFunctions(String schema) {
       return getRoutine(schema, "FUNCTION");
     }
 
-    public String getProcedures(String schema) {
+    public XMLStructure getProcedures(String schema) {
       return getRoutine(schema, "PROCEDURE");
     }
 
@@ -202,27 +175,16 @@ public class FlexSQLAdminImpl
       return result.toString();
     }
 
-    public String getJars(String schema) {
-      StringBuffer result = new StringBuffer("<jars>\n");
-      XMLStructure ds = new XMLStructure("jars", "jar label schema");
-      try {
-        final String query = "SELECT \"name\" FROM " +
-          "sys_fem.\"SQL2003\".\"Jar\" j INNER JOIN " +
-          "sys_boot.jdbc_metadata.schemas_view_internal svi " +
-          "ON svi.\"mofId\" = j.\"namespace\" " +
-          "WHERE object_schema = '" + schema + "'";
-        ResultSet rs = DBAccess.rawResultExec(query);
-        while (rs.next()) {
-          String name = rs.getString(1);
-          result.append("  <jar label=\"" + name + "\" schema=\"" + schema +
-              "\" />\n");
-        }
-        result.append("</jars>\n");
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-      return result.toString();
-
+    public XMLStructure getJars(String schema) {
+      XMLStructure ds = new XMLStructure("jars", "jar label");
+      final String query = DB.select("\"name\"",
+          DB.populate("sys_fem.{0,id}.{1,id} j INNER JOIN " +
+            "sys_boot.jdbc_metadata.schemas_view_internal svi " +
+            "ON svi.{2,id} = j.{3,id}",
+          "SQL2003", "Jar", "mofId", "namespace"),
+          DB.populate("object_schema = {0,lit}", schema));
+      DB.execute(query, ds);
+      return ds;
     }
 
     public XMLStructure getSchemaDdl(String catalog, String schema) {

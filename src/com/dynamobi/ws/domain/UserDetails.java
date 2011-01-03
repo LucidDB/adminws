@@ -24,6 +24,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 
+import com.dynamobi.ws.domain.DBLoader;
+import java.sql.*;
+
 
 /**
  * Holds UserDetails info
@@ -31,12 +34,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="userdetails")
-public class UserDetails {
+public class UserDetails extends DBLoader<UserDetails> {
 
   public String name;
   public String password;
   public String creation_timestamp;
   public String modification_timestamp;
+
+  private UserDetails copy;
 
   public String toString() {
     return
@@ -45,6 +50,18 @@ public class UserDetails {
      "\ncreation_timestamp: " + creation_timestamp +
      "\nmodification_timestamp: " + modification_timestamp;
   }
+
+  public void loadRow(ResultSet rs) throws SQLException {
+    UserDetails ud = new UserDetails();
+    ud.name = rs.getString(1);
+    ud.password = rs.getString(2);
+    ud.creation_timestamp = rs.getString(3);
+    ud.modification_timestamp = rs.getString(4);
+    copy = ud;
+  }
+
+  public void finalize() { }
+  public UserDetails copy() { return copy; }
 
   // Auto-generated for AMF
   @XmlAttribute

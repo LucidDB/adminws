@@ -27,7 +27,6 @@ import javax.ws.rs.Path;
 
 import com.dynamobi.ws.domain.Counter;
 import com.dynamobi.ws.util.AppException;
-import com.dynamobi.ws.util.DBAccess;
 import com.dynamobi.ws.util.DB;
 
 /**

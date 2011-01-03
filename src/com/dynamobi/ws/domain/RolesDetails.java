@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.dynamobi.ws.domain.PermissionsInfo;
+import com.dynamobi.ws.domain.DBLoader;
+import java.sql.*;
 
 /**
  * Holder for the roles xml tree.
@@ -36,17 +38,28 @@ import com.dynamobi.ws.domain.PermissionsInfo;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="role")
-public class RolesDetails {
+public class RolesDetails extends DBLoader<RolesDetails> {
 
   public String name;
   public List<String> users;
   public List<String> users_with_grant_option;
   public List<PermissionsInfo> permissions;
 
+  private RolesDetailsHolder holder;
+
   public RolesDetails() {
+    init();
+  }
+
+  private void init() {
     users = new ArrayList<String>();
     users_with_grant_option = new ArrayList<String>();
     permissions = new ArrayList<PermissionsInfo>();
+  }
+
+  public RolesDetails(RolesDetailsHolder h) {
+    init();
+    holder = h;
   }
 
   public String toString() {
@@ -56,6 +69,18 @@ public class RolesDetails {
      "\nusers with grant: " + users_with_grant_option + 
      "\npermissions: " + permissions;
   }
+
+  public void loadRow(ResultSet rs) throws SQLException {
+    final String role_name = rs.getString(1);
+    if (!holder.details.containsKey(role_name)) {
+      RolesDetails rd = new RolesDetails();
+      rd.name = role_name;
+      holder.details.put(role_name, rd);
+    }
+  }
+
+  public void finalize() { }
+  public RolesDetails copy() { return this; }
 
   // Auto-generated for AMF
   @XmlAttribute

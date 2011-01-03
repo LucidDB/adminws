@@ -25,14 +25,20 @@ package com.dynamobi.ws.domain;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import com.dynamobi.ws.domain.RolesDetails;
 import com.dynamobi.ws.domain.UserPermsDetails;
+import com.dynamobi.ws.domain.DBLoader;
+
+import java.sql.*;
 
 /**
  * Holder for the list of roles details. (Not a strict holder.)
@@ -42,18 +48,105 @@ import com.dynamobi.ws.domain.UserPermsDetails;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="roles")
-public final class RolesDetailsHolder {
+public final class RolesDetailsHolder extends DBLoader<RolesDetailsHolder> {
   public List<RolesDetails> value;
   public List<UserPermsDetails> value2;
 
-  public RolesDetailsHolder() {
+  @XmlTransient
+  public Map<String, RolesDetails> details;
+  private Map<String, UserPermsDetails> user_details;
+  private Map<String, PermissionsInfo> perms;
+
+  private void init() {
     value = new ArrayList<RolesDetails>();
     value2 = new ArrayList<UserPermsDetails>();
+    details = new LinkedHashMap<String, RolesDetails>();
+    user_details = new LinkedHashMap<String, UserPermsDetails>();
+    perms = new LinkedHashMap<String, PermissionsInfo>();
+  }
+
+  public RolesDetailsHolder() {
+    init();
   }
 
   public RolesDetailsHolder(List<RolesDetails> value) {
+    init();
     this.value = value;
   }
+
+  public void loadRow(ResultSet rs) throws SQLException {
+    int col = 1;
+    final String catalog = rs.getString(col++);
+    final String schema = rs.getString(col++);
+    final String element = rs.getString(col++);
+    final String grantee = rs.getString(col++);
+    final String grantor = rs.getString(col++);
+    final String action = rs.getString(col++);
+    final String role_name = rs.getString(col++);
+    final String grant_type = rs.getString(col++);
+    final String class_name = rs.getString(col++);
+    final boolean with_grant = rs.getBoolean(col++);
+
+    final String key = grantee + catalog + schema + element + class_name;
+    PermissionsInfo p;
+    if (!perms.containsKey(key)) {
+      p = new PermissionsInfo();
+      p.catalog_name = catalog;
+      p.schema_name = schema;
+      p.item_name = element;
+      p.item_type = class_name;
+      perms.put(key, p);
+    } else {
+      p = perms.get(key);
+    }
+
+    if (!action.equals("INHERIT_ROLE"))
+      p.actions.add(action);
+
+    if (role_name != null) {
+      // Role permission
+      RolesDetails rd;
+      if (!details.containsKey(role_name)) {
+        rd = new RolesDetails();
+        rd.name = role_name;
+        details.put(role_name, rd);
+      } else {
+        rd = details.get(role_name);
+      }
+
+      // Dealing with a users or permissions entry?
+      if (grant_type.equals("User")) {
+        rd.users.add(grantee);
+        if (with_grant) {
+          rd.users_with_grant_option.add(grantee);
+        }
+      } else if (grant_type.equals("Role")) {
+        rd.permissions.add(p);
+      } else {
+        throw new SQLException("Unknown grant type");
+      }
+
+    } else {
+      // User permission
+      UserPermsDetails upd;
+      if (!user_details.containsKey(grantee)) {
+        upd = new UserPermsDetails();
+        upd.name = grantee;
+        user_details.put(grantee, upd);
+      } else {
+        upd = user_details.get(grantee);
+      }
+      upd.permissions.add(p);
+    }
+
+  }
+
+  public void finalize() {
+    value.addAll(details.values());
+    value2.addAll(user_details.values());
+  }
+
+  public RolesDetailsHolder copy() { return this; }
 
   // Auto-generated for AMF
   @XmlElement(name="role")
