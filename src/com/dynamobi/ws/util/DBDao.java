@@ -65,7 +65,8 @@ public class DBDao extends JdbcDaoImpl {
         password);
 
     Map<String,String> overrides = new HashMap<String,String>();
-    overrides.put("minPoolSize", "3");
+    //causes problems when DB server is not running
+    //overrides.put("minPoolSize", "3");
     overrides.put("maxIdleTimeExcessConnections", "600");
     overrides.put("breakAfterAcquireFailure", "true");
     overrides.put("acquireRetryAttempts", "15");
