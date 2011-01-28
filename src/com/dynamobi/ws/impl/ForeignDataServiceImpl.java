@@ -163,7 +163,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
     for (String schema_name : remote_data.foreign_schemas) {
       remote_data.fschema_name = schema_name;
       query = DB.select("distinct table_name, column_name, ordinal, " +
-          "column_type, description, default_value ",
+          "formatted_datatype as column_type, description, default_value ",
           DB.populate(
             "table(sys_boot.mgmt.browse_foreign_columns({0,lit}, {1,lit}))",
             server_name, schema_name) + " ORDER BY table_name, ordinal");
@@ -197,6 +197,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
       query += ")";
     }
     query += DB.populate(" FROM SERVER {0,str} INTO {1,id}", server, to_schema);
+    //System.out.println(query);
     return DB.execute_success(query);
   }
 
