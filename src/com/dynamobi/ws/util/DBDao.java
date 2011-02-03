@@ -65,11 +65,12 @@ public class DBDao extends JdbcDaoImpl {
         password);
 
     Map<String,String> overrides = new HashMap<String,String>();
-    //causes problems when DB server is not running
-    //overrides.put("minPoolSize", "3");
+    overrides.put("minPoolSize", "3");
     overrides.put("maxIdleTimeExcessConnections", "600");
-    overrides.put("breakAfterAcquireFailure", "true");
-    overrides.put("acquireRetryAttempts", "15");
+    // breaking marks the datasource as broken if we tried to acquire
+    // a connection before LucidDB started, so make sure this is false.
+    overrides.put("breakAfterAcquireFailure", "false");
+    overrides.put("acquireRetryAttempts", "5");
     ds_pooled = DataSources.pooledDataSource(ds_unpooled, overrides);
 
     setDataSource(ds_pooled);
