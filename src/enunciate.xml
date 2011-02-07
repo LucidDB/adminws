@@ -49,8 +49,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 			<springImport file="security-beans.xml" />
 		</spring-app>
 	</modules>
-	<webapp>
-		<!--  <webapp postBase="${basedir}/webapp_base">-->
+  <webapp mergeWebXML="web2.xml">
 		<resources dir="${basedir}/src" pattern="*.properties" />
 		<manifest>
 			<attribute name="Bundle-ManifestVersion" value="2" />

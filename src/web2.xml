@@ -1,0 +1,8 @@
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+  <error-page>
+    <error-code>401</error-code>
+    <location>/bad.html</location>
+  </error-page>
+</beans>
+

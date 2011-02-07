@@ -19,16 +19,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 -->
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-	<!-- 
-		<bean id="userDetailsService"
-		class="org.springframework.security.userdetails.memory.InMemoryDaoImpl">
-		<property name="userMap">
-		<value>
-		joe=password,USER,Admin 
-		</value>
-		</property>
-		</bean>
-	-->
 	<bean id="daoAuthenticationProvider"
 		class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
 		<property name="userDetailsService">
@@ -37,33 +27,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 		<property name="passwordEncoder">
 			<ref bean="passwordEncoder" />
 		</property>
-<!--		<property name="userCache" ref="userCache" />-->
 	</bean>
 
-<!--	<bean id="cacheManager"-->
-<!--		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">-->
-<!--		<property name="configLocation"-->
-<!--			value="classpath:/ehcache-failsafe.xml" />-->
-<!--	</bean>-->
-<!---->
-<!--	<bean id="userCacheBackend"-->
-<!--		class="org.springframework.cache.ehcache.EhCacheFactoryBean">-->
-<!--		<property name="cacheManager" ref="cacheManager" />-->
-<!--		<property name="cacheName" value="userCache" />-->
-<!--	</bean>-->
-<!---->
-<!--	<bean id="userCache"-->
-<!--		class="org.springframework.security.providers.dao.cache.EhCacheBasedUserCache">-->
-<!--		<property name="cache" ref="userCacheBackend" />-->
-<!--	</bean>-->
-	
-  <!--<bean id="userDetailsService"
-    class="org.springframework.security.userdetails.jdbc.JdbcDaoImpl">-->
   <bean id="userDetailsService" class="com.dynamobi.ws.util.DBDao" destroy-method="cleanup">
-    <!--<property name="dataSource">
-			<ref local="dataSource" />
-		</property>
-    -->
 		<property name="authoritiesByUsernameQuery">
 			<value>
 				<![CDATA[select username, authority from 
@@ -87,6 +53,5 @@ where username = ?]]>
 		<property name="encodeHashAsBase64" value="true" />
 		<constructor-arg value="256" />
 	</bean>
-
 
 </beans>
