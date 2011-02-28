@@ -35,6 +35,7 @@ import com.dynamobi.ws.domain.RolesDetails;
 import com.dynamobi.ws.domain.UserPermsDetails;
 import com.dynamobi.ws.domain.RolesDetailsHolder;
 import com.dynamobi.ws.domain.PermissionsInfo;
+import com.dynamobi.ws.domain.PermissionGroup;
 import com.dynamobi.ws.domain.SubQuery;
 import com.dynamobi.ws.util.AppException;
 import com.dynamobi.ws.util.DB;
@@ -54,7 +55,7 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
     List<UserDetails> details = new ArrayList<UserDetails>();
     UserDetails seed = new UserDetails();
     final String query = "SELECT name, password, creation_timestamp, "
-      + "modification_timestamp FROM sys_root.dba_users u WHERE "
+      + "last_modified_timestamp FROM sys_root.dba_users u WHERE "
       + "u.name <> '_SYSTEM'";
     DB.execute(query, seed, details);
     return details;
@@ -101,11 +102,11 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
   public RolesDetailsHolder getRolesDetails() throws AppException {
     String query = "SELECT DISTINCT granted_catalog, granted_schema, granted_element, "
       + "grantee, grantor, action, "
-      + "CASE WHEN r.role IS NOT NULL THEN r.role "
+      + "CASE WHEN r.inherited_role_name IS NOT NULL THEN r.inherited_role_name "
       + "WHEN grant_type = 'Role' THEN grantee END AS role_name, "
       + "grant_type, class_name, g.with_grant_option "
-      + "FROM sys_root.dba_element_grants g LEFT OUTER JOIN sys_root.dba_user_roles r "
-      + "ON action = 'INHERIT_ROLE' AND r.role_mof_id = element_mof_id "
+      + "FROM sys_root.dba_element_grants g LEFT OUTER JOIN sys_root.dba_inherited_roles r "
+      + "ON action = 'INHERIT_ROLE' AND r.inherited_role_mof_id = element_mof_id "
       + "WHERE grantee NOT IN ('PUBLIC', '_SYSTEM') AND "
       + "grantor <> '_SYSTEM'";
 
@@ -174,6 +175,13 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
         "GRANT {0,str} ON {1,id}.{2,id}.{3,id} TO {4,id}",
         permissions, catalog, schema, element, grantee);
     return DB.execute_success(query);
+  }
+
+  public String grantPermissionGroup(PermissionGroup group) throws AppException
+  {
+    // build query
+    // success execute
+    return DB.execute_success("");
   }
 
   public String revokePermissionsOnSchema(String catalog, String schema,

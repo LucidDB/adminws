@@ -36,6 +36,7 @@ import com.dynamobi.ws.domain.SessionInfo;
 import com.dynamobi.ws.domain.RolesDetails;
 import com.dynamobi.ws.domain.RolesDetailsHolder;
 import com.dynamobi.ws.domain.PermissionsInfo;
+import com.dynamobi.ws.domain.PermissionGroup;
 import com.dynamobi.ws.util.AppException;
 
 import javax.annotation.security.PermitAll;
@@ -164,6 +165,8 @@ public interface UsersAndRolesService {
       @PathParam("with_grant") boolean with_grant) throws AppException;
 
   /** 
+   * DEPRECATED
+   *
    * Grant permissions for everything in the given schema.
    * This and all others expect permissions as a comma-separated string
    * of all the permissions (e.g. SELECT,INSERT).
@@ -185,10 +188,12 @@ public interface UsersAndRolesService {
     throws AppException;
 
   /**
+   * DEPRECATED
+   *
    * Grant permissions for a specific element like a table or view.
    * @param catalog - DB catalog of the element.
    * @param schema - DB schema of the element.
-   * @param type - Unused. Future uses may include granting to columns.
+   * @param type - Current unused.
    * @param element - DB element, such as a table, view, function, etc.
    * @param permissions - Comma-separated list of permissions to apply.
    * @param grantee - User or role given the permissions.
@@ -205,6 +210,15 @@ public interface UsersAndRolesService {
                 @PathParam("permissions") String permissions,
                 @PathParam("grantee") String grantee)
     throws AppException;
+
+  /**
+   *
+   */
+  @WebMethod
+  @POST
+  @Path("/roles/grant")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public String grantPermissionGroup(PermissionGroup group) throws AppException;
 
   /**
    * (NOT IMPLEMENTED)
