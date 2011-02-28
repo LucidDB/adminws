@@ -79,7 +79,13 @@ public class RolesDetails extends DBLoader<RolesDetails> {
     }
   }
 
-  public void finalize() { }
+  public void finalize() {
+    // shutup
+    holder.value = new ArrayList<RolesDetails>();
+    holder.value2 = new ArrayList<UserPermsDetails>();
+    holder.finalize();
+  }
+
   public RolesDetails copy() { return this; }
 
   // Auto-generated for AMF
