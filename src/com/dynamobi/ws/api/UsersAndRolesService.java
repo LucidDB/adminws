@@ -35,7 +35,6 @@ import com.dynamobi.ws.domain.UserDetails;
 import com.dynamobi.ws.domain.SessionInfo;
 import com.dynamobi.ws.domain.RolesDetails;
 import com.dynamobi.ws.domain.RolesDetailsHolder;
-import com.dynamobi.ws.domain.PermissionsInfo;
 import com.dynamobi.ws.domain.PermissionGroup;
 import com.dynamobi.ws.util.AppException;
 
@@ -164,39 +163,12 @@ public interface UsersAndRolesService {
       @PathParam("added") boolean added,
       @PathParam("with_grant") boolean with_grant) throws AppException;
 
-  /** 
-   * REMOVED
-   *
-  @WebMethod
-  @POST
-  @Path("/roles/grant/{catalog}/{schema}/{permissions}/{grantee}")
-  @RolesAllowed( {"Admin", "Authenticated"} )
-  public String grantPermissionsOnSchema(@PathParam("catalog") String catalog,
-                @PathParam("schema") String schema,
-                @PathParam("permissions") String permissions,
-                @PathParam("grantee") String grantee)
-    throws AppException;
-  */
-
   /**
-   * REMOVED
-   *
-  @WebMethod
-  @POST
-  @Path("/roles/grant/{catalog}/{schema}/{type}/{element}/{permissions}/{grantee}")
-  @RolesAllowed( {"Admin", "Authenticated"} )
-  public String grantPermissions(@PathParam("catalog") String catalog,
-                @PathParam("schema") String schema,
-                @PathParam("type") String type,
-                @PathParam("element") String element,
-                @PathParam("permissions") String permissions,
-                @PathParam("grantee") String grantee)
-    throws AppException;
-  */
-  // actually it's private now.
-
-  /**
-   *
+   * Allows permission granting on a group of objects, making one DB query
+   * for each object. This allows for batch-sending a bunch of permission
+   * changes.
+   * @param group - List of PermissionGroup objects to apply.
+   * @return Empty string on success, otherwise error messages.
    */
   @WebMethod
   @POST
@@ -204,6 +176,16 @@ public interface UsersAndRolesService {
   @RolesAllowed( {"Admin", "Authenticated"} )
   @Consumes ("application/xml")
   public String grantPermissionGroup(List<PermissionGroup> group) throws AppException;
+
+  /**
+   * This is a dummy method to get AMF to compile.
+   * @return Returns an empty array list.
+   */
+  @WebMethod
+  @GET
+  @Path("/roles/grant/fakeout")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public List<PermissionGroup> getEmptyGroup() throws AppException;
 
   /**
    * (NOT IMPLEMENTED)

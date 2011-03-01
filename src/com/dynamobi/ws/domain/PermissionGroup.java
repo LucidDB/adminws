@@ -25,12 +25,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author Kevin Secretan
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlRootElement(name="info")
+@XmlRootElement(name="pgroup")
 public class PermissionGroup {
   public String catalog;
   public String schema;
@@ -38,6 +39,10 @@ public class PermissionGroup {
   public String element;
   public String grantee;
   public List<String> permissions;
+
+  public PermissionGroup() {
+    permissions = new ArrayList<String>();
+  }
 
   // Auto-generated for AMF
   @XmlElement

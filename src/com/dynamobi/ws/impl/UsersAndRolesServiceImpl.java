@@ -34,7 +34,6 @@ import com.dynamobi.ws.domain.SessionInfo;
 import com.dynamobi.ws.domain.RolesDetails;
 import com.dynamobi.ws.domain.UserPermsDetails;
 import com.dynamobi.ws.domain.RolesDetailsHolder;
-import com.dynamobi.ws.domain.PermissionsInfo;
 import com.dynamobi.ws.domain.PermissionGroup;
 import com.dynamobi.ws.domain.SubQuery;
 import com.dynamobi.ws.util.AppException;
@@ -164,6 +163,10 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
       retVal.add(grantPermissions(g.catalog, g.schema, g.type, g.element, DB.join_list(g.permissions, ""), g.grantee));
     }
     return DB.join_list(retVal, "");
+  }
+
+  public List<PermissionGroup> getEmptyGroup() throws AppException {
+    return new ArrayList<PermissionGroup>();
   }
 
   public String revokePermissionsOnSchema(String catalog, String schema,
