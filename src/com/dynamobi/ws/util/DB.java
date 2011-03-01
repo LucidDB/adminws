@@ -227,4 +227,18 @@ public class DB {
     return sur + item + sur;
   }
 
+  // not so much db related but still useful
+  public static String join_list(List<String> list, String delim) {
+    StringBuilder sb = new StringBuilder();
+    boolean f = true;
+    for (String s : list) {
+      if (!f)
+        sb.append(delim);
+      else
+        f = false;
+      sb.append(s);
+    }
+    return sb.toString();
+  }
+
 }

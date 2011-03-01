@@ -165,18 +165,8 @@ public interface UsersAndRolesService {
       @PathParam("with_grant") boolean with_grant) throws AppException;
 
   /** 
-   * DEPRECATED
+   * REMOVED
    *
-   * Grant permissions for everything in the given schema.
-   * This and all others expect permissions as a comma-separated string
-   * of all the permissions (e.g. SELECT,INSERT).
-   *
-   * @param catalog - DB catalog of the schema.
-   * @param schema - DB schema to apply permissions.
-   * @param permissions - Comma-separated list of permissions.
-   * @param grantee - The user or role given the grant.
-   * @return Returns an empty string on success, otherwise an SQL error message.
-   */
   @WebMethod
   @POST
   @Path("/roles/grant/{catalog}/{schema}/{permissions}/{grantee}")
@@ -186,19 +176,11 @@ public interface UsersAndRolesService {
                 @PathParam("permissions") String permissions,
                 @PathParam("grantee") String grantee)
     throws AppException;
+  */
 
   /**
-   * DEPRECATED
+   * REMOVED
    *
-   * Grant permissions for a specific element like a table or view.
-   * @param catalog - DB catalog of the element.
-   * @param schema - DB schema of the element.
-   * @param type - Current unused.
-   * @param element - DB element, such as a table, view, function, etc.
-   * @param permissions - Comma-separated list of permissions to apply.
-   * @param grantee - User or role given the permissions.
-   * @return Returns an empty string on success, otherwise an SQL error message.
-   */
   @WebMethod
   @POST
   @Path("/roles/grant/{catalog}/{schema}/{type}/{element}/{permissions}/{grantee}")
@@ -210,6 +192,8 @@ public interface UsersAndRolesService {
                 @PathParam("permissions") String permissions,
                 @PathParam("grantee") String grantee)
     throws AppException;
+  */
+  // actually it's private now.
 
   /**
    *
@@ -218,7 +202,8 @@ public interface UsersAndRolesService {
   @POST
   @Path("/roles/grant")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public String grantPermissionGroup(PermissionGroup group) throws AppException;
+  @Consumes ("application/xml")
+  public String grantPermissionGroup(List<PermissionGroup> group) throws AppException;
 
   /**
    * (NOT IMPLEMENTED)

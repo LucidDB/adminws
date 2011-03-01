@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 package com.dynamobi.ws.domain;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
@@ -26,7 +25,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * @author Kevin Secretan
@@ -34,5 +32,37 @@ import java.util.ArrayList;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="info")
 public class PermissionGroup {
+  public String catalog;
+  public String schema;
+  public String type;
+  public String element;
+  public String grantee;
+  public List<String> permissions;
+
+  // Auto-generated for AMF
+  @XmlElement
+  public String getCatalog() { return catalog; }
+  public void setCatalog(String catalog) { this.catalog = catalog; }
+
+  @XmlElement
+  public String getSchema() { return schema; }
+  public void setSchema(String schema) { this.schema = schema; }
+
+  @XmlElement
+  public String getType() { return type; }
+  public void setType(String type) { this.type = type; }
+
+  @XmlElement
+  public String getElement() { return element; }
+  public void setElement(String element) { this.element = element; }
+
+  @XmlElement
+  public String getGrantee() { return grantee; }
+  public void setGrantee(String grantee) { this.grantee = grantee; }
+
+  @XmlElement
+  @XmlList public List<String> getPermissions() { return permissions; }
+  public void setPermissions(List<String> permissions) { this.permissions = permissions; }
 
 }
+

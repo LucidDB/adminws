@@ -65,7 +65,8 @@ public class DBDao extends JdbcDaoImpl {
         password);
 
     Map<String,String> overrides = new HashMap<String,String>();
-    overrides.put("minPoolSize", "3");
+    //overrides.put("minPoolSize", "3");
+    overrides.put("maxPoolSize", "1");
     overrides.put("maxIdleTimeExcessConnections", "600");
     // breaking marks the datasource as broken if we tried to acquire
     // a connection before LucidDB started, so make sure this is false.

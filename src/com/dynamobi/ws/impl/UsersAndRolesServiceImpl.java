@@ -148,27 +148,7 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
     return DB.execute_success(query);
   }
 
-  public String grantPermissionsOnSchema(String catalog, String schema,
-                String permissions, String grantee) throws AppException {
-    String retval = "";
-    /*String query = "CALL APPLIB.DO_FOR_ENTIRE_SCHEMA('GRANT " +
-      permissions + " ON %TABLE_NAME% TO \"" + grantee + "\"', " +
-      "'" + schema + "', 'TABLES_AND_VIEWS')";
-      * cannot do above because do_for_entire_schema does not respect
-      * catalogs.
-      */
-    String query = DB.select("table_name", "sys_root.dba_tables", DB.populate(
-          "catalog_name = {0,lit} AND schema_name = {1,lit}", catalog, schema));
-    SubQuery sq = new SubQuery(DB.populate(
-          "GRANT {0,str} ON {1,id}.{2,id}.{3,str} TO " +
-          "{4,id}", permissions, catalog, schema, "/{0,id}", grantee), 1);
-    DB.execute(query, sq);
-    if (sq.error)
-      return sq.error_msg;
-    return "";
-  }
-
-  public String grantPermissions(String catalog, String schema, String type,
+  private String grantPermissions(String catalog, String schema, String type,
                 String element, String permissions, String grantee)
                 throws AppException {
     String query = DB.populate(
@@ -177,11 +157,13 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
     return DB.execute_success(query);
   }
 
-  public String grantPermissionGroup(PermissionGroup group) throws AppException
+  public String grantPermissionGroup(List<PermissionGroup> group) throws AppException
   {
-    // build query
-    // success execute
-    return DB.execute_success("");
+    List<String> retVal = new ArrayList<String>();
+    for (PermissionGroup g : group) {
+      retVal.add(grantPermissions(g.catalog, g.schema, g.type, g.element, DB.join_list(g.permissions, ""), g.grantee));
+    }
+    return DB.join_list(retVal, "");
   }
 
   public String revokePermissionsOnSchema(String catalog, String schema,
