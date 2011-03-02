@@ -76,11 +76,11 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
                  throws AppException {
     String query = "";
     if (act == Action.NEW) {
-      query = DB.populate("CREATE USER {0,str} IDENTIFIED BY {1,lit}", user, password);
+      query = DB.populate("CREATE USER {0,id} IDENTIFIED BY {1,lit}", user, password);
     } else if (act == Action.MOD) {
-      query = DB.populate("CREATE OR REPLACE USER {0,str} IDENTIFIED BY {1,lit}", user, password);
+      query = DB.populate("CREATE OR REPLACE USER {0,id} IDENTIFIED BY {1,lit}", user, password);
     } else if (act == Action.DEL) {
-      query = DB.populate("DROP USER {0,str}", user);
+      query = DB.populate("DROP USER {0,id}", user);
     }
     return DB.execute_success(query);
   }
