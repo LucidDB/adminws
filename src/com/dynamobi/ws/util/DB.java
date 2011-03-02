@@ -51,8 +51,10 @@ public class DB {
       conn = connDataSource.getConnection(auth.getName(),
           auth.getCredentials().toString());
     } else {
+      throw new SQLException("Could not authenticate.");
+      // why was this here?
       // default connection
-      conn = connDataSource.getConnection();
+      //conn = connDataSource.getConnection();
     }
 
     return conn;
