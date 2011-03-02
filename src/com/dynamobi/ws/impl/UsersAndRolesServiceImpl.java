@@ -150,9 +150,13 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
   private String grantPermissions(String catalog, String schema, String type,
                 String element, String permissions, String grantee)
                 throws AppException {
+    String spec = "";
+    if (!type.equals("table") && !type.equals("view")) {
+      spec = "SPECIFIC " + type;
+    }
     String query = DB.populate(
-        "GRANT {0,str} ON {1,id}.{2,id}.{3,id} TO {4,id}",
-        permissions, catalog, schema, element, grantee);
+        "GRANT {0,str} ON {1,str} {2,id}.{3,id}.{4,id} TO {5,id}",
+        permissions, spec, catalog, schema, element, grantee);
     return DB.execute_success(query);
   }
 
@@ -160,9 +164,9 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
   {
     List<String> retVal = new ArrayList<String>();
     for (PermissionGroup g : group) {
-      retVal.add(grantPermissions(g.catalog, g.schema, g.type, g.element, DB.join_list(g.permissions, ""), g.grantee));
+      retVal.add(grantPermissions(g.catalog, g.schema, g.type, g.element, DB.join_list(g.permissions, ","), g.grantee));
     }
-    return DB.join_list(retVal, "");
+    return DB.join_list(retVal, "\n");
   }
 
   public List<PermissionGroup> getEmptyGroup() throws AppException {

@@ -71,7 +71,7 @@ public class DBDao extends JdbcDaoImpl {
     // breaking marks the datasource as broken if we tried to acquire
     // a connection before LucidDB started, so make sure this is false.
     overrides.put("breakAfterAcquireFailure", "false");
-    overrides.put("acquireRetryAttempts", "5");
+    overrides.put("acquireRetryAttempts", "1");
     ds_pooled = DataSources.pooledDataSource(ds_unpooled, overrides);
 
     setDataSource(ds_pooled);
