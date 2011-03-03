@@ -189,6 +189,7 @@ public interface UsersAndRolesService {
 
   /**
    * (NOT IMPLEMENTED)
+   * (DEPRECATED)
    * Revoke permissions for everything in the given schema
    * @param catalog - DB catalog of the schema.
    * @param schema - DB schema to revoke permissions.
@@ -208,6 +209,7 @@ public interface UsersAndRolesService {
 
   /**
    * (NOT IMPLEMENTED)
+   * (DEPRECATED)
    * Revoke permissions for a specific element like a table or view
    * @param catalog - DB catalog of the element.
    * @param schema - DB schema of the element.
