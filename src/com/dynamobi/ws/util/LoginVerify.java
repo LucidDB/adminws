@@ -37,11 +37,11 @@ import com.mchange.v2.c3p0.DataSources;
 import com.dynamobi.ws.util.DBAccess;
 import com.dynamobi.ws.util.DB;
 
-public class DBDao extends JdbcDaoImpl {
+public class LoginVerify extends JdbcDaoImpl {
 
   private DataSource ds_pooled = null;
 
-  public DBDao() throws ClassNotFoundException, SQLException, IOException {
+  public LoginVerify() throws ClassNotFoundException, SQLException, IOException {
     super();
 
     Properties pro = new Properties();
