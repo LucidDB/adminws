@@ -44,7 +44,7 @@ import org.springframework.security.context.SecurityContextHolder;
 
 import org.apache.commons.dbcp.BasicDataSource;
 
-public class LoginVerify extends JdbcDaoImpl {
+public class ConnectionManager extends JdbcDaoImpl {
 
   private static BasicDataSource data_source = null;
 
@@ -58,7 +58,7 @@ public class LoginVerify extends JdbcDaoImpl {
 
   private ConnectionGC GC;
 
-  public LoginVerify() throws ClassNotFoundException, SQLException, IOException {
+  public ConnectionManager() throws ClassNotFoundException, SQLException, IOException {
     super();
 
     Properties pro = new Properties();

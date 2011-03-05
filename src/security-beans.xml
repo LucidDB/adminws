@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 		</property>
 	</bean>
 
-  <bean id="userDetailsService" class="com.dynamobi.ws.util.LoginVerify" destroy-method="cleanup">
+  <bean id="userDetailsService" class="com.dynamobi.ws.util.ConnectionManager" destroy-method="cleanup">
 		<property name="authoritiesByUsernameQuery">
 			<value>
 				<![CDATA[select username, authority from 

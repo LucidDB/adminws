@@ -42,7 +42,7 @@ public class DB {
 
     if (auth != null) {
       try {
-        conn = LoginVerify.request_connection(auth);
+        conn = ConnectionManager.request_connection(auth);
       } catch (InterruptedException e) {
         e.printStackTrace();
         throw new SQLException("Could not authenticate, connection in use.");
@@ -57,7 +57,7 @@ public class DB {
   public static void release_connection(Connection c) throws SQLException {
     final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     Connection conn;
-    LoginVerify.release_connection(auth, c);
+    ConnectionManager.release_connection(auth, c);
   }
 
   /**
