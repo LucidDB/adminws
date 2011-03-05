@@ -22,42 +22,42 @@ import java.sql.*;
 import java.util.*;
 
 import java.io.FileNotFoundException;
-import javax.sql.DataSource;
 
 import com.dynamobi.ws.domain.*;
 
 import org.springframework.security.Authentication;
 import org.springframework.security.context.SecurityContextHolder;
 
-
 public class DB {
 
   private DB() { }
 
-  public static DataSource connDataSource = null;
   public static String connection_catalog = "";
 
   public static Connection getConnection()
     throws ClassNotFoundException, SQLException, FileNotFoundException
   {
-    if (connDataSource == null) {
-      throw new SQLException("No Data Source Detected");
-    }
-
     final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     Connection conn;
 
     if (auth != null) {
-      conn = connDataSource.getConnection(auth.getName(),
-          auth.getCredentials().toString());
+      try {
+        conn = LoginVerify.request_connection(auth);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+        throw new SQLException("Could not authenticate, connection in use.");
+      }
     } else {
       throw new SQLException("Could not authenticate.");
-      // why was this here?
-      // default connection
-      //conn = connDataSource.getConnection();
     }
 
     return conn;
+  }
+
+  public static void release_connection(Connection c) throws SQLException {
+    final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    Connection conn;
+    LoginVerify.release_connection(auth, c);
   }
 
   /**
@@ -192,7 +192,7 @@ public class DB {
           ps.close();
         }
         if (conn != null) {
-          conn.close();
+          release_connection(conn);
         }
         if (rs != null) {
           rs.close();

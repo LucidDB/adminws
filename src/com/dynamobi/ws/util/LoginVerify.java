@@ -18,12 +18,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 package com.dynamobi.ws.util;
 
-import java.sql.SQLException;
-import javax.sql.DataSource;
+import org.apache.commons.codec.binary.Base64;
+
 import java.lang.ClassNotFoundException;
 import java.sql.SQLException;
+import java.sql.DriverManager;
+import java.sql.Connection;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Properties;
 import java.io.InputStream;
 import java.io.IOException;
@@ -31,15 +35,28 @@ import java.io.IOException;
 // Base class
 import org.springframework.security.userdetails.jdbc.JdbcDaoImpl;
 
-// Factory class to construct our pooled datasource
-import com.mchange.v2.c3p0.DataSources;
+import org.springframework.security.userdetails.User;
+import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.GrantedAuthority;
 
-import com.dynamobi.ws.util.DBAccess;
-import com.dynamobi.ws.util.DB;
+import org.springframework.security.Authentication;
+import org.springframework.security.context.SecurityContextHolder;
+
+import org.apache.commons.dbcp.BasicDataSource;
 
 public class LoginVerify extends JdbcDaoImpl {
 
-  private DataSource ds_pooled = null;
+  private static BasicDataSource data_source = null;
+
+  // conns stores per-session Connections,
+  // stored by UUID, then username and the connection.
+
+  private static Map<String, ConnectionInfo> conns;
+
+  private static String jdbc_driver;
+  private static String jdbc_url;
+
+  private ConnectionGC GC;
 
   public LoginVerify() throws ClassNotFoundException, SQLException, IOException {
     super();
@@ -53,34 +70,192 @@ public class LoginVerify extends JdbcDaoImpl {
       pro.load(this.getClass().getResourceAsStream("/luciddb-jdbc-default.properties"));
     }
 
-    Class.forName(pro.getProperty("jdbc.driver"));
+    jdbc_driver = pro.getProperty("jdbc.driver");
+    Class.forName(jdbc_driver);
 
     String username = pro.getProperty("jdbc.username");
     String password = pro.getProperty("jdbc.password");
-    String url      = pro.getProperty("jdbc.url");
+    jdbc_url        = pro.getProperty("jdbc.url");
 
-    DataSource ds_unpooled = DataSources.unpooledDataSource(
-        url,
-        username,
-        password);
+    // this sets up the connection to validate other connections.
+    data_source = new BasicDataSource();
+    data_source.setDriverClassName(jdbc_driver);
+    data_source.setUrl(jdbc_url);
+    data_source.setUsername(username);
+    data_source.setPassword(password);
+    setDataSource(data_source);
 
-    Map<String,String> overrides = new HashMap<String,String>();
-    //overrides.put("minPoolSize", "3");
-    overrides.put("maxPoolSize", "1");
-    overrides.put("maxIdleTimeExcessConnections", "600");
-    // breaking marks the datasource as broken if we tried to acquire
-    // a connection before LucidDB started, so make sure this is false.
-    overrides.put("breakAfterAcquireFailure", "false");
-    overrides.put("acquireRetryAttempts", "1");
-    ds_pooled = DataSources.pooledDataSource(ds_unpooled, overrides);
+    conns = new HashMap<String, ConnectionInfo>();
 
-    setDataSource(ds_pooled);
-    DBAccess.connDataSource = ds_pooled;
-    DB.connDataSource = ds_pooled;
+    GC = new ConnectionGC(60*5, 60*60);
+    // check to close stuff every 5 mins, invalidation time is 1 hr
   }
 
   public void cleanup() throws SQLException {
-    DataSources.destroy(ds_pooled);
+    data_source.close();
+
+    GC_close_all();
+  }
+
+  public static synchronized void GC_close_old(long invalid) throws SQLException {
+    for (Map.Entry<String, ConnectionInfo> conn : conns.entrySet()) {
+      if (!conn.getValue().closed && !conn.getValue().busy &&
+          conn.getValue().older_than(invalid)) {
+        conn.getValue().connection.close();
+        conn.getValue().closed = true;
+      }
+    }
+  }
+
+  public static synchronized void GC_close_all() throws SQLException {
+    for (Map.Entry<String, ConnectionInfo> conn : conns.entrySet()) {
+      if (!conn.getValue().closed) {
+        conn.getValue().connection.close();
+        conn.getValue().closed = true;
+      }
+    }
+    conns = new HashMap<String, ConnectionInfo>();
+  }
+
+  public static Connection request_connection(Authentication auth)
+      throws SQLException, ClassNotFoundException, InterruptedException {
+    String uname = auth.getName();
+    String pw = null;
+    String[] parts = auth.getCredentials().toString().split(":", 4);
+    boolean first;
+    if (parts.length == 4) { // a first call, possibly
+      first = true;
+      pw = parts[3];
+    } else if (parts.length == 3) { // subsequent calls
+      first = false;
+    } else { // wtf? (They shouldn't have gotten this far, something is wrong.)
+      throw new SQLException("SEVERE: Server received unexpected invalid " +
+          "authentication token.");
+    }
+
+    String uuid = parts[2];
+    if (conns.containsKey(uuid) && !first) {
+      ConnectionInfo info = conns.get(uuid);
+      if (info.uname.equals(uname)) {
+        while (info.get_busy()) {
+          Thread.sleep(1000);
+        }
+        if (info.closed) { // they may have timed out and come back, recreate c
+          info.set_connection(stupid_connection(info.uname, info.pw));
+        }
+        info.update_time();
+
+        info.busy = true;
+        return info.connection;
+      } else {
+        throw new SQLException("SEVERE: UUID collision among different users.");
+      }
+    } else if (conns.containsKey(uuid) && first) {
+      // enforce them not to send the password twice.
+      throw new SQLException("Please do not continue to send your password "+
+          "raw after authenticating.");
+    } else if (first) { // make new connection for them.
+      Connection c = stupid_connection(uname, pw);
+      ConnectionInfo info = new ConnectionInfo();
+      conns.put(uuid, info);
+
+      info.uname = uname;
+      info.pw = pw;
+      info.set_connection(c);
+      info.busy = true;
+      return c;
+    } else { // !first, no known, we need a raw pass from them to make a conn.
+      throw new SQLException("Your raw password is required for the initial " +
+          "request to form a connection.");
+    }
+  }
+
+  private static Connection stupid_connection(String uname, String pw)
+      throws SQLException, ClassNotFoundException {
+    Class.forName(jdbc_driver);
+    Connection c = DriverManager.getConnection(jdbc_url, uname, pw);
+    return c;
+  }
+
+  public static void release_connection(Authentication auth, Connection c)
+      throws SQLException {
+    String[] parts = auth.getCredentials().toString().split(":", 4);
+    if (parts.length < 3) {
+      throw new SQLException("SEVERE: Authentication changed.");
+    }
+    String uuid = parts[2];
+    if (!conns.containsKey(uuid)) {
+      throw new SQLException("SEVERE: Missing ConnectionInfo object for UUID " + uuid);
+    }
+
+    ConnectionInfo info = conns.get(uuid);
+    info.busy = false;
+    info.update_time();
+  }
+
+  protected static class ConnectionInfo {
+    public String uname;
+    public String pw;
+    public Connection connection;
+    public long last_used;
+    public boolean closed;
+    public boolean busy;
+
+    public ConnectionInfo() {
+      uname = "";
+      pw = "";
+      connection = null;
+      update_time();
+      closed = true;
+      busy = false;
+    }
+
+    public void set_connection(Connection c) {
+      connection = c;
+      closed = false;
+      busy = true;
+    }
+
+    public void update_time() {
+      last_used = System.currentTimeMillis() / 1000L;
+    }
+
+    public boolean older_than(long seconds) {
+      return System.currentTimeMillis() / 1000L - last_used > seconds;
+    }
+
+    public boolean older_than_mins(long minutes) {
+      return older_than(60*minutes);
+    }
+
+    public boolean get_busy() { return busy; }
+
+  }
+
+  protected class ConnectionGC extends Thread {
+    private long secs_to_check;
+    private long secs_invalidated;
+    public ConnectionGC(long secs_to_check, long secs_invalidated) {
+      setDaemon(true);
+      this.secs_to_check = secs_to_check;
+      this.secs_invalidated = secs_invalidated;
+      start();
+    }
+
+    public void run() {
+      while(true) {
+        try {
+          // daemon fell asleep!
+          sleep(secs_to_check);
+          // daemon woke up!
+          GC_close_old(secs_invalidated);
+        } catch (InterruptedException e) {
+          throw new RuntimeException("SEVERE: Garbage collector broke.");
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+    }
   }
 
 }

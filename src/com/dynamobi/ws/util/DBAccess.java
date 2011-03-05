@@ -75,23 +75,7 @@ public class DBAccess
     public static Connection getConnection()
         throws ClassNotFoundException, SQLException, FileNotFoundException
     {
-
-        if (connDataSource == null) {
-          throw new SQLException("No Data Source Detected");
-        }
-
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Connection conn;
-
-        if (auth != null) {
-          conn = connDataSource.getConnection(auth.getName(),
-                                              auth.getCredentials().toString());
-        } else {
-          // default connection
-          conn = connDataSource.getConnection();
-        }
-
-        return conn;
+      return DB.getConnection();
     }
 
     public static SystemParameter findSystemParameterByName(String paramName)
@@ -145,7 +129,7 @@ public class DBAccess
                     ps.close();
                 }
                 if (conn != null) {
-                    conn.close();
+                    DB.release_connection(conn);
                 }
 
             } catch (SQLException ex) {
@@ -211,7 +195,7 @@ public class DBAccess
                     ps.close();
                 }
                 if (conn != null) {
-                    conn.close();
+                    DB.release_connection(conn);
                 }
 
             } catch (SQLException ex) {
@@ -269,7 +253,7 @@ public class DBAccess
                     ps.close();
                 }
                 if (conn != null) {
-                    conn.close();
+                    DB.release_connection(conn);
                 }
 
             } catch (SQLException ex) {
@@ -341,7 +325,7 @@ public class DBAccess
                     ps.close();
                 }
                 if (conn != null) {
-                    conn.close();
+                    DB.release_connection(conn);
                 }
 
             } catch (SQLException ex) {
@@ -449,7 +433,7 @@ public class DBAccess
                     ps.close();
                 }
                 if (conn != null) {
-                    conn.close();
+                    DB.release_connection(conn);
                 }
 
             } catch (SQLException ex) {
@@ -627,7 +611,7 @@ public class DBAccess
                     ps.close();
                 }
                 if (conn != null) {
-                    conn.close();
+                    DB.release_connection(conn);
                 }
 
             } catch (SQLException ex) {
@@ -918,7 +902,7 @@ public class DBAccess
                     ps.close();
                 }
                 if (conn != null) {
-                    conn.close();
+                    DB.release_connection(conn);
                 }
 
             } catch (SQLException ex) {
@@ -1049,7 +1033,7 @@ public class DBAccess
                     ps.close();
                 }
                 if (conn != null) {
-                    conn.close();
+                    DB.release_connection(conn);
                 }
 
             } catch (SQLException ex) {
@@ -1101,14 +1085,12 @@ public class DBAccess
       } catch (Exception ex) {
         ex.printStackTrace();
       } finally {
-        // We don't need to explicitly close RS's
-        // because c3p0 will handle it for us.
+        DB.release_connection(conn);
         /*try {
           if (ps != null) {
             //ps.close();
           }
           if (conn != null) {
-            //conn.close();
           }
         } catch (SQLException ex) {
           ex.printStackTrace();
@@ -1263,7 +1245,7 @@ public class DBAccess
                     ps.close();
                 }
                 if (conn != null) {
-                    conn.close();
+                    DB.release_connection(conn);
                 }
 
             } catch (SQLException ex) {

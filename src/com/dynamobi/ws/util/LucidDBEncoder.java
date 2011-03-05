@@ -35,57 +35,56 @@ public class LucidDBEncoder
         super(strength);
     }
 
+    private String hexHash(String str) {
+      MessageDigest md = getMessageDigest();
+      byte[] mdbytes = md.digest(str.getBytes());
+      StringBuffer hex = new StringBuffer();
+      for (int i = 0; i < mdbytes.length; i++) {
+        String add = Integer.toHexString(0xFF & mdbytes[i]);
+        if (add.length() == 1) hex.append(0);
+        hex.append(add);
+      }
+      return hex.toString();
+    }
+
+    // DEPRECATED
     public String encodePassword(String rawPass, Object salt)
     {    
-        // support a case: password is null.   
-        if(rawPass.isEmpty()){
-        	return "";
-        }
-            	
-    	String saltedPass = mergePasswordAndSalt(rawPass, salt, false);
+      // support a case: password is null.   
+      if(rawPass.isEmpty()){
+        return "";
+      }
 
-        MessageDigest messageDigest = getMessageDigest();
+      String saltedPass = mergePasswordAndSalt(rawPass, salt, false);
+      MessageDigest messageDigest = getMessageDigest();
 
-        byte[] digest;
+      byte[] digest;
 
-        try {
-            digest = messageDigest.digest(saltedPass.getBytes("UTF-16LE"));
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("UTF-16LE not supported!");
-        }
+      try {
+        digest = messageDigest.digest(saltedPass.getBytes("UTF-16LE"));
+      } catch (UnsupportedEncodingException e) {
+        throw new IllegalStateException("UTF-16LE not supported!");
+      }
 
-//         System.out.println("ZZZZ Base64 ["
-//         + new String(Base64.encodeBase64(digest)) + "] Hex = ["
-//         + new String(Hex.encodeHex(digest)) + "]");
-        if (getEncodeHashAsBase64()) {
-            return new String(Base64.encodeBase64(digest));
-        } else {
-            return new String(Hex.encodeHex(digest));
-        }
+      System.out.println("digest: " + new String(digest));
+      if (getEncodeHashAsBase64()) {
+        return new String(Base64.encodeBase64(digest));
+      } else {
+        return new String(Hex.encodeHex(digest));
+      }
     }
 
     public boolean isPasswordValid(String encPass, String rawPass, Object salt)
     {
-        String pass1 = "" + encPass;
-        String pass2 = encodePassword(rawPass, salt);
-
-//         System.out.println("ZZZZ rawPass= [" + rawPass + "] pass1 = [" +
-//         pass1
-//         + "] pass2 = [" + pass2 + "]");
-
-        return pass1.equals(pass2);
-    }
-
-    public static void main(String... strings)
-    {
-
-        LucidDBEncoder te = new LucidDBEncoder(256);
-        te.setEncodeHashAsBase64(true);
-        System.out.println(te.encodePassword("", null));
-        System.out.println(te.isPasswordValid(
-            "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
-            "",
-            null));
+      String[] parts = rawPass.split(":", 3);
+      // pw_token, salt, uuid
+      if (parts.length != 3)
+        return false;
+      if (hexHash(parts[1] + encPass).equals(parts[0])) {
+        //         ^salt     ^dbpass         ^pw_token
+        return true;
+      }
+      return false;
     }
 
 }
