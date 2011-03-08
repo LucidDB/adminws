@@ -18,8 +18,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 package com.dynamobi.ws.util;
 
-import org.apache.commons.codec.binary.Base64;
-
 import java.lang.ClassNotFoundException;
 import java.sql.SQLException;
 import java.sql.DriverManager;
@@ -27,20 +25,13 @@ import java.sql.Connection;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Properties;
 import java.io.InputStream;
 import java.io.IOException;
 
 // Base class
 import org.springframework.security.userdetails.jdbc.JdbcDaoImpl;
-
-import org.springframework.security.userdetails.User;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.GrantedAuthority;
-
 import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContextHolder;
 
 import org.apache.commons.dbcp.BasicDataSource;
 
@@ -50,7 +41,6 @@ public class ConnectionManager extends JdbcDaoImpl {
 
   // conns stores per-session Connections,
   // stored by UUID, then username and the connection.
-
   private static Map<String, ConnectionInfo> conns;
 
   private static String jdbc_driver;
@@ -58,6 +48,11 @@ public class ConnectionManager extends JdbcDaoImpl {
 
   private ConnectionGC GC;
 
+  /**
+   * Constructor sets up the dataSource manager for the connections which
+   * validate other connections and starts the garbage collector for
+   * user connections.
+   */
   public ConnectionManager() throws ClassNotFoundException, SQLException, IOException {
     super();
 
@@ -91,13 +86,17 @@ public class ConnectionManager extends JdbcDaoImpl {
     // check to close stuff every 5 mins, invalidation time is 1 hr
   }
 
+  /**
+   * Called when the server shuts down,
+   * cleans up the connection resources.
+   */
   public void cleanup() throws SQLException {
     data_source.close();
 
     GC_close_all();
   }
 
-  public static synchronized void GC_close_old(long invalid) throws SQLException {
+  protected static synchronized void GC_close_old(long invalid) throws SQLException {
     for (Map.Entry<String, ConnectionInfo> conn : conns.entrySet()) {
       if (!conn.getValue().closed && !conn.getValue().busy &&
           conn.getValue().older_than(invalid)) {
@@ -107,7 +106,7 @@ public class ConnectionManager extends JdbcDaoImpl {
     }
   }
 
-  public static synchronized void GC_close_all() throws SQLException {
+  protected static synchronized void GC_close_all() throws SQLException {
     for (Map.Entry<String, ConnectionInfo> conn : conns.entrySet()) {
       if (!conn.getValue().closed) {
         conn.getValue().connection.close();
@@ -117,6 +116,12 @@ public class ConnectionManager extends JdbcDaoImpl {
     conns = new HashMap<String, ConnectionInfo>();
   }
 
+  /**
+   * Used by the caller to get their Connection resource.
+   * This will block if the connection is not available yet.
+   * @param auth - Spring authentication for the caller.
+   * @return Either a new SQL Connection or one previously created.
+   */
   public static Connection request_connection(Authentication auth)
       throws SQLException, ClassNotFoundException, InterruptedException {
     String uname = auth.getName();
@@ -170,6 +175,9 @@ public class ConnectionManager extends JdbcDaoImpl {
     }
   }
 
+  /**
+   * Actually creates the SQL Connection using the driver manager class.
+   */
   private static Connection stupid_connection(String uname, String pw)
       throws SQLException, ClassNotFoundException {
     Class.forName(jdbc_driver);
@@ -177,6 +185,12 @@ public class ConnectionManager extends JdbcDaoImpl {
     return c;
   }
 
+  /**
+   * Used by the caller to signal that they are done with the connection
+   * and allow other tasks to use it.
+   * @param auth - the caller's Spring authentication.
+   * @param c - the connection to release
+   */
   public static void release_connection(Authentication auth, Connection c)
       throws SQLException {
     String[] parts = auth.getCredentials().toString().split(":", 4);
@@ -233,12 +247,14 @@ public class ConnectionManager extends JdbcDaoImpl {
   }
 
   protected class ConnectionGC extends Thread {
-    private long secs_to_check;
-    private long secs_invalidated;
-    public ConnectionGC(long secs_to_check, long secs_invalidated) {
+    private long sex_to_check; // how many seconds to wait before checking conns
+    private long sex_invalidated; // amount of seconds needed to mark a conn
+    // for closing.
+
+    public ConnectionGC(long sex_to_check, long sex_invalidated) {
       setDaemon(true);
-      this.secs_to_check = secs_to_check;
-      this.secs_invalidated = secs_invalidated;
+      this.sex_to_check = sex_to_check;
+      this.sex_invalidated = sex_invalidated;
       start();
     }
 
@@ -246,9 +262,9 @@ public class ConnectionManager extends JdbcDaoImpl {
       while(true) {
         try {
           // daemon fell asleep!
-          sleep(secs_to_check);
+          sleep(sex_to_check);
           // daemon woke up!
-          GC_close_old(secs_invalidated);
+          GC_close_old(sex_invalidated);
         } catch (InterruptedException e) {
           throw new RuntimeException("SEVERE: Garbage collector broke.");
         } catch (SQLException e) {
