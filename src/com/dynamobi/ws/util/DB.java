@@ -191,14 +191,22 @@ public class DB {
         if (ps != null) {
           ps.close();
         }
+      } catch (SQLException ex1) {
+        ex1.printStackTrace();
+      }
+      try {
         if (conn != null) {
           release_connection(conn);
         }
+      } catch (SQLException ex2) {
+        ex2.printStackTrace();
+      }
+      try {
         if (rs != null) {
           rs.close();
         }
-      } catch (SQLException ex) {
-        ex.printStackTrace();
+      } catch (SQLException ex3) {
+        ex3.printStackTrace();
       }
     }
   }

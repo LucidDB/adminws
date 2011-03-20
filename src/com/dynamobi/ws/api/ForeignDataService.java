@@ -159,6 +159,25 @@ public interface ForeignDataService {
       @PathParam("to_schema") String to_schema,
       List<String> tables) throws AppException;
 
+  /**
+   * Called to physically copy the data at a foreign table into a local
+   * LucidDB table. This is done when creating a data warehouse.
+   *
+   * @param catalog - catalog of foreign table
+   * @param from_schema - schema of foreign table
+   * @param from_table - foreign table name
+   * @param to_schema - schema to copy to
+   * @param to_table - table to copy into (will create if it doesn't exist)
+   */
+  @WebMethod
+  @POST
+  @Path("/tables/copy/{catalog}/{from_schema}/{from_table}/{to_schema}/{to_table}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public String copyForeignTable(@PathParam("catalog") String catalog,
+      @PathParam("from_schema") String from_schema,
+      @PathParam("from_table") String from_table,
+      @PathParam("to_schema") String to_schema,
+      @PathParam("to_table") String to_table) throws AppException;
 
 
 }

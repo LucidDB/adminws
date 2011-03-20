@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import com.dynamobi.ws.api.ForeignDataService;
 import com.dynamobi.ws.domain.WrapperOptions;
 import com.dynamobi.ws.domain.RemoteData;
+import com.dynamobi.ws.domain.XMLStructure;
 
 import com.dynamobi.ws.util.AppException;
 import com.dynamobi.ws.util.DB;
@@ -184,7 +185,19 @@ public class ForeignDataServiceImpl implements ForeignDataService {
   public String importForeignSchema(String server, String from_schema,
       String to_schema,
       List<String> tables) throws AppException {
-    if (from_schema == null || from_schema.equals("")) from_schema = "";
+    if (from_schema == null || from_schema.equals("")) {
+      String q = DB.select("option_value","sys_root.dba_foreign_server_options",
+          DB.populate(
+            "foreign_server_name={0,lit} and option_name='SCHEMA_NAME'",
+            server));
+      XMLStructure sch_name = new XMLStructure("schema_name");
+      DB.execute(q, sch_name);
+      try {
+        from_schema = sch_name.row_data.get(0);
+      } catch (IndexOutOfBoundsException e) {
+        from_schema = "";
+      }
+    }
     String query = DB.populate("IMPORT FOREIGN SCHEMA {0,id}", from_schema);
     if (tables.size() > 0) {
       query += " LIMIT TO (";
@@ -197,9 +210,54 @@ public class ForeignDataServiceImpl implements ForeignDataService {
       query += ")";
     }
     query += DB.populate(" FROM SERVER {0,str} INTO {1,id}", server, to_schema);
-    //System.out.println(query);
+    return DB.execute_success(query);
+  }
+
+  public String copyForeignTable(String catalog, String from_schema,
+      String from_table, String to_schema, String to_table) throws AppException
+  {
+    // do we need to create to_table?
+    String q = DB.select("table_name",
+        "sys_root.dba_tables",
+        DB.populate("catalog_name={0,lit} and schema_name={1,lit} and " +
+          "table_name={2,lit}", catalog, to_schema, to_table));
+    XMLStructure exist_check = new XMLStructure("tab");
+    DB.execute(q, exist_check);
+    boolean create = false;
+    try {
+      exist_check.row_data.get(0);
+    } catch (IndexOutOfBoundsException e) {
+      create = true;
+    }
+
+    String create_success = "";
+    if (create) {
+      // get structure of from table
+      q = DB.select("statement", DB.populate(
+          "table(sys_root.generate_ddl_for_table({0,lit}, {1, lit}, {2, lit}))",
+            catalog, from_schema, from_table));
+      XMLStructure stmt = new XMLStructure("stmt");
+      DB.execute(q, stmt);
+      StringBuilder create_stmt = new StringBuilder();
+      for (String row : stmt.row_data) {
+        if (row.indexOf("FOREIGN TABLE") != -1) {
+          row = row.replaceFirst("FOREIGN TABLE ",
+              DB.populate("TABLE {0,id}.", catalog));
+          row = row.replaceFirst(from_schema, to_schema).replaceFirst(
+              from_table, to_table);
+        }
+        if (row.indexOf("SERVER \"") != -1)
+          break;
+        create_stmt.append(row + "\n");
+      }
+      create_success = DB.execute_success(create_stmt.toString());
+    }
+
+    String query = DB.populate("insert into {0,id}.{1,id}.{2,id} ", catalog,
+        to_schema, to_table);
+    query += DB.populate("select * from {0,id}.{1,id}.{2,id}", catalog,
+        from_schema, from_table);
     return DB.execute_success(query);
   }
 
 }
-

@@ -22,6 +22,7 @@ import com.dynamobi.ws.domain.DBLoader;
 import com.dynamobi.ws.util.DB;
 import java.sql.*;
 import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
 
 /**
  * Useful structure for wrapping up some db values
@@ -37,6 +38,8 @@ public class XMLStructure extends DBLoader<XMLStructure> {
 
   public String result;
 
+  public ArrayList<String> row_data;
+
   private StringBuffer result_builder;
 
   private String root, child;
@@ -47,6 +50,8 @@ public class XMLStructure extends DBLoader<XMLStructure> {
     result_builder = new StringBuffer("<" + root_node + ">\n");
     if (child_node.equals(""))
       result_builder.append("<![CDATA[\n");
+
+    row_data = new ArrayList<String>();
   }
 
   public XMLStructure() {
@@ -65,6 +70,7 @@ public class XMLStructure extends DBLoader<XMLStructure> {
     if (child.equals("")) {
       String stmt = rs.getString(1);
       result_builder.append(stmt + "\n");
+      row_data.add(stmt);
     } else {
       String[] child_parts = child.split(" ");
       String node = child_parts[0];
@@ -75,6 +81,7 @@ public class XMLStructure extends DBLoader<XMLStructure> {
         val = (val == null) ? "" : val.replaceAll("\"", "&quot;");
         result_builder.append(
             DB.populate("{0,str}={1,id} ", child_parts[i], val));
+        row_data.add(val);
       }
       result_builder.append("/>\n");
     }
