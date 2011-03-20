@@ -151,13 +151,14 @@ public interface ForeignDataService {
    */
   @WebMethod
   @POST
-  @Path("/servers/import/{server}/{from_schema}/{to_schema}")
+  @Path("/servers/import/{server}/{from_schema}/{to_schema}/{copy_local}")
   @RolesAllowed( {"Admin", "Authenticated"} )
   @Consumes ("application/xml")
   public String importForeignSchema(@PathParam("server") String server,
       @PathParam("from_schema") String from_schema,
       @PathParam("to_schema") String to_schema,
-      List<String> tables) throws AppException;
+      List<String> tables, @PathParam("copy_local") boolean copy_local)
+      throws AppException;
 
   /**
    * Called to physically copy the data at a foreign table into a local
