@@ -41,7 +41,7 @@ public class ConnectionManager extends JdbcDaoImpl {
 
   // conns stores per-session Connections,
   // stored by UUID, then username and the connection.
-  private static Map<String, ConnectionInfo> conns;
+  public static Map<String, ConnectionInfo> conns;
 
   private static String jdbc_driver;
   private static String jdbc_url;
@@ -126,19 +126,21 @@ public class ConnectionManager extends JdbcDaoImpl {
       throws SQLException, ClassNotFoundException, InterruptedException {
     String uname = auth.getName();
     String pw = null;
-    String[] parts = auth.getCredentials().toString().split(":", 4);
+    String[] parts = auth.getCredentials().toString().split(":", 2);
+    // uuid, optionally password
     boolean first;
-    if (parts.length == 4) { // a first call, possibly
+    if (parts.length == 2) { // a first call, possibly
       first = true;
-      pw = parts[3];
-    } else if (parts.length == 3) { // subsequent calls
+      pw = parts[1];
+    } else if (parts.length == 1) { // subsequent calls
       first = false;
     } else { // wtf? (They shouldn't have gotten this far, something is wrong.)
       throw new SQLException("SEVERE: Server received unexpected invalid " +
           "authentication token.");
     }
 
-    String uuid = parts[2];
+    String uuid = parts[0];
+    System.out.println(uuid);
     if (conns.containsKey(uuid) && !first) {
       ConnectionInfo info = conns.get(uuid);
       if (info.uname.equals(uname)) {
@@ -193,11 +195,11 @@ public class ConnectionManager extends JdbcDaoImpl {
    */
   public static void release_connection(Authentication auth, Connection c)
       throws SQLException {
-    String[] parts = auth.getCredentials().toString().split(":", 4);
-    if (parts.length < 3) {
+    String[] parts = auth.getCredentials().toString().split(":", 2);
+    if (parts.length < 1) {
       throw new SQLException("SEVERE: Authentication changed.");
     }
-    String uuid = parts[2];
+    String uuid = parts[0];
     if (!conns.containsKey(uuid)) {
       throw new SQLException("SEVERE: Missing ConnectionInfo object for UUID " + uuid);
     }

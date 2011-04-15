@@ -47,7 +47,6 @@ public class LucidDBEncoder
       return hex.toString();
     }
 
-    // DEPRECATED
     public String encodePassword(String rawPass, Object salt)
     {    
       // support a case: password is null.   
@@ -66,7 +65,6 @@ public class LucidDBEncoder
         throw new IllegalStateException("UTF-16LE not supported!");
       }
 
-      System.out.println("digest: " + new String(digest));
       if (getEncodeHashAsBase64()) {
         return new String(Base64.encodeBase64(digest));
       } else {
@@ -76,15 +74,17 @@ public class LucidDBEncoder
 
     public boolean isPasswordValid(String encPass, String rawPass, Object salt)
     {
-      String[] parts = rawPass.split(":", 3);
-      // pw_token, salt, uuid
-      if (parts.length != 3)
+      String[] parts = rawPass.split(":", 2);
+      // uuid, optional pw
+      if (parts.length < 1)
         return false;
-      if (hexHash(parts[1] + encPass).equals(parts[0])) {
-        //         ^salt     ^dbpass         ^pw_token
+      else if (parts.length == 2 &&
+          encodePassword(parts[1], salt).equals(encPass)) {
+        //                  ^pw                  ^dbpass
         return true;
+      } else { // try a UUID lookup
+        return ConnectionManager.conns.containsKey(parts[0]);
       }
-      return false;
     }
 
 }
