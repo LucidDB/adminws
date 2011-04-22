@@ -17,10 +17,33 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 -->
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans 
+     xmlns="http://www.springframework.org/schema/beans"
+     xmlns:security="http://www.springframework.org/schema/security"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.springframework.org/schema/beans      
+               http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.springframework.org/schema/security
+               http://www.springframework.org/schema/security/spring-security-2.0.xsd">
+
+
+<!--
+ <security:http>
+    <security:intercept-url pattern="/**" access="isAuthenticated()" />
+    <security:http-basic />
+  </security:http>
+
+-->
+
+    <security:authentication-provider user-service-ref="userDetailsService">
+	<security:password-encoder ref="passwordEncoder"/>
+    </security:authentication-provider>
+
+
+<!-- 
 	<bean id="daoAuthenticationProvider"
 		class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
+<security:custom-authentication-provider />
 		<property name="userDetailsService">
 			<ref bean="userDetailsService" />
 		</property>
@@ -28,8 +51,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 			<ref bean="passwordEncoder" />
 		</property>
 	</bean>
+-->
 
-  <bean id="userDetailsService" class="com.dynamobi.ws.util.ConnectionManager" destroy-method="cleanup">
+  <bean id="userDetailsService" class="org.springframework.security.userdetails.jdbc.JdbcDaoImpl" destroy-method="cleanup">
 		<property name="authoritiesByUsernameQuery">
 			<value>
 				<![CDATA[select username, authority from 
@@ -45,6 +69,9 @@ where username = ?]]>
 				<![CDATA[SELECT username, case when password is null then '' else password end as password, enabled FROM (select "name" as username, "encryptedPassword" as password, true as enabled from sys_fem."Security"."User") spring_users WHERE username = ? ORDER BY username]]>
 			</value>
 		</property>
+		<property name="dataSource">
+			<ref bean="dataSource"/>
+		</property>
 	</bean>
 	
     
@@ -53,5 +80,18 @@ where username = ?]]>
 		<property name="encodeHashAsBase64" value="true" />
 		<constructor-arg value="256" />
 	</bean>
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName"> <value>org.luciddb.jdbc.LucidDbClientDriver</value> </property>
+    <property name="url"> <value>jdbc:luciddb:http://localhost</value> </property>
+   <property name="username" value="sa"/>
+   <property name="password" value=""/>
+  </bean>
+
+ 	 <bean id="myDataSource" class="org.springframework.jdbc.datasource.UserCredentialsDataSourceAdapter">
+   <property name="targetDataSource" ref="dataSource"/>
+ </bean>	
+
+<bean id="sessionConnection" class="com.dynamobi.ws.util.DBSessionHolder" scope="session" destroy-method="cleanup"></bean>
 
 </beans>

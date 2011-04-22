@@ -49,18 +49,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 			<springImport file="security-beans.xml" />
 		</spring-app>
 	</modules>
-  <webapp mergeWebXML="web2.xml">
+  <webapp>
 		<resources dir="${basedir}/src" pattern="*.properties" />
-		<manifest>
-			<attribute name="Bundle-ManifestVersion" value="2" />
-			<attribute name="Bundle-SymbolicName"
-				value="com.dynamobi.ws.admin" />
-			<attribute name="Import-Package"
-				value="javax.servlet,javax.servlet.http, javax.xml.transform, javax.xml.transform.stream, org.xml.sax, org.xml.sax.helpers" />
-			<attribute name="Export-Package" value="com.dynamobi.api" />
-			<attribute name="Webapp-Context" value="wsadmin" />
-			<attribute name="Bundle-ClassPath"
-				value="WEB-INF/classes, . , WEB-INF/" />
-		</manifest>
+<globalServletFilter name="requestContextServlet" classname="org.springframework.web.filter.RequestContextFilter"/>
+<globalServletFilter name="springSecurityFilterChain" classname="org.springframework.web.filter.DelegatingFilterProxy"/>
 	</webapp>
 </enunciate>

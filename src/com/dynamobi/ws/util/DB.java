@@ -23,10 +23,22 @@ import java.util.*;
 
 import java.io.FileNotFoundException;
 
-import com.dynamobi.ws.domain.*;
+import javax.sql.DataSource;
 
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.security.Authentication;
 import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.userdetails.UserDetailsService;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.util.WebAppRootListener;
+
+import com.dynamobi.ws.domain.DBLoader;
+import com.dynamobi.ws.domain.SuccessQuery;
 
 public class DB {
 
@@ -37,27 +49,15 @@ public class DB {
   public static Connection getConnection()
     throws ClassNotFoundException, SQLException, FileNotFoundException
   {
-    final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    Connection conn;
+    
+    
+    //DataSource myDataSource;
+    WebApplicationContext wac = ContextLoader.getCurrentWebApplicationContext();
+    DBSessionHolder dsh = (DBSessionHolder) wac.getBean("sessionConnection");
+    
+    return dsh.getSessionConnection();    
 
-    if (auth != null) {
-      try {
-        conn = ConnectionManager.request_connection(auth);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-        throw new SQLException("Could not authenticate, connection in use.");
-      }
-    } else {
-      throw new SQLException("Could not authenticate.");
-    }
-
-    return conn;
-  }
-
-  public static void release_connection(Connection c) throws SQLException {
-    final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    Connection conn;
-    ConnectionManager.release_connection(auth, c);
+   
   }
 
   /**
@@ -194,13 +194,7 @@ public class DB {
       } catch (SQLException ex1) {
         ex1.printStackTrace();
       }
-      try {
-        if (conn != null) {
-          release_connection(conn);
-        }
-      } catch (SQLException ex2) {
-        ex2.printStackTrace();
-      }
+      
       try {
         if (rs != null) {
           rs.close();

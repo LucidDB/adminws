@@ -22,12 +22,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 <project default="enunciate">
 	
   <!-- <property name="webapp.dir" value="/var/lib/jetty/webapps/"/> -->
-    <property name="webapp.dir" value="/Users/ngoodman/pentaho/biserver-ce-3.6.0/biserver-ce/tomcat/webapps"/> 
+    <property name="webapp.dir" value="/Users/ngoodman/pentaho/biserver-ee-3.8.0.GA/biserver-ee/tomcat/webapps"/> 
 	<!-- <property name="webapp.dir" value="D:\\dev\\jetty-6.1.7\\webapps"/> -->
 
 
   <!--The ${enunciate.home} property should point to the Enunciate home distribution directory. -->
-  <property name="FLEX_HOME" value="/home/kevin/Desktop/flex_sdk_4" />
+  <property name="FLEX_HOME" value="/Applications/Adobe Flash Builder 4 Plug-in/sdks/4.1.0" />
   <property name="enunciate.home" value="${basedir}"/>
   <target name="clean">
     <delete dir="${basedir}/target"></delete>

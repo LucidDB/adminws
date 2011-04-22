@@ -18,7 +18,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 package com.dynamobi.ws.util;
 
+import org.springframework.jdbc.datasource.UserCredentialsDataSourceAdapter;
 import org.springframework.security.providers.encoding.ShaPasswordEncoder;
+import org.springframework.security.userdetails.UserDetailsService;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -35,56 +39,65 @@ public class LucidDBEncoder
         super(strength);
     }
 
-    private String hexHash(String str) {
-      MessageDigest md = getMessageDigest();
-      byte[] mdbytes = md.digest(str.getBytes());
-      StringBuffer hex = new StringBuffer();
-      for (int i = 0; i < mdbytes.length; i++) {
-        String add = Integer.toHexString(0xFF & mdbytes[i]);
-        if (add.length() == 1) hex.append(0);
-        hex.append(add);
-      }
-      return hex.toString();
-    }
-
     public String encodePassword(String rawPass, Object salt)
     {    
-      // support a case: password is null.   
-      if(rawPass.isEmpty()){
-        return "";
-      }
+        // support a case: password is null.   
+        if(rawPass.isEmpty()){
+        	return "";
+        }
+            	
+    	String saltedPass = mergePasswordAndSalt(rawPass, salt, false);
 
-      String saltedPass = mergePasswordAndSalt(rawPass, salt, false);
-      MessageDigest messageDigest = getMessageDigest();
+        MessageDigest messageDigest = getMessageDigest();
 
-      byte[] digest;
+        byte[] digest;
 
-      try {
-        digest = messageDigest.digest(saltedPass.getBytes("UTF-16LE"));
-      } catch (UnsupportedEncodingException e) {
-        throw new IllegalStateException("UTF-16LE not supported!");
-      }
+        try {
+            digest = messageDigest.digest(saltedPass.getBytes("UTF-16LE"));
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("UTF-16LE not supported!");
+        }
 
-      if (getEncodeHashAsBase64()) {
-        return new String(Base64.encodeBase64(digest));
-      } else {
-        return new String(Hex.encodeHex(digest));
-      }
+//         System.out.println("ZZZZ Base64 ["
+//         + new String(Base64.encodeBase64(digest)) + "] Hex = ["
+//         + new String(Hex.encodeHex(digest)) + "]");
+        if (getEncodeHashAsBase64()) {
+            return new String(Base64.encodeBase64(digest));
+        } else {
+            return new String(Hex.encodeHex(digest));
+        }
     }
 
     public boolean isPasswordValid(String encPass, String rawPass, Object salt)
     {
-      String[] parts = rawPass.split(":", 2);
-      // uuid, optional pw
-      if (parts.length < 1)
-        return false;
-      else if (parts.length == 2 &&
-          encodePassword(parts[1], salt).equals(encPass)) {
-        //                  ^pw                  ^dbpass
-        return true;
-      } else { // try a UUID lookup
-        return ConnectionManager.conns.containsKey(parts[0]);
-      }
+        String pass1 = "" + encPass;
+        String pass2 = encodePassword(rawPass, salt);
+
+//         System.out.println("ZZZZ rawPass= [" + rawPass + "] pass1 = [" +
+//         pass1
+//         + "] pass2 = [" + pass2 + "]");
+        
+        // We were successful, update session bean.
+        if  (pass1.equals(pass2) ) {
+        	WebApplicationContext wac = ContextLoader.getCurrentWebApplicationContext();
+  		  
+        	UserCredentialsDataSourceAdapter ds = (UserCredentialsDataSourceAdapter) wac.getBean("myDataSource");
+        	ds.setPassword(rawPass);
+        }
+
+        return pass1.equals(pass2);
+    }
+
+    public static void main(String... strings)
+    {
+
+        LucidDBEncoder te = new LucidDBEncoder(256);
+        te.setEncodeHashAsBase64(true);
+        System.out.println(te.encodePassword("", null));
+        System.out.println(te.isPasswordValid(
+            "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+            "",
+            null));
     }
 
 }

@@ -128,9 +128,7 @@ public class DBAccess
                 if (ps != null) {
                     ps.close();
                 }
-                if (conn != null) {
-                    DB.release_connection(conn);
-                }
+                
 
             } catch (SQLException ex) {
 
@@ -194,10 +192,7 @@ public class DBAccess
                 if (ps != null) {
                     ps.close();
                 }
-                if (conn != null) {
-                    DB.release_connection(conn);
-                }
-
+        
             } catch (SQLException ex) {
 
                 throw new AppException("Error Info: Release db resouce failed");
@@ -252,9 +247,7 @@ public class DBAccess
                 if (ps != null) {
                     ps.close();
                 }
-                if (conn != null) {
-                    DB.release_connection(conn);
-                }
+
 
             } catch (SQLException ex) {
 
@@ -323,9 +316,6 @@ public class DBAccess
                 }
                 if (ps != null) {
                     ps.close();
-                }
-                if (conn != null) {
-                    DB.release_connection(conn);
                 }
 
             } catch (SQLException ex) {
@@ -432,9 +422,7 @@ public class DBAccess
                 if (ps != null) {
                     ps.close();
                 }
-                if (conn != null) {
-                    DB.release_connection(conn);
-                }
+
 
             } catch (SQLException ex) {
 
@@ -610,9 +598,7 @@ public class DBAccess
                 if (ps != null) {
                     ps.close();
                 }
-                if (conn != null) {
-                    DB.release_connection(conn);
-                }
+
 
             } catch (SQLException ex) {
 
@@ -901,9 +887,7 @@ public class DBAccess
                 if (ps != null) {
                     ps.close();
                 }
-                if (conn != null) {
-                    DB.release_connection(conn);
-                }
+               
 
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -1032,9 +1016,7 @@ public class DBAccess
                 if (ps != null) {
                     ps.close();
                 }
-                if (conn != null) {
-                    DB.release_connection(conn);
-                }
+
 
             } catch (SQLException ex) {
 
@@ -1084,17 +1066,6 @@ public class DBAccess
         throw ex;
       } catch (Exception ex) {
         ex.printStackTrace();
-      } finally {
-        DB.release_connection(conn);
-        /*try {
-          if (ps != null) {
-            //ps.close();
-          }
-          if (conn != null) {
-          }
-        } catch (SQLException ex) {
-          ex.printStackTrace();
-        }*/
       }
       return rs;
     }
@@ -1243,9 +1214,6 @@ public class DBAccess
                 }
                 if (ps != null) {
                     ps.close();
-                }
-                if (conn != null) {
-                    DB.release_connection(conn);
                 }
 
             } catch (SQLException ex) {
