@@ -1,0 +1,279 @@
+/*#############################################################
+Name: Transparentia
+Date: 2006-08-20
+Description: Simple, lightweight and slightly blue.
+Author: Viktor Persson
+URL: http://templates.arcsin.se
+
+Feel free to use and modify but please provide credits.
+#############################################################*/
+
+
+/* title */
+.title {
+	background: url(img/logo-dynamoDB.png);
+	z-index: 1;
+	background-repeat:no-repeat;
+	background-position: 50px 35px;
+
+}
+
+/* standard elements */
+* {
+	margin: 0;
+	padding: 0;
+}
+a {
+	color: #66808C;
+	text-decoration: none;
+}
+a:hover {
+	color:#47606D;
+}
+body {
+	background: #EEE;
+	color: #444;
+	font: normal 62.5% "Lucida Sans Unicode",sans-serif;
+	margin: 0;
+}
+input {
+	color: #555;
+	font: normal 1.1em "Lucida Sans Unicode",sans-serif;
+}
+p,cite,code,ul {
+	font-size: 1.2em;
+	padding-bottom: 1.2em;
+}
+ul ul {
+  font-size: 1em;
+  padding-bottom: 0;
+}
+h1 {
+	font-size: 1.4em;
+	margin-bottom: 4px;
+}
+h2 {
+  font-size: 1.2em;
+}
+code {
+	background: url(img/bgcode.gif);
+	border: 1px solid #F0F0F0;
+	border-left: 6px solid #39F;
+	color: #555;
+	display: block;
+	font: normal 1.1em "Lucida Sans Unicode",serif;
+	margin-bottom: 12px;
+	padding: 8px 10px;
+	white-space: pre;
+  overflow: auto;
+  max-height: 300px;
+}
+cite {
+	background: url(img/quote.gif) no-repeat;
+	color: #666;
+	display: block;
+	font: normal 1.3em "Lucida Sans Unicode",serif;
+	padding-left: 28px;
+}
+h1,h2,h3 {
+	color: #47606D;
+	padding-top: 6px;
+	font-weight: normal;
+}
+
+/* misc */
+.clearer {
+	clear: both;
+}
+.deprecated {
+  color: red;
+}
+.errortext {
+  color: red;
+  padding: 6px 12px;
+  font-variant:small-caps;
+}
+
+/* structure */
+.container {
+	background: url(img/bgcontainer.gif) repeat-y;
+	margin: 0 auto;
+	padding-bottom: 6px;
+	width: 767px;
+}
+.header {
+	background: url(img/header.gif) repeat-x;
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+	border-radius: 20px;
+}
+
+/* title */
+.title h1 {
+	color: #FFF;
+	height: 150px;
+	line-height: 145px;
+	margin-bottom: 8px;
+	text-indent: 190px;
+	font-size: 35px;
+	font-weight: normal;
+	font-family:'Myriad Pro', 'Lucida Grande', 'Lucida Sans Unicode', 'Trebuchet MS', Arial;
+
+}
+
+/* main */
+.main {
+	clear: both;
+	padding: 8px 18px;
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+	border-radius: 20px;
+}
+
+/* main left */
+.sidenav h1,.sidenav ul {
+	padding-left: 12px;
+}
+.sidenav {
+	background: #EEE;
+	border: 1px solid #E5E5E5;
+	float: left;
+	width: 200px;
+	margin-top: -8px;
+}
+.sidenav h1 {
+	color: #47606D;
+	font-weight: normal;
+	font-size: 13px;
+	height: 20px;
+	margin-top: 1.2em;
+	width: 180px;
+}
+.sidenav ul {
+	border-top: 1px solid #FAFAFA;
+	background: url(img/bgul.gif) repeat-x;
+	margin: 0;
+	padding: 0;
+  overflow: auto;
+}
+.sidenav li {
+	border: 1px solid #FAFAFA;
+	border-top: none;
+	list-style: none;
+	margin: 0;
+}
+.sidenav li a {
+	color: #777;
+	display: block;
+	font-size: 0.9em;
+	padding: 3px 6px 3px 14px;
+	text-decoration: none;
+}
+.sidenav li a:hover {
+	color: #111;
+}
+
+/* content */
+.content {
+	float: right;
+	width: 520px;
+}
+.content .item {
+	padding: 6px 12px;
+	border: 1px solid #EEE;
+	background: #FFF;
+	margin-bottom: 38px;
+}
+.content .descr {
+	color: #333;
+}
+.content li {
+	list-style: url(img/li.gif);
+	margin-left: 18px;
+}
+.content table {
+	background: url(img/bgcode.gif);
+	border: 1px solid #F0F0F0;
+	border-left: 6px solid #66808C;
+	color: #555;
+	display: block;
+	font: normal 1.1em "Lucida Sans Unicode",serif;
+	margin-bottom: 12px;
+	padding: 8px 10px;
+}
+.content table tr td {
+  vertical-align:top;
+  text-align:left;
+  padding: 3px 3px 3px 3px;
+}
+.content table tr th {
+  vertical-align:top;
+  text-align:left;
+  padding: 3px 3px 3px 3px;
+}
+.content h1 {
+  color:#47606D;
+	margin-top: 25px;
+	font-weight: normal;
+	font-size: 13px;
+
+}
+.content h1 a {
+  color: #666;
+}
+.subcontent {
+  background: url(img/bgcode.gif);
+  border: 1px solid #F0F0F0;
+  border-left: 6px solid #39F;
+  color: #555;
+  display: block;
+  font: normal 1.1em "Lucida Sans Unicode",serif;
+  margin-bottom: 12px;
+  padding: 8px 10px;
+}
+.example
+
+/* footer */
+.footer {
+	background: #FFF;
+	border: 1px solid #EEE;
+	color: #666;
+	font-size: 1.1em;
+	margin: 0 auto;
+	text-align: center;
+	padding: 6px;
+	width: 720px;
+}
+.footer a {
+	color:#00AEEF;
+	text-decoration: none;
+}
+.footer a:hover {
+	color: #00AEEF;
+}
+
+/* widecontent (content with no sidenav) */
+.widecontent {
+	background: #FFF;
+	border: 1px solid #EEE;
+	color: #666;
+	font-size: 1.1em;
+	margin: 0 auto;
+	padding: 6px;
+	width: 720px;
+}
+.widecontent a {
+	color: #36C;
+	text-decoration: none;
+}
+.widecontent a:hover {
+	color: #06F;
+	text-decoration: underline;
+}
+.widecontent h1 {
+  padding: 6px 12px;
+  text-decoration:underline;
+}
+.widecontent form {
+  padding: 6px 12px;
+}
