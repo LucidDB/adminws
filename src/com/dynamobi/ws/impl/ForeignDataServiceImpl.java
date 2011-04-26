@@ -29,6 +29,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.dynamobi.ws.api.ForeignDataService;
+import com.dynamobi.ws.domain.ForeignServer;
 import com.dynamobi.ws.domain.Wrapper;
 import com.dynamobi.ws.domain.WrapperOptions;
 import com.dynamobi.ws.domain.RemoteData;
@@ -275,5 +276,15 @@ public class ForeignDataServiceImpl implements ForeignDataService {
 	return DBAccess.getWrappers();
 	
   }
+
+
+public List<ForeignServer> getForeignServers(String wrapper)
+		throws AppException {
+	// TODO Auto-generated method stub
+	return DBAccess.getForeignServers(wrapper);
+}
+  
+  
+  
 
 }

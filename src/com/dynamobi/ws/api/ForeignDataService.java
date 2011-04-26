@@ -33,6 +33,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
+import com.dynamobi.ws.domain.ForeignServer;
 import com.dynamobi.ws.domain.Wrapper;
 import com.dynamobi.ws.domain.WrapperOptions;
 import com.dynamobi.ws.domain.RemoteData;
@@ -77,6 +78,18 @@ public interface ForeignDataService {
   @Path("/wrappers")
   @RolesAllowed( {"Admin", "Authenticated"} )
   public List<Wrapper> getWrappers() throws AppException;
+  
+  /**
+   * @param wrapper - Name of the foreign data wrapper.
+   * @return Returns a list of all servers for that wrapper
+   */
+  @WebMethod
+  @GET
+  @Path("/servers/getByWrapper/{wrapper}")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public List<ForeignServer> getForeignServers(
+      @PathParam("wrapper") String wrapper) throws AppException;
+  
 
   /**
    * @param wrapper - Name of the foreign data wrapper.
@@ -98,7 +111,7 @@ public interface ForeignDataService {
    */
   @WebMethod
   @GET
-  @Path("/serverss/options/{server}")
+  @Path("/servers/options/{server}")
   @RolesAllowed( {"Admin", "Authenticated"} )
   public List<WrapperOptions> getWrapperOptionsForServer(
       @PathParam("server") String server) throws AppException;

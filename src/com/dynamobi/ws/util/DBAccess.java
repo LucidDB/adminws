@@ -38,6 +38,7 @@ import com.dynamobi.ws.domain.Column;
 import com.dynamobi.ws.domain.ColumnStats;
 import com.dynamobi.ws.domain.Counter;
 import com.dynamobi.ws.domain.DBMeta;
+import com.dynamobi.ws.domain.ForeignServer;
 import com.dynamobi.ws.domain.RelNode;
 import com.dynamobi.ws.domain.Schema;
 import com.dynamobi.ws.domain.ShowPlanEntity;
@@ -565,6 +566,48 @@ public class DBAccess
         }
 
         return result.toString();
+    }
+    
+ public static List<ForeignServer> getForeignServers(String wrapper) throws AppException {
+    	
+    	List<ForeignServer> retVal = new ArrayList<ForeignServer>();
+    	
+    	Connection conn;
+    	PreparedStatement ps;
+    	ResultSet rs;
+    	
+    	 try {
+
+             conn = getConnection();
+
+             ps = conn.prepareStatement("select FOREIGN_WRAPPER_NAME, foreign_server_name "
+            		 + " , remarks"
+            		 + " from sys_root.dba_foreign_servers"
+            		 + " where foreign_wrapper_name = ?");
+             ps.setString(1, wrapper);
+             rs = ps.executeQuery();
+
+             while (rs.next()) {
+
+                 ForeignServer fs = new ForeignServer();
+                 fs.setWrapperName(rs.getString(1));
+                 fs.setName(rs.getString(2));
+                 fs.setDesc(rs.getString(3));
+                 
+                 retVal.add(fs);
+
+             }
+
+         }  catch (SQLException e) {
+
+             e.printStackTrace();
+             throw new AppException(
+                 "Error Info: The connection was bad or Execute sql statment failed!");
+         } 
+         
+         return retVal;
+         
+    	
     }
     
     public static List<Wrapper> getWrappers() throws AppException {
