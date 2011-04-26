@@ -141,6 +141,7 @@ public class FlexSQLAdminImpl
       return getRoutine(schema, "PROCEDURE");
     }
 
+    // WTF? Don't we have XML libraries for a reason?
     public String getRemoteData() {
       StringBuffer result = new StringBuffer("<wrappers>\n");
       try {

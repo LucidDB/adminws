@@ -46,6 +46,7 @@ import com.dynamobi.ws.domain.Table;
 import com.dynamobi.ws.domain.TableDetails;
 import com.dynamobi.ws.domain.TablesInfo;
 import com.dynamobi.ws.domain.SessionInfo;
+import com.dynamobi.ws.domain.Wrapper;
 
 import org.springframework.security.Authentication;
 import org.springframework.security.context.SecurityContextHolder;
@@ -73,7 +74,7 @@ public class DBAccess
     }
 
     public static Connection getConnection()
-        throws ClassNotFoundException, SQLException, FileNotFoundException
+        throws SQLException
     {
       return DB.getConnection();
     }
@@ -104,21 +105,12 @@ public class DBAccess
 
             }
 
-        } catch (ClassNotFoundException e) {
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found JDBC driver!");
         } catch (SQLException e) {
 
             e.printStackTrace();
             throw new AppException(
                 "Error Info: The connection was bad or Execute sql statment failed!");
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found jdbc.properties!");
-        } finally {
+        }  finally {
 
             try {
 
@@ -168,21 +160,12 @@ public class DBAccess
 
             }
 
-        } catch (ClassNotFoundException e) {
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found JDBC driver!");
-        } catch (SQLException e) {
+        }  catch (SQLException e) {
 
             e.printStackTrace();
             throw new AppException(
                 "Error Info: The connection was bad or Execute sql statment failed!");
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found jdbc.properties!");
-        } finally {
+        }  finally {
 
             try {
 
@@ -226,20 +209,11 @@ public class DBAccess
 
             retVal = true;
 
-        } catch (ClassNotFoundException e) {
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found JDBC driver!");
-        } catch (SQLException e) {
+        }  catch (SQLException e) {
 
             e.printStackTrace();
             throw new AppException(
                 "Error Info: The connection was bad or Execute sql statment failed!");
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found jdbc.properties!");
         } finally {
 
             try {
@@ -293,21 +267,12 @@ public class DBAccess
 
             }
 
-        } catch (ClassNotFoundException e) {
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found JDBC driver!");
-        } catch (SQLException e) {
+        }  catch (SQLException e) {
 
             e.printStackTrace();
             throw new AppException(
                 "Error Info: The connection was bad or Execute sql statment failed!");
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found jdbc.properties!");
-        } finally {
+        }  finally {
 
             try {
 
@@ -398,20 +363,11 @@ public class DBAccess
 
             }
 
-        } catch (ClassNotFoundException e) {
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found JDBC driver!");
         } catch (SQLException e) {
 
             e.printStackTrace();
             throw new AppException(
                 "Error Info: The connection was bad or Execute sql statment failed!");
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found jdbc.properties!");
         } finally {
 
             try {
@@ -609,6 +565,42 @@ public class DBAccess
         }
 
         return result.toString();
+    }
+    
+    public static List<Wrapper> getWrappers() throws AppException {
+    	
+    	List<Wrapper> retVal = new ArrayList<Wrapper>();
+    	
+    	Connection conn;
+    	PreparedStatement ps;
+    	ResultSet rs;
+    	
+    	 try {
+
+             conn = getConnection();
+
+             ps = conn.prepareStatement("select FOREIGN_WRAPPER_NAME, LIBRARY "
+            		 + "FROM SYS_ROOT.DBA_FOREIGN_WRAPPERS");
+             rs = ps.executeQuery();
+
+             while (rs.next()) {
+
+                 Wrapper w = new Wrapper(rs.getString(1), rs.getString(2));
+                 
+                 retVal.add(w);
+
+             }
+
+         }  catch (SQLException e) {
+
+             e.printStackTrace();
+             throw new AppException(
+                 "Error Info: The connection was bad or Execute sql statment failed!");
+         } 
+         
+         return retVal;
+         
+    	
     }
 
     public static String execSQL(
@@ -1190,22 +1182,12 @@ public class DBAccess
                 }
             }
 
-        } catch (ClassNotFoundException e) {
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found JDBC Driver Class!");
-
-        } catch (SQLException e) {
+        }  catch (SQLException e) {
 
             e.printStackTrace();
             throw new AppException(
                 "Error Info: The connection was bad or Execute sql statment failed!");
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-
-            e.printStackTrace();
-            throw new AppException("Error Info: Not found jdbc.properties!");
-        } finally {
+        }  finally {
 
             try {
 
@@ -1249,6 +1231,8 @@ public class DBAccess
 
         return ret.toString();
     }
+    
+
 
     private static String createColumnSQL(Column col)
     {

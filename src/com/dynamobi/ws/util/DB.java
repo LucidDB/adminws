@@ -47,7 +47,7 @@ public class DB {
   public static String connection_catalog = "";
 
   public static Connection getConnection()
-    throws ClassNotFoundException, SQLException, FileNotFoundException
+    throws SQLException
   {
     
     

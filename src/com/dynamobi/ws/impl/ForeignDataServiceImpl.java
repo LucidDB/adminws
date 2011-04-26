@@ -29,12 +29,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.dynamobi.ws.api.ForeignDataService;
+import com.dynamobi.ws.domain.Wrapper;
 import com.dynamobi.ws.domain.WrapperOptions;
 import com.dynamobi.ws.domain.RemoteData;
 import com.dynamobi.ws.domain.XMLStructure;
 
 import com.dynamobi.ws.util.AppException;
 import com.dynamobi.ws.util.DB;
+import com.dynamobi.ws.util.DBAccess;
 
 /**
  * ForeignDataService implementation
@@ -64,6 +66,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
     DB.execute(query, first, options_list);
     return options_list;
   }
+  
 
   public List<WrapperOptions> getExtendedWrapperOptions(String wrapper,
       String driver) throws AppException {
@@ -265,6 +268,12 @@ public class ForeignDataServiceImpl implements ForeignDataService {
     query += DB.populate("select * from {0,id}.{1,id}.{2,id}", catalog,
         from_schema, from_table);
     return DB.execute_success(query);
+  }
+
+  public List<Wrapper> getWrappers() throws AppException {
+	// TODO Auto-generated method stub
+	return DBAccess.getWrappers();
+	
   }
 
 }
