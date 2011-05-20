@@ -23,10 +23,12 @@ import javax.jws.WebMethod;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.QueryParam;
 
 import com.dynamobi.ws.domain.*;
 
@@ -79,12 +81,13 @@ public interface FlexSQLAdmin
      */
     @WebMethod
     @GET
-    @Path("/query/{connection}/{sqlquerytype}/{sql}/{toomany}")
+    @Path("/query")
     @RolesAllowed( {"Admin","Authenticated"} )
-    public String execSQL(@PathParam("connection") String connection,
-        @PathParam("sqlquerytype") String sqlquerytype,
-        @PathParam("sql") String sql,
-        @PathParam("toomany") int toomany);
+    public String execSQL(
+    		@QueryParam("connection") @DefaultValue("server=;uid=;pwd=;database=;") String connection,
+    		@QueryParam("sqlquerytype") @DefaultValue("normal") String sqlquerytype,
+    		@QueryParam("sql") String sql,
+        @QueryParam("toomany") @DefaultValue("1000") int toomany);
     
     /**
      * Attempts to safely update data by checking for affected rows.

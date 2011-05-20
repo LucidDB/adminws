@@ -30,6 +30,9 @@ import java.sql.SQLException;
 
 import com.dynamobi.ws.api.ForeignDataService;
 import com.dynamobi.ws.domain.ForeignServer;
+import com.dynamobi.ws.domain.ForeignTable;
+import com.dynamobi.ws.domain.ForeignTables;
+import com.dynamobi.ws.domain.Option;
 import com.dynamobi.ws.domain.Wrapper;
 import com.dynamobi.ws.domain.WrapperOptions;
 import com.dynamobi.ws.domain.RemoteData;
@@ -280,11 +283,35 @@ public class ForeignDataServiceImpl implements ForeignDataService {
 
 public List<ForeignServer> getForeignServers(String wrapper)
 		throws AppException {
-	// TODO Auto-generated method stub
+
 	return DBAccess.getForeignServers(wrapper);
 }
-  
-  
-  
+
+
+public ForeignTable createForeignTable(ForeignTable foreignTable)
+throws AppException {
+	return DBAccess.createForeignTable(foreignTable);
+	
+}
+
+public ForeignTables listForeignTables(String catalog, String schema) {
+	ForeignTables tbs = new ForeignTables();
+	
+	ForeignTable ft = new ForeignTable();
+	ft.setName("tablename");
+	
+	List<Option> options = new ArrayList<Option>();
+	Option o;
+	o = new Option(); o.setName("name1"); options.add(o);
+	o = new Option(); o.setName("name2"); options.add(o);
+	
+	ft.setOptions(options);
+	
+	tbs.addForeignTable(ft);
+	
+	
+	return tbs;
+}
+
 
 }

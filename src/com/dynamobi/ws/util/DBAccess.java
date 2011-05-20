@@ -18,9 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 package com.dynamobi.ws.util;
 
-import java.io.FileNotFoundException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,24 +31,17 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
-import com.dynamobi.ws.domain.Catalog;
+
 import com.dynamobi.ws.domain.Column;
 import com.dynamobi.ws.domain.ColumnStats;
-import com.dynamobi.ws.domain.Counter;
-import com.dynamobi.ws.domain.DBMeta;
 import com.dynamobi.ws.domain.ForeignServer;
+import com.dynamobi.ws.domain.ForeignTable;
 import com.dynamobi.ws.domain.RelNode;
-import com.dynamobi.ws.domain.Schema;
 import com.dynamobi.ws.domain.ShowPlanEntity;
 import com.dynamobi.ws.domain.SystemParameter;
-import com.dynamobi.ws.domain.Table;
 import com.dynamobi.ws.domain.TableDetails;
-import com.dynamobi.ws.domain.TablesInfo;
-import com.dynamobi.ws.domain.SessionInfo;
-import com.dynamobi.ws.domain.Wrapper;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContextHolder;
+import com.dynamobi.ws.domain.Wrapper;
 
 /**
  * Get Tables' info from database
@@ -645,6 +636,33 @@ public class DBAccess
          
     	
     }
+    
+    public static ForeignTable createForeignTable ( ForeignTable ft) throws AppException {
+    	
+    	ForeignTable returnFT = null;
+    	try {
+			Connection conn = getConnection();
+			
+			StringBuffer sb = new StringBuffer();
+			// create foreign table catalog.schema.table
+			sb.append("CREATE FOREIGN TABLE \"" + ft.getCatalog() + "\"."
+						+ "\"" + ft.getSchema() + "\"."
+						+ "\"" + ft.getName() + "\"" + "\n");
+			sb.append("(\n");
+			
+			sb.append(")\n");
+			sb.append("server " );
+			
+
+		} catch (SQLException e) {
+			throw new AppException();
+		}
+		
+		return returnFT;
+		
+		
+    	
+    }
 
     public static String execSQL(
         String connection,
@@ -1104,6 +1122,8 @@ public class DBAccess
       }
       return rs;
     }
+    
+
 
     public static boolean postTableDetails(
         String catalogName,
@@ -1350,10 +1370,7 @@ public class DBAccess
       }
       return escaped;
     }
-
-    public static void main(String[] args)
-    {
-
-    }
+    
+    
 
 }

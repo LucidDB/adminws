@@ -18,13 +18,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 package com.dynamobi.ws.domain;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
-import com.sun.tools.javac.util.List;
-import com.sun.xml.internal.txw2.annotation.XmlElement;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="foreignServer")

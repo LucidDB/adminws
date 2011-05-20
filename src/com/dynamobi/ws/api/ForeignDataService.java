@@ -23,22 +23,28 @@ import java.util.List;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.annotation.security.PermitAll;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+
 import javax.annotation.security.RolesAllowed;
 
 import com.dynamobi.ws.domain.ForeignServer;
+import com.dynamobi.ws.domain.ForeignTable;
+import com.dynamobi.ws.domain.ForeignTables;
 import com.dynamobi.ws.domain.Wrapper;
 import com.dynamobi.ws.domain.WrapperOptions;
 import com.dynamobi.ws.domain.RemoteData;
 
 import com.dynamobi.ws.util.AppException;
+import com.sun.jersey.api.view.ImplicitProduces;
 
 /**
  * Service for handling all the foreign data wrappers/services
@@ -54,7 +60,6 @@ import com.dynamobi.ws.util.AppException;
  */
 
 @WebService(serviceName="ForeignDataService", name="ForeignDataService")
-
 public interface ForeignDataService {
 
   /**
@@ -170,7 +175,7 @@ public interface ForeignDataService {
    * @param server - Name of the foreign server to import from.
    * @param from_schema - Name of the foreign schema to import from.
    * @param to_schema - Name of the local schema to import into.
-   * @param tables - List of foreign table names to import.
+   * @param tables - List of foreign table names to import
    * @return Returns an empty string on success, otherwise an SQL error message.
    */
   @WebMethod
@@ -203,6 +208,32 @@ public interface ForeignDataService {
       @PathParam("from_table") String from_table,
       @PathParam("to_schema") String to_schema,
       @PathParam("to_table") String to_table) throws AppException;
+  
+  /**
+   * @param catalog Catalog the schema is in
+   * @param schema The schema name to create the foreign table in.
+   */
+  @WebMethod
+  @POST
+  @Path("/table")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  public ForeignTable createForeignTable(ForeignTable foreignTable) throws AppException;
+  
+  /**
+
+   */
+  @WebMethod
+  @GET
+  @Path("/table")
+  @RolesAllowed( {"Admin", "Authenticated"} )
+  @Produces("application/xml")
+  public  ForeignTables listForeignTables(
+		  @QueryParam(value ="catalog") @DefaultValue("LOCALDB") String catalog,
+		  @QueryParam(value ="schema") String schema) throws AppException;
+  
+
+  
+  
 
 
 }
