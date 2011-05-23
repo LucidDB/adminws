@@ -191,7 +191,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
 
   public String importForeignSchema(String server, String from_schema,
       String to_schema,
-      List<String> tables, boolean copy_local) throws AppException {
+      List<String> tables, String copy_local) throws AppException {
     if (from_schema == null || from_schema.equals("")) {
       String q = DB.select("option_value","sys_root.dba_foreign_server_options",
           DB.populate(
@@ -218,7 +218,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
     }
     query += DB.populate(" FROM SERVER {0,str} INTO {1,id}", server, to_schema);
     String ret = DB.execute_success(query);
-    if (copy_local) {
+    if (copy_local.toLowerCase().equals("true")) {
       for (String table : tables) {
         ret += copyForeignTable("LOCALDB", to_schema, table, to_schema,
             "local_" + table);

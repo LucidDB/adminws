@@ -176,6 +176,7 @@ public interface ForeignDataService {
    * @param from_schema - Name of the foreign schema to import from.
    * @param to_schema - Name of the local schema to import into.
    * @param tables - List of foreign table names to import
+   * @param copy_local - Whether to create local warehouses or not--send "true" or "false"
    * @return Returns an empty string on success, otherwise an SQL error message.
    */
   @WebMethod
@@ -186,7 +187,7 @@ public interface ForeignDataService {
   public String importForeignSchema(@PathParam("server") String server,
       @PathParam("from_schema") String from_schema,
       @PathParam("to_schema") String to_schema,
-      List<String> tables, @PathParam("copy_local") boolean copy_local)
+      List<String> tables, @PathParam("copy_local") String copy_local)
       throws AppException;
 
   /**
