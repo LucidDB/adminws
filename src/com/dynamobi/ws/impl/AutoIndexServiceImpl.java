@@ -47,15 +47,24 @@ public class AutoIndexServiceImpl
           , cat, schema, table, Integer.toString(threshold));
   }
 
-  public XMLStructure getCandidates(String cat, String schema, String table,
-      int threshold) throws AppException {
-    String tag = "column";
-    XMLStructure ds = new XMLStructure("indexes",
-        tag + " column_name");
+  private XMLStructure getCandidatesGen(String cat, String schema, String table,
+      int threshold, XMLStructure ds) throws AppException {
     final String query = DB.select("column_name",
         get_show_query(cat, schema, table, threshold));
     DB.execute(query, ds);
     return ds;
+  }
+
+  public XMLStructure getCandidates(String cat, String schema, String table,
+      int threshold) throws AppException {
+    XMLStructure ds = new XMLStructure("indexes", "column column_name");
+    return getCandidatesGen(cat, schema, table, threshold, ds);
+  }
+
+  public XMLStructure getCandidatesJson(String cat, String schema, String table,
+      int threshold) throws AppException {
+    XMLStructure ds = new XMLStructure("indexes", XMLStructure.Mode.JSON);
+    return getCandidatesGen(cat, schema, table, threshold, ds);
   }
 
   public String createIndexes(String cat, String schema, String table,

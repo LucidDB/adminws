@@ -29,12 +29,18 @@ import java.util.ArrayList;
  * into an XML string the client can use.
  * Mainly used for the Object Tree.
  *
+ * It also supports limited JSON: a root key name can be given that maps
+ * to an array of strings.
+ *
  * @author Kevin Secretan
  */
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="result")
 public class XMLStructure extends DBLoader<XMLStructure> {
+
+  public static enum Mode {XML, JSON};
+  public Mode mode;
 
   public String result;
 
@@ -44,31 +50,55 @@ public class XMLStructure extends DBLoader<XMLStructure> {
 
   private String root, child;
 
-  private void init(String root_node, String child_node) {
+  private void init(String root_node, String child_node, Mode md) {
+    mode = md;
     root = root_node;
     child = child_node;
-    result_builder = new StringBuffer("<" + root_node + ">\n");
-    if (child_node.equals(""))
-      result_builder.append("<![CDATA[\n");
-
+    if (mode == Mode.XML) {
+      result_builder = new StringBuffer("<" + root_node + ">\n");
+      if (child_node.equals(""))
+        result_builder.append("<![CDATA[\n");
+    } else {
+      result_builder = new StringBuffer("{\"" + root_node + "\": ");
+      if (child_node.equals("")) {
+        result_builder.append("[\n");
+      } else {
+        // UNSUPPORTED
+        //result_builder.append("{\n");
+      }
+    }
     row_data = new ArrayList<String>();
   }
 
   public XMLStructure() {
-    init("result", "");
+    init("result", "", Mode.XML);
   }
 
   public XMLStructure(String root_node) {
-    init(root_node, "");
+    init(root_node, "", Mode.XML);
   }
 
+  /**
+   * @param root_node - defines the name of the root XML node
+   * @param child_node - defines the name of the child node along with any
+   *                     following attributes separated by spaces.
+   */
   public XMLStructure(String root_node, String child_node) {
-    init(root_node, child_node);
+    init(root_node, child_node, Mode.XML);
+  }
+
+  /**
+   * Mainly a plug for JSON structures.
+   */
+  public XMLStructure(String root_node, Mode md) {
+    init(root_node, "", md);
   }
 
   public void loadRow(ResultSet rs) throws SQLException {
     if (child.equals("")) {
       String stmt = rs.getString(1);
+      if (mode == Mode.JSON)
+        stmt = "\"" + stmt.replaceAll("\"", "\\\"") + "\",";
       result_builder.append(stmt + "\n");
       row_data.add(stmt);
     } else {
@@ -88,9 +118,17 @@ public class XMLStructure extends DBLoader<XMLStructure> {
   }
 
   public void finalize() {
-    if (child.equals(""))
-      result_builder.append("]]>");
-    result_builder.append("</" + root + ">");
+    if (mode == Mode.XML) {
+      if (child.equals(""))
+        result_builder.append("]]>");
+      result_builder.append("</" + root + ">");
+    } else {
+      // kill last comma
+      result_builder.setCharAt(result_builder.length()-2, '\n');
+      if (child.equals(""))
+        result_builder.append("]");
+      result_builder.append("\n}");
+    }
     result = result_builder.toString();
   }
 
