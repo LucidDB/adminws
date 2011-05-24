@@ -42,7 +42,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 		<obj-c disabled="true" />
 		<docs splashPackage="com.dynamobi.ws.api" title="DynamoBI's API"
 			copyright="Dynamo Business Intelligence Corporation"
-			base="${basedir}/doc_look_and_feel">
+      base="${basedir}/doc_look_and_feel" xslt="${basedir}/doc_look_and_feel/transform.xslt">
 			<download name="License" file="LICENSE.txt"
 				description="The license file governing the use of this API." />
 		</docs>
