@@ -99,9 +99,13 @@ public class FlexSQLAdminImpl
         return ret;
     }
 
-    private XMLStructure getAuthIDs(String class_name) {
+    private XMLStructure getAuthIDs(String class_name, boolean json) {
       String lower = class_name.toLowerCase();
-      XMLStructure ds = new XMLStructure(lower + "s", lower + " label");
+      XMLStructure ds;
+      if (!json)
+        ds = new XMLStructure(lower + "s", lower + " label");
+      else
+        ds = new XMLStructure(lower + "s", XMLStructure.Mode.JSON);
       final String query = DB.select("name", "sys_root.dba_auth_ids",
           DB.populate("class_name = {0,lit} AND name <> '_SYSTEM' AND " +
             "name <> 'PUBLIC' ORDER BY name", class_name));
@@ -110,21 +114,36 @@ public class FlexSQLAdminImpl
     }
 
     public XMLStructure getUsers() {
-        return getAuthIDs("User");
+        return getAuthIDs("User", false);
+    }
+
+    public XMLStructure getUsersJson() {
+        return getAuthIDs("User", true);
     }
 
     public XMLStructure getRoles() {
-      return getAuthIDs("Role");
+      return getAuthIDs("Role", false);
+    }
+
+    public XMLStructure getRolesJson() {
+      return getAuthIDs("Role", true);
     }
 
     public String getForeignTables(String schema) {
       return "";
     }
 
-    private XMLStructure getRoutine(String schema, String type) {
+    private XMLStructure getRoutine(String schema, String type, boolean json) {
       String tag = type.toLowerCase();
-      XMLStructure ds = new XMLStructure(tag + "s",
-          tag + " label externalName isTableFunction isDeterministic");
+      XMLStructure ds;
+      if (!json) {
+        ds = new XMLStructure(tag + "s",
+            tag + " label externalName isTableFunction isDeterministic");
+      } else {
+        ds = new XMLStructure(tag + "s",
+            tag + " label externalName isTableFunction isDeterministic",
+            XMLStructure.Mode.JSON);
+      }
       final String query = DB.select("DISTINCT invocation_name, external_name, "
           + "is_table_function, is_deterministic ", "sys_root.dba_routines",
           DB.populate("schema_name = {0,lit} AND routine_type = {1,lit}",
@@ -134,14 +153,24 @@ public class FlexSQLAdminImpl
     }
 
     public XMLStructure getFunctions(String schema) {
-      return getRoutine(schema, "FUNCTION");
+      return getRoutine(schema, "FUNCTION", false);
+    }
+
+    public XMLStructure getFunctionsJson(String schema) {
+      return getRoutine(schema, "FUNCTION", true);
     }
 
     public XMLStructure getProcedures(String schema) {
-      return getRoutine(schema, "PROCEDURE");
+      return getRoutine(schema, "PROCEDURE", false);
+    }
+
+    public XMLStructure getProceduresJson(String schema) {
+      return getRoutine(schema, "PROCEDURE", true);
     }
 
     // WTF? Don't we have XML libraries for a reason?
+    // Yes, yes we do. :(
+    // TODO: fix this.
     public String getRemoteData() {
       StringBuffer result = new StringBuffer("<wrappers>\n");
       try {

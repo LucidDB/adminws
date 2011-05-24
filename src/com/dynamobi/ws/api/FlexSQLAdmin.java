@@ -29,6 +29,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.Produces;
 
 import com.dynamobi.ws.domain.*;
 
@@ -118,7 +119,20 @@ public interface FlexSQLAdmin
     @GET
     @Path("/getusers")
     @RolesAllowed( {"Admin","Authenticated"} )
+    @Produces("application/xml")
     public XMLStructure getUsers();
+
+    /**
+     * Gets a list of users for the object tree. (JSON version.)
+     * @return JSON-string of users.
+     * {"users": ["u1", "u2"]}
+     */
+    @WebMethod
+    @GET
+    @Path("/getusers")
+    @RolesAllowed( {"Admin","Authenticated"} )
+    @Produces("application/json")
+    public XMLStructure getUsersJson();
 
     /**
      * Gets a list of roles for the object tree.
@@ -129,11 +143,24 @@ public interface FlexSQLAdmin
     @GET
     @Path("/getroles")
     @RolesAllowed( {"Admin","Authenticated"} )
+    @Produces("application/xml")
     public XMLStructure getRoles();
 
     /**
+     * Gets a list of roles for the object tree.
+     * @return JSON-string of roles.
+     * {"roles": ["r1", "r2"]}
+     */
+    @WebMethod
+    @GET
+    @Path("/getroles")
+    @RolesAllowed( {"Admin","Authenticated"} )
+    @Produces("application/json")
+    public XMLStructure getRolesJson();
+
+    /**
      * Gets a list of foreign tables for the object tree.
-     * (UNIMPLEMENTED, returned with normal metadata.)
+     * (UNIMPLEMENTED, data returned with normal metadata.)
      * @param schema - Schema to get foreign tables in.
      * @return XML-string of foreign tables.
      * &lt;foreign_tables&gt;&lt;foreign_table label="name" /&gt;&lt;foreign_tables /&gt;
@@ -154,7 +181,21 @@ public interface FlexSQLAdmin
     @GET
     @Path("/getfunctions/{schema}")
     @RolesAllowed( {"Admin","Authenticated"} )
+    @Produces("application/xml")
     public XMLStructure getFunctions(@PathParam("schema") String schema);
+
+    /**
+     * Gets a list of functions for the object tree.
+     * @param schema - Schema to get functions in.
+     * @return JSON-string of functions.
+     * {"functions": [ {"label": "name"} ]}
+     */
+    @WebMethod
+    @GET
+    @Path("/getfunctions/{schema}")
+    @RolesAllowed( {"Admin","Authenticated"} )
+    @Produces("application/json")
+    public XMLStructure getFunctionsJson(@PathParam("schema") String schema);
 
     /**
      * Gets a list of procedures for the object tree.
@@ -166,7 +207,20 @@ public interface FlexSQLAdmin
     @GET
     @Path("/getprocedures/{schema}")
     @RolesAllowed( {"Admin","Authenticated"} )
+    @Produces("application/xml")
     public XMLStructure getProcedures(@PathParam("schema") String schema);
+
+    /**
+     * Gets a list of procedures for the object tree.
+     * @param schema - Schema to get procedures in.
+     * @return JSON-string of procedures.
+     */
+    @WebMethod
+    @GET
+    @Path("/getprocedures/{schema}")
+    @RolesAllowed( {"Admin","Authenticated"} )
+    @Produces("application/json")
+    public XMLStructure getProceduresJson(@PathParam("schema") String schema);
 
     /**
      * Gets a list of foreign data wrappers and servers for the object tree.

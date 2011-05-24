@@ -26,11 +26,12 @@ import java.util.ArrayList;
 
 /**
  * Useful structure for wrapping up some db values
- * into an XML string the client can use.
+ * into an XML or JSON string the client can use.
  * Mainly used for the Object Tree.
- *
- * It also supports limited JSON: a root key name can be given that maps
- * to an array of strings.
+ * It makes it easy to return lists of data.
+ * @see com.dynamobi.ws.api.AutoIndexService.getCandidatesJson
+ * and
+ * @see com.dynamobi.ws.api.FlexSQLAdmin.getUsersJson()
  *
  * @author Kevin Secretan
  */
@@ -59,13 +60,7 @@ public class XMLStructure extends DBLoader<XMLStructure> {
       if (child_node.equals(""))
         result_builder.append("<![CDATA[\n");
     } else {
-      result_builder = new StringBuffer("{\"" + root_node + "\": ");
-      if (child_node.equals("")) {
-        result_builder.append("[\n");
-      } else {
-        // UNSUPPORTED
-        //result_builder.append("{\n");
-      }
+      result_builder = new StringBuffer("{\"" + root_node + "\": [  \n");
     }
     row_data = new ArrayList<String>();
   }
@@ -94,6 +89,10 @@ public class XMLStructure extends DBLoader<XMLStructure> {
     init(root_node, "", md);
   }
 
+  public XMLStructure(String root_node, String child_node, Mode md) {
+    init(root_node, child_node, md);
+  }
+
   public void loadRow(ResultSet rs) throws SQLException {
     if (child.equals("")) {
       String stmt = rs.getString(1);
@@ -104,16 +103,30 @@ public class XMLStructure extends DBLoader<XMLStructure> {
     } else {
       String[] child_parts = child.split(" ");
       String node = child_parts[0];
-      result_builder.append("<" + node + " ");
+      if (mode == Mode.XML)
+        result_builder.append("<" + node + " ");
+      else
+        result_builder.append("{ ");
       int c = 0;
       for (int i = 1; i < child_parts.length; ++i) {
         String val = rs.getString(++c);
         val = (val == null) ? "" : val.replaceAll("\"", "&quot;");
-        result_builder.append(
-            DB.populate("{0,str}={1,id} ", child_parts[i], val));
+        if (mode == Mode.XML) {
+          result_builder.append(
+              DB.populate("{0,str}={1,id} ", child_parts[i], val));
+        } else {
+          if (i > 1) {
+            result_builder.append(", ");
+          }
+          result_builder.append("\"" + child_parts[i].replaceAll("\"", "&quot;")
+              + "\" : \"" + val + "\"");
+        }
         row_data.add(val);
       }
-      result_builder.append("/>\n");
+      if (mode == Mode.XML)
+        result_builder.append("/>\n");
+      else
+        result_builder.append("},\n");
     }
   }
 
@@ -125,9 +138,7 @@ public class XMLStructure extends DBLoader<XMLStructure> {
     } else {
       // kill last comma
       result_builder.setCharAt(result_builder.length()-2, '\n');
-      if (child.equals(""))
-        result_builder.append("]");
-      result_builder.append("\n}");
+      result_builder.append("]\n}");
     }
     result = result_builder.toString();
   }
