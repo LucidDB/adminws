@@ -205,8 +205,12 @@ public class FlexSQLAdminImpl
       return result.toString();
     }
 
-    public XMLStructure getJars(String schema) {
-      XMLStructure ds = new XMLStructure("jars", "jar label");
+    private XMLStructure getJarsGen(String schema, boolean json) {
+      XMLStructure ds;
+      if (!json)
+        ds = new XMLStructure("jars", "jar label");
+      else
+        ds = new XMLStructure("jars", "jar label", XMLStructure.Mode.JSON);
       final String query = DB.select("\"name\"",
           DB.populate("sys_fem.{0,id}.{1,id} j INNER JOIN " +
             "sys_boot.jdbc_metadata.schemas_view_internal svi " +
@@ -216,13 +220,29 @@ public class FlexSQLAdminImpl
       DB.execute(query, ds);
       return ds;
     }
+    public XMLStructure getJars(String schema) {
+      return getJarsGen(schema, false);
+    }
+    public XMLStructure getJarsJson(String schema) {
+      return getJarsGen(schema, true);
+    }
 
-    public XMLStructure getSchemaDdl(String catalog, String schema) {
-      XMLStructure ds = new XMLStructure("statement");
+    private XMLStructure getSchemaDdlGen(String catalog, String schema, boolean json) {
+      XMLStructure ds;
+      if (!json)
+        ds = new XMLStructure("statement");
+      else
+        ds = new XMLStructure("statement", XMLStructure.Mode.JSON);
       final String query = DB.select("statement", DB.populate(
             "table(sys_root.generate_ddl_for_schema({0,lit}, {1,lit}))",
             catalog, schema));
       DB.execute(query, ds);
       return ds;
+    }
+    public XMLStructure getSchemaDdl(String catalog, String schema) {
+      return getSchemaDdlGen(catalog, schema, false);
+    }
+    public XMLStructure getSchemaDdlJson(String catalog, String schema) {
+      return getSchemaDdlGen(catalog, schema, true);
     }
 }

@@ -241,7 +241,20 @@ public interface FlexSQLAdmin
     @GET
     @Path("/getjars/{schema}")
     @RolesAllowed( {"Admin", "Authenticated"} )
+    @Produces("application/xml")
     public XMLStructure getJars(@PathParam("schema") String schema);
+
+    /**
+     * Gets a list of jars for a schema's tree.
+     * @param schema - Schema to get jars for.
+     * @return JSON-string of jars.
+     */
+    @WebMethod
+    @GET
+    @Path("/getjars/{schema}")
+    @RolesAllowed( {"Admin", "Authenticated"} )
+    @Produces("application/json")
+    public XMLStructure getJarsJson(@PathParam("schema") String schema);
 
     /**
      * Gets the DDL for the given schema.
@@ -255,5 +268,19 @@ public interface FlexSQLAdmin
     @Path("/ddl/schema/{catalog}/{schema}")
     @RolesAllowed( {"Admin", "Authenticated"} )
     public XMLStructure getSchemaDdl(@PathParam("catalog") String catalog,
+        @PathParam("schema") String schema);
+
+    /**
+     * Gets the DDL for the given schema.
+     * @param catalog - Catalog of schema
+     * @param schema - Schema to get ddl for.
+     * @return Returns a &lt;statement&gt; list with the string of
+     * the ddl as its values.
+     */
+    @WebMethod
+    @GET
+    @Path("/ddl/schema/{catalog}/{schema}")
+    @RolesAllowed( {"Admin", "Authenticated"} )
+    public XMLStructure getSchemaDdlJson(@PathParam("catalog") String catalog,
         @PathParam("schema") String schema);
 }
