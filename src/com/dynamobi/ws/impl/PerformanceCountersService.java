@@ -26,6 +26,7 @@ import javax.jws.WebService;
 import javax.ws.rs.Path;
 
 import com.dynamobi.ws.domain.Counter;
+import com.dynamobi.ws.domain.CounterHolder;
 import com.dynamobi.ws.util.AppException;
 import com.dynamobi.ws.util.DB;
 
@@ -60,7 +61,7 @@ public class PerformanceCountersService
     /* (non-Javadoc)
      * @see com.dynamobi.api.PerformanceCountersService#getAllPerformanceCounters()
      */
-    public List<Counter> getAllPerformanceCounters()
+    public CounterHolder getAllPerformanceCounters()
         throws AppException
     {
       List<Counter> retVal = new ArrayList<Counter>();
@@ -71,10 +72,12 @@ public class PerformanceCountersService
       Counter commander = new Counter();
       commander.list_mode = true;
       DB.execute(query, commander, retVal);
-      return retVal;
+      CounterHolder r = new CounterHolder();
+      r.counters = retVal;
+      return r;
     }
 
-    public List<Counter> getCountersByNames(String names)
+    public CounterHolder getCountersByNames(String names)
       throws AppException {
       List<Counter> retVal = new ArrayList<Counter>();
       String query = DB.select(
@@ -85,6 +88,8 @@ public class PerformanceCountersService
       Counter commander = new Counter();
       commander.list_mode = true;
       DB.execute(query, commander, retVal);
-      return retVal;
+      CounterHolder r = new CounterHolder();
+      r.counters = retVal;
+      return r;
     }
 }

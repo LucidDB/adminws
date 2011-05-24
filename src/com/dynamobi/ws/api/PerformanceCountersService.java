@@ -18,8 +18,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 package com.dynamobi.ws.api;
 
-import java.util.List;
-
 import javax.jws.WebService;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -30,6 +28,7 @@ import javax.annotation.security.RolesAllowed;
 
 import com.dynamobi.ws.domain.Counter;
 import com.dynamobi.ws.util.AppException;
+import com.dynamobi.ws.domain.CounterHolder;
 
 /**
  * Service for retrieving some performance information about
@@ -48,7 +47,7 @@ public interface PerformanceCountersService
     @GET
     @Path("/")
     @RolesAllowed( {"Admin", "Authenticated"} )
-    List<Counter> getAllPerformanceCounters() throws AppException;
+    CounterHolder getAllPerformanceCounters() throws AppException;
 
     /**
      * Return demanded counters.
@@ -59,7 +58,7 @@ public interface PerformanceCountersService
     @GET
     @Path("/list/{names}")
     @RolesAllowed( {"Admin", "Authenticated"} )
-    List<Counter> getCountersByNames(@PathParam("names") String names)
+    CounterHolder getCountersByNames(@PathParam("names") String names)
     throws AppException;
 
     /**
