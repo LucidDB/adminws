@@ -35,6 +35,7 @@ import com.dynamobi.ws.domain.ForeignTables;
 import com.dynamobi.ws.domain.Option;
 import com.dynamobi.ws.domain.Wrapper;
 import com.dynamobi.ws.domain.WrapperOptions;
+import com.dynamobi.ws.domain.WrapperOptionsHolder;
 import com.dynamobi.ws.domain.RemoteData;
 import com.dynamobi.ws.domain.XMLStructure;
 
@@ -52,7 +53,7 @@ import com.dynamobi.ws.util.DBAccess;
 @Path("/foreign_data")
 public class ForeignDataServiceImpl implements ForeignDataService {
 
-  public List<WrapperOptions> getWrapperOptions(String wrapper)
+  public WrapperOptionsHolder getWrapperOptions(String wrapper)
       throws AppException {
     List<WrapperOptions> options_list = new ArrayList<WrapperOptions>();
     WrapperOptions first = new WrapperOptions();
@@ -68,11 +69,13 @@ public class ForeignDataServiceImpl implements ForeignDataService {
         "option_choice_ordinal = -1 ") +
       " order by option_ordinal ";
     DB.execute(query, first, options_list);
-    return options_list;
+    WrapperOptionsHolder ret = new WrapperOptionsHolder();
+    ret.options = options_list;
+    return ret;
   }
   
 
-  public List<WrapperOptions> getExtendedWrapperOptions(String wrapper,
+  public WrapperOptionsHolder getExtendedWrapperOptions(String wrapper,
       String driver) throws AppException {
     List<WrapperOptions> options_list = new ArrayList<WrapperOptions>();
     WrapperOptions first = new WrapperOptions(true); // is_extended
@@ -90,10 +93,12 @@ public class ForeignDataServiceImpl implements ForeignDataService {
         "option_choice_ordinal = -1 ") +
       "order by option_ordinal ";
     DB.execute(query, first, options_list);
-    return options_list;
+    WrapperOptionsHolder ret = new WrapperOptionsHolder();
+    ret.options = options_list;
+    return ret;
   }
 
-  public List<WrapperOptions> getWrapperOptionsForServer(String server)
+  public WrapperOptionsHolder getWrapperOptionsForServer(String server)
       throws AppException {
     List<WrapperOptions> options_list = new ArrayList<WrapperOptions>();
     WrapperOptions first = new WrapperOptions("for_server");
@@ -101,7 +106,9 @@ public class ForeignDataServiceImpl implements ForeignDataService {
         "sys_root.dba_foreign_server_options",
         DB.populate("foreign_server_name = {0,lit}", server));
     DB.execute(query, first, options_list);
-    return options_list;
+    WrapperOptionsHolder ret = new WrapperOptionsHolder();
+    ret.options = options_list;
+    return ret;
   }
 
   public String createServer(String server_name, String wrapper_name,
@@ -274,43 +281,42 @@ public class ForeignDataServiceImpl implements ForeignDataService {
     return DB.execute_success(query);
   }
 
+  // Nick, stop using DBAccess!
   public List<Wrapper> getWrappers() throws AppException {
-	// TODO Auto-generated method stub
-	return DBAccess.getWrappers();
-	
+    return DBAccess.getWrappers();
   }
 
 
 public List<ForeignServer> getForeignServers(String wrapper)
-		throws AppException {
+    throws AppException {
 
-	return DBAccess.getForeignServers(wrapper);
+  return DBAccess.getForeignServers(wrapper);
 }
 
 
 public ForeignTable createForeignTable(ForeignTable foreignTable)
 throws AppException {
-	return DBAccess.createForeignTable(foreignTable);
-	
+  return DBAccess.createForeignTable(foreignTable);
+  
 }
 
 public ForeignTables listForeignTables(String catalog, String schema) {
-	ForeignTables tbs = new ForeignTables();
-	
-	ForeignTable ft = new ForeignTable();
-	ft.setName("tablename");
-	
-	List<Option> options = new ArrayList<Option>();
-	Option o;
-	o = new Option(); o.setName("name1"); options.add(o);
-	o = new Option(); o.setName("name2"); options.add(o);
-	
-	ft.setOptions(options);
-	
-	tbs.addForeignTable(ft);
-	
-	
-	return tbs;
+  ForeignTables tbs = new ForeignTables();
+  
+  ForeignTable ft = new ForeignTable();
+  ft.setName("tablename");
+  
+  List<Option> options = new ArrayList<Option>();
+  Option o;
+  o = new Option(); o.setName("name1"); options.add(o);
+  o = new Option(); o.setName("name2"); options.add(o);
+  
+  ft.setOptions(options);
+  
+  tbs.addForeignTable(ft);
+  
+  
+  return tbs;
 }
 
 

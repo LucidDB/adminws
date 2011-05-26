@@ -28,11 +28,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
+import org.codehaus.enunciate.jaxrs.TypeHint;
 
 import javax.annotation.security.RolesAllowed;
 
@@ -41,6 +41,7 @@ import com.dynamobi.ws.domain.ForeignTable;
 import com.dynamobi.ws.domain.ForeignTables;
 import com.dynamobi.ws.domain.Wrapper;
 import com.dynamobi.ws.domain.WrapperOptions;
+import com.dynamobi.ws.domain.WrapperOptionsHolder;
 import com.dynamobi.ws.domain.RemoteData;
 
 import com.dynamobi.ws.util.AppException;
@@ -71,7 +72,7 @@ public interface ForeignDataService {
   @GET
   @Path("/wrappers/options/{wrapper}")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public List<WrapperOptions> getWrapperOptions(
+  public WrapperOptionsHolder getWrapperOptions(
       @PathParam("wrapper") String wrapper) throws AppException;
   
   /**
@@ -92,6 +93,7 @@ public interface ForeignDataService {
   @GET
   @Path("/servers/getByWrapper/{wrapper}")
   @RolesAllowed( {"Admin", "Authenticated"} )
+  //@TypeHint(ForeignServer.class)
   public List<ForeignServer> getForeignServers(
       @PathParam("wrapper") String wrapper) throws AppException;
   
@@ -105,7 +107,7 @@ public interface ForeignDataService {
   @GET
   @Path("/wrappers/options/extended/{wrapper}/{driver}")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public List<WrapperOptions> getExtendedWrapperOptions(
+  public WrapperOptionsHolder getExtendedWrapperOptions(
       @PathParam("wrapper") String wrapper,
       @PathParam("driver") String driver) throws AppException;
 
@@ -118,7 +120,7 @@ public interface ForeignDataService {
   @GET
   @Path("/servers/options/{server}")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public List<WrapperOptions> getWrapperOptionsForServer(
+  public WrapperOptionsHolder getWrapperOptionsForServer(
       @PathParam("server") String server) throws AppException;
 
   /**
@@ -211,31 +213,32 @@ public interface ForeignDataService {
       @PathParam("to_table") String to_table) throws AppException;
   
   /**
+   * Creates a new foreign table definition.
    * @param catalog Catalog the schema is in
    * @param schema The schema name to create the foreign table in.
+   * @return Returns the newly created foreign table.
    */
   @WebMethod
   @POST
   @Path("/table")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public ForeignTable createForeignTable(ForeignTable foreignTable) throws AppException;
+  public ForeignTable createForeignTable(@FormParam("foreignTable") ForeignTable foreignTable) throws AppException;
   
   /**
-
+   * Gets a list of foreign tables
+   * (UNIMPLEMENTED)
+   * @param catalog - Catalog of schema, default of localdb
+   * @param schema - Schema to get foreign tables in.
+   * @return XML or JSON list of foreign tables.
    */
   @WebMethod
   @GET
   @Path("/table")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  @Produces("application/xml")
-  public  ForeignTables listForeignTables(
-		  @QueryParam(value ="catalog") @DefaultValue("LOCALDB") String catalog,
-		  @QueryParam(value ="schema") String schema) throws AppException;
+  @Produces( {"application/xml", "application/json"} )
+  public ForeignTables listForeignTables(
+      @QueryParam(value ="catalog") @DefaultValue("LOCALDB") String catalog,
+      @QueryParam(value ="schema") String schema) throws AppException;
   
-
-  
-  
-
-
 }
 

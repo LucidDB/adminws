@@ -129,10 +129,6 @@ public class FlexSQLAdminImpl
       return getAuthIDs("Role", true);
     }
 
-    public String getForeignTables(String schema) {
-      return "";
-    }
-
     private XMLStructure getRoutine(String schema, String type, boolean json) {
       String tag = type.toLowerCase();
       XMLStructure ds;
@@ -168,9 +164,6 @@ public class FlexSQLAdminImpl
       return getRoutine(schema, "PROCEDURE", true);
     }
 
-    // WTF? Don't we have XML libraries for a reason?
-    // Yes, yes we do. :(
-    // TODO: fix this.
     public String getRemoteData() {
       StringBuffer result = new StringBuffer("<wrappers>\n");
       try {

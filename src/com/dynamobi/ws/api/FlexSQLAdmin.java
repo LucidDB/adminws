@@ -159,19 +159,6 @@ public interface FlexSQLAdmin
     public XMLStructure getRolesJson();
 
     /**
-     * Gets a list of foreign tables for the object tree.
-     * (UNIMPLEMENTED, data returned with normal metadata.)
-     * @param schema - Schema to get foreign tables in.
-     * @return XML-string of foreign tables.
-     * &lt;foreign_tables&gt;&lt;foreign_table label="name" /&gt;&lt;foreign_tables /&gt;
-     */
-    @WebMethod
-    @GET
-    @Path("/getforeigntables/{schema}")
-    @RolesAllowed( {"Admin","Authenticated"} )
-    public String getForeignTables(@PathParam("schema") String schema);
-
-    /**
      * Gets a list of functions for the object tree.
      * @param schema - Schema to get functions in.
      * @return XML-string of functions.
