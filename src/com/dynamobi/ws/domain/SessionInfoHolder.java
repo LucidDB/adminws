@@ -28,13 +28,20 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.List;
 import java.util.ArrayList;
 
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement(name="sessioninfoholder")
 public class SessionInfoHolder  {
 
-  @XmlElement public List<SessionInfo> sessions;
+  public List<SessionInfo> sessions;
 
   public SessionInfoHolder() {
     sessions = new ArrayList<SessionInfo>();
   }
+
+  // Auto-generated for AMF
+  @XmlElement
+  public List<SessionInfo> getSessions() { return sessions; }
+  public void setSessions(List<SessionInfo> sessions) { this.sessions = sessions; }
+
 }
+
