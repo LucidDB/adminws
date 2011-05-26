@@ -267,6 +267,7 @@ public interface FlexSQLAdmin
     @GET
     @Path("/ddl/schema/{catalog}/{schema}")
     @RolesAllowed( {"Admin", "Authenticated"} )
+    @Produces("application/xml")
     public XMLStructure getSchemaDdl(@PathParam("catalog") String catalog,
         @PathParam("schema") String schema);
 
@@ -281,6 +282,7 @@ public interface FlexSQLAdmin
     @GET
     @Path("/ddl/schema/{catalog}/{schema}")
     @RolesAllowed( {"Admin", "Authenticated"} )
+    @Produces("application/json")
     public XMLStructure getSchemaDdlJson(@PathParam("catalog") String catalog,
         @PathParam("schema") String schema);
 }

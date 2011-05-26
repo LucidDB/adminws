@@ -1045,7 +1045,7 @@
             </xsl:choose>
           </xsl:if>
         </xsl:when>
-        <xsl:otherwise>(custom)</xsl:otherwise>
+        <xsl:otherwise>(custom text)</xsl:otherwise>
       </xsl:choose>
     </td>
   </xsl:template>

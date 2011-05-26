@@ -23,11 +23,13 @@ import java.util.List;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.FormParam;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
@@ -65,9 +67,9 @@ public interface TableDetailsService {
   @WebMethod
   @POST
   @Path("/{catalog}/{schema}")
-  @Consumes ("application/xml")
+  @Produces("text/plain")
   public String createSchema(@PathParam("catalog") String catalog,
-      String schema) throws AppException;
+      @PathParam("schema") String schema) throws AppException;
 
 
   /**
@@ -96,9 +98,11 @@ public interface TableDetailsService {
   @POST
   @Path("/{catalog}/{schema}/{table}")
   @RolesAllowed( {"Admin","Authenticated"} )
-  @Consumes ("application/xml")
-    public boolean postTableDetails(@PathParam("catalog") String catalog,
+  @Consumes ( {"application/xml", "application/json"} )
+  @Produces("text/plain")
+  public boolean postTableDetails(@PathParam("catalog") String catalog,
         @PathParam("schema") String schema,
-        @PathParam("table") String table, TableDetails details);
+        @PathParam("table") String table,
+        @FormParam("details") TableDetails details);
 
 }
