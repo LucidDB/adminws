@@ -18,8 +18,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 package com.dynamobi.ws.api;
 
-import java.util.List;
-
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.ws.rs.Consumes;

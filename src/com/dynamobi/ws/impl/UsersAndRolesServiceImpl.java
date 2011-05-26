@@ -30,7 +30,9 @@ import java.sql.SQLException;
 
 import com.dynamobi.ws.api.UsersAndRolesService;
 import com.dynamobi.ws.domain.UserDetails;
+import com.dynamobi.ws.domain.UserDetailsHolder;
 import com.dynamobi.ws.domain.SessionInfo;
+import com.dynamobi.ws.domain.SessionInfoHolder;
 import com.dynamobi.ws.domain.RolesDetails;
 import com.dynamobi.ws.domain.UserPermsDetails;
 import com.dynamobi.ws.domain.RolesDetailsHolder;
@@ -50,17 +52,19 @@ import com.dynamobi.ws.util.DB;
 public class UsersAndRolesServiceImpl implements UsersAndRolesService {
 
 
-  public List<UserDetails> getUsersDetails() throws AppException {
+  public UserDetailsHolder getUsersDetails() throws AppException {
     List<UserDetails> details = new ArrayList<UserDetails>();
     UserDetails seed = new UserDetails();
     final String query = "SELECT name, password, creation_timestamp, "
       + "last_modified_timestamp FROM sys_root.dba_users u WHERE "
       + "u.name <> '_SYSTEM'";
     DB.execute(query, seed, details);
-    return details;
+    UserDetailsHolder ret = new UserDetailsHolder();
+    ret.details = details;
+    return ret;
   }
 
-  public List<SessionInfo> getCurrentSessions() throws AppException {
+  public SessionInfoHolder getCurrentSessions() throws AppException {
     List<SessionInfo> retVal = new ArrayList<SessionInfo>();
     SessionInfo seed = new SessionInfo();
     final String query = DB.select("s.session_id, s.connect_url, " +
@@ -68,7 +72,9 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
         "LEFT JOIN sys_root.dba_sql_statements s2 ON " +
         "s.session_id = s2.session_id");
     DB.execute(query, seed, retVal);
-    return retVal;
+    SessionInfoHolder ret = new SessionInfoHolder();
+    ret.sessions = retVal;
+    return ret;
   }
 
   private enum Action { NEW, MOD, DEL };

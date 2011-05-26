@@ -32,7 +32,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 import com.dynamobi.ws.domain.UserDetails;
+import com.dynamobi.ws.domain.UserDetailsHolder;
 import com.dynamobi.ws.domain.SessionInfo;
+import com.dynamobi.ws.domain.SessionInfoHolder;
 import com.dynamobi.ws.domain.RolesDetails;
 import com.dynamobi.ws.domain.RolesDetailsHolder;
 import com.dynamobi.ws.domain.PermissionGroup;
@@ -66,7 +68,7 @@ public interface UsersAndRolesService {
   @GET
   @Path("/")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public List<UserDetails> getUsersDetails() throws AppException;
+  public UserDetailsHolder getUsersDetails() throws AppException;
 
   /**
    * @return Returns a list of currently active user sessions along with any
@@ -76,7 +78,7 @@ public interface UsersAndRolesService {
   @GET
   @Path("/sessions")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public List<SessionInfo> getCurrentSessions() throws AppException;
+  public SessionInfoHolder getCurrentSessions() throws AppException;
 
   /**
    * @param user - Name of the user.
