@@ -30,10 +30,12 @@ import java.sql.SQLException;
 
 import com.dynamobi.ws.api.ForeignDataService;
 import com.dynamobi.ws.domain.ForeignServer;
+import com.dynamobi.ws.domain.ForeignServerHolder;
 import com.dynamobi.ws.domain.ForeignTable;
 import com.dynamobi.ws.domain.ForeignTables;
 import com.dynamobi.ws.domain.Option;
 import com.dynamobi.ws.domain.Wrapper;
+import com.dynamobi.ws.domain.WrapperHolder;
 import com.dynamobi.ws.domain.WrapperOptions;
 import com.dynamobi.ws.domain.WrapperOptionsHolder;
 import com.dynamobi.ws.domain.RemoteData;
@@ -282,15 +284,18 @@ public class ForeignDataServiceImpl implements ForeignDataService {
   }
 
   // Nick, stop using DBAccess!
-  public List<Wrapper> getWrappers() throws AppException {
-    return DBAccess.getWrappers();
+  public WrapperHolder getWrappers() throws AppException {
+    WrapperHolder ret = new WrapperHolder();
+    ret.wrappers = DBAccess.getWrappers();
+    return ret;
   }
 
 
-public List<ForeignServer> getForeignServers(String wrapper)
+public ForeignServerHolder getForeignServers(String wrapper)
     throws AppException {
-
-  return DBAccess.getForeignServers(wrapper);
+  ForeignServerHolder ret = new ForeignServerHolder();
+  ret.servers = DBAccess.getForeignServers(wrapper);
+  return ret;
 }
 
 

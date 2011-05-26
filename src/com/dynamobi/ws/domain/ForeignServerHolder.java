@@ -26,18 +26,17 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
 import java.util.List;
-import java.util.ArrayList;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlRootElement(name="sessioninfoholder")
-public class SessionInfoHolder  {
+@XmlRootElement(name="foreignserverholder")
+public class ForeignServerHolder  {
 
-  public List<SessionInfo> sessions;
+  public List<ForeignServer> servers;
 
   // Auto-generated for AMF
   @XmlElement
-  public List<SessionInfo> getSessions() { return sessions; }
-  public void setSessions(List<SessionInfo> sessions) { this.sessions = sessions; }
+  public List<ForeignServer> getServers() { return servers; }
+  public void setServers(List<ForeignServer> servers) { this.servers = servers; }
 
 }
 

@@ -26,18 +26,17 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
 import java.util.List;
-import java.util.ArrayList;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlRootElement(name="sessioninfoholder")
-public class SessionInfoHolder  {
+@XmlRootElement(name="wrapperholder")
+public class WrapperHolder  {
 
-  public List<SessionInfo> sessions;
+  public List<Wrapper> wrappers;
 
   // Auto-generated for AMF
   @XmlElement
-  public List<SessionInfo> getSessions() { return sessions; }
-  public void setSessions(List<SessionInfo> sessions) { this.sessions = sessions; }
+  public List<Wrapper> getWrappers() { return wrappers; }
+  public void setWrappers(List<Wrapper> wrappers) { this.wrappers = wrappers; }
 
 }
 

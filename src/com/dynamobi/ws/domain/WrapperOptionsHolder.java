@@ -34,10 +34,6 @@ public class WrapperOptionsHolder  {
 
   public List<WrapperOptions> options;
 
-  public WrapperOptionsHolder() {
-    options = new ArrayList<WrapperOptions>();
-  }
-
   // Auto-generated for AMF
   @XmlElement
   public List<WrapperOptions> getOptions() { return options; }

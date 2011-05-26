@@ -37,9 +37,11 @@ import org.codehaus.enunciate.jaxrs.TypeHint;
 import javax.annotation.security.RolesAllowed;
 
 import com.dynamobi.ws.domain.ForeignServer;
+import com.dynamobi.ws.domain.ForeignServerHolder;
 import com.dynamobi.ws.domain.ForeignTable;
 import com.dynamobi.ws.domain.ForeignTables;
 import com.dynamobi.ws.domain.Wrapper;
+import com.dynamobi.ws.domain.WrapperHolder;
 import com.dynamobi.ws.domain.WrapperOptions;
 import com.dynamobi.ws.domain.WrapperOptionsHolder;
 import com.dynamobi.ws.domain.RemoteData;
@@ -83,7 +85,7 @@ public interface ForeignDataService {
   @GET
   @Path("/wrappers")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  public List<Wrapper> getWrappers() throws AppException;
+  public WrapperHolder getWrappers() throws AppException;
   
   /**
    * @param wrapper - Name of the foreign data wrapper.
@@ -93,8 +95,7 @@ public interface ForeignDataService {
   @GET
   @Path("/servers/getByWrapper/{wrapper}")
   @RolesAllowed( {"Admin", "Authenticated"} )
-  //@TypeHint(ForeignServer.class)
-  public List<ForeignServer> getForeignServers(
+  public ForeignServerHolder getForeignServers(
       @PathParam("wrapper") String wrapper) throws AppException;
   
 
