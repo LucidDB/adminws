@@ -20,7 +20,7 @@ public class DBSessionHolder {
 	
 	private Connection sessionConnection;
 
-	public Connection getSessionConnection() {
+	public synchronized Connection getSessionConnection() {
 		if ( sessionConnection == null ) {
 			try {
 				init();
