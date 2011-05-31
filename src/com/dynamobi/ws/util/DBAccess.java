@@ -71,6 +71,10 @@ public class DBAccess
       return DB.getConnection();
     }
 
+    public static void releaseConnection() {
+      DB.releaseConnection();
+    }
+
     public static SystemParameter findSystemParameterByName(String paramName)
         throws AppException
     {
@@ -106,6 +110,9 @@ public class DBAccess
 
             try {
 
+                if (conn != null) {
+                  releaseConnection();
+                }
                 if (rs != null) {
                     rs.close();
                 }
@@ -161,6 +168,9 @@ public class DBAccess
 
             try {
 
+                if (conn != null) {
+                  releaseConnection();
+                }
                 if (rs != null) {
                     rs.close();
                 }
@@ -210,6 +220,9 @@ public class DBAccess
 
             try {
 
+                if (conn != null) {
+                  releaseConnection();
+                }
                 if (ps != null) {
                     ps.close();
                 }
@@ -268,6 +281,9 @@ public class DBAccess
 
             try {
 
+                if (conn != null) {
+                  releaseConnection();
+                }
                 if (rs != null) {
                     rs.close();
                 }
@@ -364,6 +380,9 @@ public class DBAccess
 
             try {
 
+                if (conn != null) {
+                  releaseConnection();
+                }
                 if (rs != null) {
                     rs.close();
                 }
@@ -540,6 +559,9 @@ public class DBAccess
 
             try {
 
+                if (conn != null) {
+                  releaseConnection();
+                }
                 if (rs != null) {
                     rs.close();
                 }
@@ -563,7 +585,7 @@ public class DBAccess
     	
     	List<ForeignServer> retVal = new ArrayList<ForeignServer>();
     	
-    	Connection conn;
+    	Connection conn = null;
     	PreparedStatement ps;
     	ResultSet rs;
     	
@@ -594,7 +616,11 @@ public class DBAccess
              e.printStackTrace();
              throw new AppException(
                  "Error Info: The connection was bad or Execute sql statment failed!");
-         } 
+         } finally {
+           if (conn != null) {
+             releaseConnection();
+           }
+         }
          
          return retVal;
          
@@ -605,7 +631,7 @@ public class DBAccess
     	
     	List<Wrapper> retVal = new ArrayList<Wrapper>();
     	
-    	Connection conn;
+    	Connection conn = null;
     	PreparedStatement ps;
     	ResultSet rs;
     	
@@ -630,7 +656,11 @@ public class DBAccess
              e.printStackTrace();
              throw new AppException(
                  "Error Info: The connection was bad or Execute sql statment failed!");
-         } 
+         } finally {
+           if (conn != null) {
+             releaseConnection();
+           }
+         }
          
          return retVal;
          
@@ -640,8 +670,9 @@ public class DBAccess
     public static ForeignTable createForeignTable ( ForeignTable ft) throws AppException {
     	
     	ForeignTable returnFT = null;
+      Connection conn = null;
     	try {
-			Connection conn = getConnection();
+			conn = getConnection();
 			
 			StringBuffer sb = new StringBuffer();
 			// create foreign table catalog.schema.table
@@ -656,7 +687,11 @@ public class DBAccess
 
 		} catch (SQLException e) {
 			throw new AppException();
-		}
+		} finally {
+      if (conn != null) {
+        releaseConnection();
+      }
+    }
 		
 		return returnFT;
 		
@@ -934,6 +969,9 @@ public class DBAccess
 
             try {
 
+                if (conn != null) {
+                  releaseConnection();
+                }
                 if (rs != null) {
                     rs.close();
                 }
@@ -1063,6 +1101,9 @@ public class DBAccess
 
             try {
 
+                if (conn != null) {
+                  releaseConnection();
+                }
                 if (rs != null) {
                     rs.close();
                 }
@@ -1119,7 +1160,12 @@ public class DBAccess
         throw ex;
       } catch (Exception ex) {
         ex.printStackTrace();
+      } finally {
+        if (conn != null) {
+          releaseConnection();
+        }
       }
+
       return rs;
     }
     
@@ -1254,6 +1300,9 @@ public class DBAccess
 
             try {
 
+                if (conn != null) {
+                  releaseConnection();
+                }
                 if (rs != null) {
                     rs.close();
                 }

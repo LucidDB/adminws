@@ -60,6 +60,12 @@ public class DB {
    
   }
 
+  public static void releaseConnection() {
+    WebApplicationContext wac = ContextLoader.getCurrentWebApplicationContext();
+    DBSessionHolder dsh = (DBSessionHolder) wac.getBean("sessionConnection");
+    dsh.releaseSessionConnection();
+  }
+
   /**
    * @param query
    *        Query represents a basic structure similar in form to
@@ -187,6 +193,9 @@ public class DB {
     } catch (Exception ex) {
       ex.printStackTrace();
     } finally {
+      if (conn != null) {
+        releaseConnection();
+      }
       try {
         if (ps != null) {
           ps.close();
@@ -194,7 +203,6 @@ public class DB {
       } catch (SQLException ex1) {
         ex1.printStackTrace();
       }
-      
       try {
         if (rs != null) {
           rs.close();

@@ -15,12 +15,22 @@ import org.springframework.web.context.WebApplicationContext;
 public class DBSessionHolder {
 	
 	public DBSessionHolder() {
-		
+    busy_session = false;
 	}
 	
 	private Connection sessionConnection;
+  private boolean busy_session;
 
 	public synchronized Connection getSessionConnection() {
+    while (busy_session) {
+      try {
+        Thread.sleep(200);
+      } catch (InterruptedException e) {
+        // request could have been terminated, ignore.
+        e.printStackTrace();
+      }
+    }
+    busy_session = true;
 		if ( sessionConnection == null ) {
 			try {
 				init();
@@ -31,6 +41,10 @@ public class DBSessionHolder {
 		}
 		return sessionConnection;
 	}
+
+  public void releaseSessionConnection() {
+    busy_session = false;
+  }
 
 	public void setSessionConnection(Connection sessionConnection) {
 		this.sessionConnection = sessionConnection;
