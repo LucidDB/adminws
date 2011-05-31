@@ -30,7 +30,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
-import com.dynamobi.ws.domain.ColumnStats;
+import com.dynamobi.ws.domain.ColumnStatsHolder;
 import com.dynamobi.ws.util.AppException;
 
 /**
@@ -50,7 +50,7 @@ public interface ColumnStatsService
      */
     @GET
     @RolesAllowed( { "Admin", "Authenticated" })
-    List<ColumnStats> getAllColumnStats()
+    ColumnStatsHolder getAllColumnStats()
         throws AppException;
 
     /**
@@ -62,7 +62,7 @@ public interface ColumnStatsService
     @GET
     @Path("/find")
     @RolesAllowed( { "Admin", "Authenticated" })
-    List<ColumnStats> findColumnStats(@QueryParam("catalog")
+    ColumnStatsHolder findColumnStats(@QueryParam("catalog")
     String catalogName, @QueryParam("schema")
     String schemaName, @QueryParam("table")
     String tableName, @QueryParam("column")

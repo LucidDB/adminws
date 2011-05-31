@@ -28,6 +28,7 @@ import javax.ws.rs.Path;
 
 import com.dynamobi.ws.api.ColumnStatsService;
 import com.dynamobi.ws.domain.ColumnStats;
+import com.dynamobi.ws.domain.ColumnStatsHolder;
 import com.dynamobi.ws.util.AppException;
 import com.dynamobi.ws.util.DBAccess;
 
@@ -48,7 +49,7 @@ public class ColumnStatsServiceImpl
     /* (non-Javadoc)
      * @see com.dynamobi.api.ColumnStatsService#findColumnStats(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
-    public List<ColumnStats> findColumnStats(
+    public ColumnStatsHolder findColumnStats(
         String catalogName,
         String schemaName,
         String tableName,
@@ -59,17 +60,21 @@ public class ColumnStatsServiceImpl
             schemaName,
             tableName,
             columnName);
-        return list;
+        ColumnStatsHolder ret = new ColumnStatsHolder();
+        ret.stats = list;
+        return ret;
     }
 
     /* (non-Javadoc)
      * @see com.dynamobi.api.ColumnStatsService#getAllColumnStats()
      */
-    public List<ColumnStats> getAllColumnStats()
+    public ColumnStatsHolder getAllColumnStats()
         throws AppException
     {
         List<ColumnStats> list = DBAccess.getAllColumnStats();
-        return list;
+        ColumnStatsHolder ret = new ColumnStatsHolder();
+        ret.stats = list;
+        return ret;
     }
 
 }

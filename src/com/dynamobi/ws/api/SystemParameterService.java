@@ -28,6 +28,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import com.dynamobi.ws.domain.SystemParameter;
+import com.dynamobi.ws.domain.SystemParameterHolder;
 import com.dynamobi.ws.util.AppException;
 
 @WebService
@@ -38,7 +39,7 @@ public interface SystemParameterService
      * @return a list of SystemParameter
      */
     @GET
-    List<SystemParameter> getAllSystemParameters() throws AppException;
+    SystemParameterHolder getAllSystemParameters() throws AppException;
     
     /**
      * Read special system parameter thru parameter name

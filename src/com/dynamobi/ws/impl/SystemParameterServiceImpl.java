@@ -25,6 +25,7 @@ import javax.ws.rs.Path;
 
 import com.dynamobi.ws.api.SystemParameterService;
 import com.dynamobi.ws.domain.SystemParameter;
+import com.dynamobi.ws.domain.SystemParameterHolder;
 import com.dynamobi.ws.util.AppException;
 import com.dynamobi.ws.util.DBAccess;
 
@@ -42,10 +43,12 @@ public class SystemParameterServiceImpl
         return entity;
     }
 
-    public List<SystemParameter> getAllSystemParameters() throws AppException
+    public SystemParameterHolder getAllSystemParameters() throws AppException
     {
         List<SystemParameter> list = DBAccess.getAllSystemParameters();
-        return list;
+        SystemParameterHolder ret = new SystemParameterHolder();
+        ret.params = list;
+        return ret;
     }
 
     public boolean updateSystemParameter(String paramName, String paramValue) throws AppException
