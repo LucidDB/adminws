@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 		<xfire-client disabled="true" />
     <!-- If you get a flex error about a Fonts.ser file, change your
          flex-config.xml file and uncomment the local-fonts-snapshot item.-->
-    <amf disabled="false" flexHome="${FLEX_HOME}" swcDownloadable="true" asSourcesDownloadable="true" >
+    <amf disabled="true" flexHome="${FLEX_HOME}" swcDownloadable="true" asSourcesDownloadable="true" >
 	<compiler>
 		<arg>-compiler.fonts.local-fonts-snapshot</arg>
 		<arg>${FLEX_HOME}/frameworks/localFonts.ser</arg>

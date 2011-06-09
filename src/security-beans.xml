@@ -70,7 +70,7 @@ where username = ?]]>
 			</value>
 		</property>
 		<property name="dataSource">
-			<ref bean="dataSource"/>
+			<ref bean="myDataSource"/>
 		</property>
 	</bean>
 	
@@ -81,17 +81,13 @@ where username = ?]]>
 		<constructor-arg value="256" />
 	</bean>
 
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-    <property name="driverClassName"> <value>org.luciddb.jdbc.LucidDbClientDriver</value> </property>
-    <property name="url"> <value>jdbc:luciddb:http://localhost</value> </property>
-   <property name="username" value="sa"/>
-   <property name="password" value=""/>
-  </bean>
-
- 	 <bean id="myDataSource" class="org.springframework.jdbc.datasource.UserCredentialsDataSourceAdapter">
-   <property name="targetDataSource" ref="dataSource"/>
- </bean>	
+  <bean id="myDataSource" class="com.dynamobi.ws.util.UserToDataSource" />
 
 <bean id="sessionConnection" class="com.dynamobi.ws.util.DBSessionHolder" scope="session" destroy-method="cleanup"></bean>
+
+<!--<bean id="schedule" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+  <property name="waitForJobsToCompleteOnShutdown" value="true" />
+  <property name="dataSource" ref="myDataSource" />
+</bean>-->
 
 </beans>
