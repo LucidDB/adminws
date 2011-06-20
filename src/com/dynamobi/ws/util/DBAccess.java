@@ -891,7 +891,7 @@ public class DBAccess
                 for (int i = 0; i < colCnt; i++) {
 
                     int index = i + 1;
-                    datamap += rs.getMetaData().getColumnName(index);
+                    datamap += rs.getMetaData().getColumnName(index).replaceAll(" ", "&nbsp;");
                     if (index < colCnt) {
                         datamap += ",";
                     }

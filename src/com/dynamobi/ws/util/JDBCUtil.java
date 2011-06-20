@@ -45,7 +45,7 @@ public class JDBCUtil
         while (rs.next()) {
             ret.append("<Table>");  
             for (int i = 1; i <= colCount; i++) {
-                String columnName = rsmd.getColumnName(i);
+                String columnName = rsmd.getColumnName(i).replaceAll(" ", "&nbsp;");
                 String value = rs.getString(i);
                 if (value != null && (value.indexOf("<") != -1 || value.indexOf(">") != -1)) {
                   value = "<![CDATA[" + value + "]]>";
