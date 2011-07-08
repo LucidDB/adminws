@@ -51,9 +51,19 @@ public class DBSessionHolder {
     final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     WebApplicationContext wac = ContextLoader.getCurrentWebApplicationContext();
     UserToDataSource ds = (UserToDataSource) wac.getBean("myDataSource");
-		  
+
+    boolean badConnection = false;
+    try {
+      if (sessionConnection != null) {
+        badConnection = (sessionConnection.isClosed() || sessionConnection.isReadOnly());
+        sessionConnection.createStatement();
+      }
+    } catch (java.sql.SQLException e) {
+      badConnection = true;
+    }
+
 		if ( sessionConnection == null || auth.getName() != ds.getUsername() ||
-        auth.getCredentials().toString() != ds.getPassword()) {
+        auth.getCredentials().toString() != ds.getPassword() || badConnection) {
 			try {
         if (sessionConnection != null) {
           sessionConnection.close();
