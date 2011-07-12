@@ -182,7 +182,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
       query = DB.select("distinct table_name, column_name, ordinal, " +
           "formatted_datatype as column_type, description, default_value ",
           DB.populate(
-            "table(sys_boot.mgmt.browse_foreign_columns({0,lit}, {1,lit}))",
+            "table(sys_boot.mgmt.browse_foreign_schema_columns({0,lit}, {1,lit}))",
             server_name, schema_name) + " ORDER BY table_name, ordinal");
       DB.execute(query, remote_data);
       // mysteriously sometimes this causes an error in some dark corner
