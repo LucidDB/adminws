@@ -53,7 +53,7 @@ public class TableDetailsServiceImpl implements TableDetailsService {
         "dst.last_analyze_timestamp, dst.current_row_count, " +
         "dst.deleted_row_count,dt.table_type",
         "sys_boot.mgmt.dba_stored_tables_internal1 dst join " +
-        "sys_root.dba_tables dt on dst.\"lineageId\" = dt.lineage_id",
+        "localdb.sys_root.dba_tables dt on dst.\"lineageId\" = dt.lineage_id",
         DB.populate(
           "dt.catalog_name = {0,lit} and dt.schema_name = {1,lit} and " +
           "dt.table_name = {2,lit}", catalog, schema, table));
@@ -64,7 +64,7 @@ public class TableDetailsServiceImpl implements TableDetailsService {
         "dc.\"PRECISION\", dc.dec_digits, dc.is_nullable, dc.remarks, " +
         "dcs.distinct_value_count, dcs.is_distinct_value_count_estimated, " +
         "dcs.last_analyze_time, dc.default_value",
-        "sys_root.dba_columns dc left join sys_root.dba_column_stats " +
+        "localdb.sys_root.dba_columns dc left join localdb.sys_root.dba_column_stats " +
         "dcs on dc.table_name = dcs.table_name and " +
         "dc.schema_name = dcs.schema_name and " +
         "dc.catalog_name = dcs.catalog_name and " +

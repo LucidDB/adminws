@@ -44,8 +44,6 @@ public class DB {
 
   private DB() { }
 
-  public static String connection_catalog = "";
-
   public static Connection getConnection()
     throws SQLException
   {
@@ -168,13 +166,6 @@ public class DB {
 
     try {
       conn = getConnection();
-      if (!connection_catalog.equals("")) {
-        ps = conn.prepareStatement("SET CATALOG '" + connection_catalog + "'");
-        connection_catalog = "";
-      } else {
-        ps = conn.prepareStatement("SET CATALOG 'LOCALDB'");
-      }
-      ps.execute();
       ps = conn.prepareStatement(query);
       ps.setMaxRows(0);
       if (ps.execute()) {

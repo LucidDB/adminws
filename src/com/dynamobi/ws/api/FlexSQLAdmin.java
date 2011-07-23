@@ -272,4 +272,15 @@ public interface FlexSQLAdmin
     @Produces("application/json")
     public XMLStructure getSchemaDdlJson(@PathParam("catalog") String catalog,
         @PathParam("schema") String schema);
+
+    /**
+     * Simply grabs the current catalog for the user's connection,
+     * only returns its name.
+     */
+    @WebMethod
+    @GET
+    @Path("/current-catalog")
+    @RolesAllowed( {"Admin", "Authenticated"} )
+    @Produces("application/json")
+    public Catalog getCurrentCatalog();
 }

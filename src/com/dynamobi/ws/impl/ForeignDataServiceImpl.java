@@ -105,7 +105,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
     List<WrapperOptions> options_list = new ArrayList<WrapperOptions>();
     WrapperOptions first = new WrapperOptions("for_server");
     final String query = DB.select("option_name, option_value",
-        "sys_root.dba_foreign_server_options",
+        "localdb.sys_root.dba_foreign_server_options",
         DB.populate("foreign_server_name = {0,lit}", server));
     DB.execute(query, first, options_list);
     WrapperOptionsHolder ret = new WrapperOptionsHolder();
@@ -149,7 +149,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
     // unique column identifiers.
     start = System.currentTimeMillis();
     String query = DB.select("schema_name, table_name, column_name, datatype",
-        "sys_root.dba_columns c INNER JOIN sys_root.dba_foreign_tables f " +
+        "localdb.sys_root.dba_columns c INNER JOIN localdb.sys_root.dba_foreign_tables f " +
         DB.populate("ON foreign_server_name = {0,lit} AND ", server_name) +
         " table_name = foreign_table_name ORDER BY schema_name, table_name, " +
         "column_name");
@@ -202,7 +202,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
       String to_schema,
       List<String> tables, String copy_local) throws AppException {
     if (from_schema == null || from_schema.equals("")) {
-      String q = DB.select("option_value","sys_root.dba_foreign_server_options",
+      String q = DB.select("option_value","localdb.sys_root.dba_foreign_server_options",
           DB.populate(
             "foreign_server_name={0,lit} and option_name='SCHEMA_NAME'",
             server));
@@ -241,7 +241,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
   {
     // do we need to create to_table?
     String q = DB.select("table_name",
-        "sys_root.dba_tables",
+        "localdb.sys_root.dba_tables",
         DB.populate("catalog_name={0,lit} and schema_name={1,lit} and " +
           "table_name={2,lit}", catalog, to_schema, to_table));
     XMLStructure exist_check = new XMLStructure("tab");
@@ -257,7 +257,7 @@ public class ForeignDataServiceImpl implements ForeignDataService {
     if (create) {
       // get structure of from table
       q = DB.select("statement", DB.populate(
-          "table(sys_root.generate_ddl_for_table({0,lit}, {1, lit}, {2, lit}))",
+          "table(localdb.sys_root.generate_ddl_for_table({0,lit}, {1, lit}, {2, lit}))",
             catalog, from_schema, from_table));
       XMLStructure stmt = new XMLStructure("stmt");
       DB.execute(q, stmt);

@@ -56,7 +56,7 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
     List<UserDetails> details = new ArrayList<UserDetails>();
     UserDetails seed = new UserDetails();
     final String query = "SELECT name, password, creation_timestamp, "
-      + "last_modified_timestamp FROM sys_root.dba_users u WHERE "
+      + "last_modified_timestamp FROM localdb.sys_root.dba_users u WHERE "
       + "u.name <> '_SYSTEM'";
     DB.execute(query, seed, details);
     UserDetailsHolder ret = new UserDetailsHolder();
@@ -68,8 +68,8 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
     List<SessionInfo> retVal = new ArrayList<SessionInfo>();
     SessionInfo seed = new SessionInfo();
     final String query = DB.select("s.session_id, s.connect_url, " +
-        "s.current_user_name, s2.sql_text", "sys_root.dba_sessions s " +
-        "LEFT JOIN sys_root.dba_sql_statements s2 ON " +
+        "s.current_user_name, s2.sql_text", "localdb.sys_root.dba_sessions s " +
+        "LEFT JOIN localdb.sys_root.dba_sql_statements s2 ON " +
         "s.session_id = s2.session_id");
     DB.execute(query, seed, retVal);
     SessionInfoHolder ret = new SessionInfoHolder();
@@ -110,7 +110,7 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
       + "CASE WHEN r.inherited_role_name IS NOT NULL THEN r.inherited_role_name "
       + "WHEN grant_type = 'Role' THEN grantee END AS role_name, "
       + "grant_type, class_name, g.with_grant_option "
-      + "FROM sys_root.dba_element_grants g LEFT OUTER JOIN sys_root.dba_inherited_roles r "
+      + "FROM localdb.sys_root.dba_element_grants g LEFT OUTER JOIN localdb.sys_root.dba_inherited_roles r "
       + "ON action = 'INHERIT_ROLE' AND r.inherited_role_mof_id = element_mof_id "
       + "WHERE grantee NOT IN ('PUBLIC', '_SYSTEM') AND "
       + "grantor <> '_SYSTEM'";
@@ -123,7 +123,7 @@ public class UsersAndRolesServiceImpl implements UsersAndRolesService {
     DB.execute(query, rh);
 
     RolesDetails rd = new RolesDetails(rh);
-    query = DB.select("name", "sys_root.dba_roles", "name <> 'PUBLIC'");
+    query = DB.select("name", "localdb.sys_root.dba_roles", "name <> 'PUBLIC'");
     DB.execute(query, rd);
 
     return rh;

@@ -106,7 +106,7 @@ public class FlexSQLAdminImpl
         ds = new XMLStructure(lower + "s", lower + " label");
       else
         ds = new XMLStructure(lower + "s", XMLStructure.Mode.JSON);
-      final String query = DB.select("name", "sys_root.dba_auth_ids",
+      final String query = DB.select("name", "localdb.sys_root.dba_auth_ids",
           DB.populate("class_name = {0,lit} AND name <> '_SYSTEM' AND " +
             "name <> 'PUBLIC' ORDER BY name", class_name));
       DB.execute(query, ds);
@@ -141,7 +141,7 @@ public class FlexSQLAdminImpl
             XMLStructure.Mode.JSON);
       }
       final String query = DB.select("DISTINCT invocation_name, external_name, "
-          + "is_table_function, is_deterministic ", "sys_root.dba_routines",
+          + "is_table_function, is_deterministic ", "localdb.sys_root.dba_routines",
           DB.populate("schema_name = {0,lit} AND routine_type = {1,lit}",
             schema, type));
       DB.execute(query, ds);
@@ -168,8 +168,8 @@ public class FlexSQLAdminImpl
       StringBuffer result = new StringBuffer("<wrappers>\n");
       try {
         final String query = "SELECT w.foreign_wrapper_name, w.library, "
-          + "s.foreign_server_name FROM sys_root.dba_foreign_wrappers w "
-          + "left outer join sys_root.dba_foreign_servers s ON "
+          + "s.foreign_server_name FROM localdb.sys_root.dba_foreign_wrappers w "
+          + "left outer join localdb.sys_root.dba_foreign_servers s ON "
           + "s.foreign_wrapper_name = w.foreign_wrapper_name "
           + "ORDER BY w.foreign_wrapper_name";
         ResultSet rs = DBAccess.rawResultExec(query);
@@ -227,7 +227,7 @@ public class FlexSQLAdminImpl
       else
         ds = new XMLStructure("statement", XMLStructure.Mode.JSON);
       final String query = DB.select("statement", DB.populate(
-            "table(sys_root.generate_ddl_for_schema({0,lit}, {1,lit}))",
+            "table(localdb.sys_root.generate_ddl_for_schema({0,lit}, {1,lit}))",
             catalog, schema));
       DB.execute(query, ds);
       return ds;
@@ -237,5 +237,17 @@ public class FlexSQLAdminImpl
     }
     public XMLStructure getSchemaDdlJson(String catalog, String schema) {
       return getSchemaDdlGen(catalog, schema, true);
+    }
+
+    public Catalog getCurrentCatalog() {
+      Catalog c = new Catalog();
+      try {
+        Connection conn = DB.getConnection();
+        c.name = conn.getCatalog();
+      } catch (SQLException e) {
+        e.printStackTrace();
+        c.name = "ERROR OCCURRED FETCHING CATALOG";
+      }
+      return c;
     }
 }

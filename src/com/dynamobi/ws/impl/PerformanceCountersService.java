@@ -52,7 +52,7 @@ public class PerformanceCountersService
 
       final String query = DB.select(
           "source_name, counter_name, counter_units, counter_value",
-          "SYS_ROOT.DBA_PERFORMANCE_COUNTERS",
+          "localdb.SYS_ROOT.DBA_PERFORMANCE_COUNTERS",
           DB.populate("counter_name = {0,lit}", counterName));
       DB.execute(query, retVal);
       return retVal;
@@ -68,7 +68,7 @@ public class PerformanceCountersService
 
       final String query = DB.select(
           "counter_category, counter_subcategory, source_name, counter_name, " +
-          "counter_units, counter_value ", "sys_root.dba_performance_counters");
+          "counter_units, counter_value ", "localdb.sys_root.dba_performance_counters");
       Counter commander = new Counter();
       commander.list_mode = true;
       DB.execute(query, commander, retVal);
@@ -82,7 +82,7 @@ public class PerformanceCountersService
       List<Counter> retVal = new ArrayList<Counter>();
       String query = DB.select(
           "counter_category, counter_subcategory, source_name, counter_name, " +
-          "counter_units, counter_value", "sys_root.dba_performance_counters",
+          "counter_units, counter_value", "localdb.sys_root.dba_performance_counters",
           DB.populate("counter_name IN ({0,lit_list})",
             Arrays.asList(names.split(","))));
       Counter commander = new Counter();

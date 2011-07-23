@@ -89,7 +89,7 @@ public class DBAccess
 
             conn = getConnection();
 
-            ps = conn.prepareStatement("select param_name, param_value from sys_root.dba_system_parameters where param_name = ?");
+            ps = conn.prepareStatement("select param_name, param_value from localdb.sys_root.dba_system_parameters where param_name = ?");
             ps.setString(1, paramName);
             rs = ps.executeQuery();
 
@@ -147,7 +147,7 @@ public class DBAccess
 
             conn = getConnection();
 
-            ps = conn.prepareStatement("select param_name, param_value from sys_root.dba_system_parameters");
+            ps = conn.prepareStatement("select param_name, param_value from localdb.sys_root.dba_system_parameters");
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -254,7 +254,7 @@ public class DBAccess
 
             conn = getConnection();
 
-            ps = conn.prepareStatement("select catalog_name, schema_name, table_name, column_name, distinct_value_count, is_distinct_value_count_estimated, percent_sampled, sample_size from sys_root.dba_column_stats");
+            ps = conn.prepareStatement("select catalog_name, schema_name, table_name, column_name, distinct_value_count, is_distinct_value_count_estimated, percent_sampled, sample_size from localdb.sys_root.dba_column_stats");
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -324,7 +324,7 @@ public class DBAccess
             StringBuffer sql = new StringBuffer();
 
             List<String> myConditions = new ArrayList<String>();
-            sql.append("select catalog_name, schema_name, table_name, column_name, distinct_value_count, is_distinct_value_count_estimated, percent_sampled, sample_size from sys_root.dba_column_stats where ");
+            sql.append("select catalog_name, schema_name, table_name, column_name, distinct_value_count, is_distinct_value_count_estimated, percent_sampled, sample_size from localdb.sys_root.dba_column_stats where ");
             if (catalogName != null && !catalogName.isEmpty()) {
                 myConditions.add("catalog_name = '" + catalogName + "'");
             }
@@ -430,9 +430,9 @@ public class DBAccess
                 + "c.\"PRECISION\" AS Length, "
                 + "c.is_nullable AS Nullable, "
                 + "c.datatype AS DataType "
-                + "from sys_root.dba_schemas s "
-                + "LEFT OUTER JOIN sys_root.dba_columns c ON c.schema_name = s.schema_name AND c.catalog_name = s.catalog_name "
-                + "LEFT OUTER JOIN sys_root.dba_tables t ON t.table_name = c.table_name "
+                + "from localdb.sys_root.dba_schemas s "
+                + "LEFT OUTER JOIN localdb.sys_root.dba_columns c ON c.schema_name = s.schema_name AND c.catalog_name = s.catalog_name "
+                + "LEFT OUTER JOIN localdb.sys_root.dba_tables t ON t.table_name = c.table_name "
                 + "where s.catalog_name = ? "
                 + "order by schema_name,ObjectType,Object,ColumnOrder");
             ps.setString(1, catalog);
@@ -595,7 +595,7 @@ public class DBAccess
 
              ps = conn.prepareStatement("select FOREIGN_WRAPPER_NAME, foreign_server_name "
             		 + " , remarks"
-            		 + " from sys_root.dba_foreign_servers"
+            		 + " from localdb.sys_root.dba_foreign_servers"
             		 + " where foreign_wrapper_name = ?");
              ps.setString(1, wrapper);
              rs = ps.executeQuery();
@@ -640,7 +640,7 @@ public class DBAccess
              conn = getConnection();
 
              ps = conn.prepareStatement("select FOREIGN_WRAPPER_NAME, LIBRARY "
-            		 + "FROM SYS_ROOT.DBA_FOREIGN_WRAPPERS");
+            		 + "FROM localdb.SYS_ROOT.DBA_FOREIGN_WRAPPERS");
              rs = ps.executeQuery();
 
              while (rs.next()) {
@@ -1189,7 +1189,7 @@ public class DBAccess
             conn = getConnection();
 
             StringBuffer sb = new StringBuffer();
-            sb.append("select count(1) from sys_root.dba_tables where ");
+            sb.append("select count(1) from localdb.sys_root.dba_tables where ");
             sb.append(" TABLE_TYPE = 'LOCAL TABLE'");
             sb.append(" AND catalog_name = ? ");
             sb.append(" AND schema_name = ? ");
@@ -1223,7 +1223,7 @@ public class DBAccess
                 ps = conn.prepareStatement("select dc.lineage_id, dc.column_name, dc.ordinal_position, dc.datatype,"
                     + "dc.\"PRECISION\", dc.dec_digits, dc.is_nullable, dc.remarks, dcs.distinct_value_count, dcs.is_distinct_value_count_estimated, "
                     + "dcs.last_analyze_time "
-                    + "from sys_root.dba_columns dc left join sys_root.dba_column_stats dcs on dc.table_name "
+                    + "from localdb.sys_root.dba_columns dc left join localdb.sys_root.dba_column_stats dcs on dc.table_name "
                     + " = dcs.table_name and dc.schema_name = dcs.schema_name and dc.catalog_name = dcs.catalog_name "
                     + "and dc.column_name = dcs.column_name "
                     + "where dc.catalog_name = ? and dc.schema_name = ? "
