@@ -41,7 +41,7 @@ public class DBSessionHolder {
 	public synchronized Connection getSessionConnection() {
     while (busy_session) {
       try {
-        Thread.sleep(200);
+        Thread.sleep(300);
       } catch (InterruptedException e) {
         // request could have been terminated, ignore.
         e.printStackTrace();
@@ -55,8 +55,7 @@ public class DBSessionHolder {
     boolean badConnection = false;
     try {
       if (sessionConnection != null) {
-        badConnection = (sessionConnection.isClosed() || sessionConnection.isReadOnly());
-        sessionConnection.createStatement();
+        badConnection = (sessionConnection.isClosed() || sessionConnection.isReadOnly() || !sessionConnection.isValid(5));
       }
     } catch (java.sql.SQLException e) {
       badConnection = true;

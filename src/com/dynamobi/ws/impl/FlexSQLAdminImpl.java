@@ -247,6 +247,8 @@ public class FlexSQLAdminImpl
       } catch (SQLException e) {
         e.printStackTrace();
         c.name = "ERROR OCCURRED FETCHING CATALOG";
+      } finally {
+        DB.releaseConnection();
       }
       return c;
     }
