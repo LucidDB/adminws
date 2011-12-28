@@ -432,7 +432,7 @@ public class DBAccess
                 + "c.datatype AS DataType "
                 + "from localdb.sys_root.dba_schemas s "
                 + "LEFT OUTER JOIN localdb.sys_root.dba_columns c ON c.schema_name = s.schema_name AND c.catalog_name = s.catalog_name "
-                + "LEFT OUTER JOIN localdb.sys_root.dba_tables t ON t.table_name = c.table_name "
+                + "LEFT OUTER JOIN localdb.sys_root.dba_tables t ON t.table_name = c.table_name AND t.schema_name = c.schema_name AND t.catalog_name = c.catalog_name "
                 + "where s.catalog_name = ? "
                 + "order by schema_name,ObjectType,Object,ColumnOrder");
             ps.setString(1, catalog);
